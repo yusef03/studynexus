@@ -12,7 +12,9 @@
       "email": "E-Mail-Adresse",
       "password": "Passwort",
       "confirmPassword": "Passwort bestätigen",
-      "fullName": "Vollständiger Name"
+      "fullName": "Vollständiger Name",
+      "showPassword": "Passwort anzeigen",
+      "hidePassword": "Passwort verbergen"
     },
     "login": {
       "title": "Willkommen zurück",

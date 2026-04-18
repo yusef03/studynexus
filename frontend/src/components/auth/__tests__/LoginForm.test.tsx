@@ -35,18 +35,30 @@ describe("LoginForm", () => {
     });
 
     render(<LoginForm locale="de" />);
-    fireEvent.submit(screen.getByRole("button").closest("form")!);
+    fireEvent.submit(screen.getByRole("button", { name: "login.submit" }).closest("form")!);
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("Invalid email or password");
     });
   });
 
+  it("toggles password visibility on eye button click", async () => {
+    render(<LoginForm locale="de" />);
+    const passwordInput = screen.getByLabelText("fields.password");
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    fireEvent.click(screen.getByLabelText("fields.showPassword"));
+    expect(passwordInput).toHaveAttribute("type", "text");
+
+    fireEvent.click(screen.getByLabelText("fields.hidePassword"));
+    expect(passwordInput).toHaveAttribute("type", "password");
+  });
+
   it("shows network error when fetch throws", async () => {
     global.fetch = jest.fn().mockRejectedValue(new Error("Network error"));
 
     render(<LoginForm locale="de" />);
-    fireEvent.submit(screen.getByRole("button").closest("form")!);
+    fireEvent.submit(screen.getByRole("button", { name: "login.submit" }).closest("form")!);
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toBeInTheDocument();
