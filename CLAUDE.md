@@ -9,9 +9,9 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS – Gamified Study and Collaboration Platform
-**Status:** 🟡 Sprint 0 – Setup and Requirements done
+**Status:** 🟡 Sprint 1 – Docker/Infrastructure setup done, Auth next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-04-18
+**Last Updated:** 2026-04-18 (Session 2)
 
 ---
 
@@ -121,12 +121,21 @@ studynexus/
 - [x] Domain Model Diagram drawn (class diagram)
 - [x] All committed and pushed to GitHub
 
+## Completed Steps (Session 2 – Sprint 1 Issue #1)
+
+- [x] docker-compose.yml (Next.js + FastAPI + PostgreSQL + Redis, health checks)
+- [x] .env.example with all required variables
+- [x] frontend/ – Next.js 14 App Router, TypeScript, Tailwind CSS, shadcn/ui, next-intl (DE/EN), PWA manifest
+- [x] backend/ – FastAPI, SQLAlchemy, Alembic, Pydantic v2, User model, security utils
+- [x] backend/tests/ – pytest with mocked DB, conftest, test_health
+- [x] docs/api/health.md
+
 ## Next Steps
 
 - [ ] GitHub Projects Scrum Board einrichten
-- [ ] Sprint-Plan definieren (alle Sprints mit Zielen)
-- [ ] docker-compose.yml base setup
-- [ ] Sprint 1 beginnen: Auth + User Management
+- [ ] Sprint 1: Auth endpoints (register, login, JWT) – backend/app/routers/auth.py
+- [ ] Sprint 1: Auth.js v5 integration on the frontend
+- [ ] Run first Alembic migration for users table
 
 ---
 

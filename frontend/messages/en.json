@@ -1,0 +1,10 @@
+{
+  "home": {
+    "title": "StudyNexus",
+    "description": "Your gamified study platform – study smarter, not harder.",
+    "cta": {
+      "register": "Get started",
+      "login": "Sign in"
+    }
+  }
+}
