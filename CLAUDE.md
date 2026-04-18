@@ -8,10 +8,10 @@
 ## Project Overview
 
 **Name:** StudyNexus
-**Type:** B2C SaaS – Gamified Study & Collaboration Platform
-**Status:** 🟡 Setup Phase
+**Type:** B2C SaaS – Gamified Study and Collaboration Platform
+**Status:** 🟡 Sprint 0 – Setup and Requirements done
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2025-04-18
+**Last Updated:** 2026-04-18
 
 ---
 
@@ -31,12 +31,13 @@
 
 ## Architecture Decisions
 
-- **Monorepo** structure: frontend/ and backend/ in one repo
-- **API-first**: FastAPI backend exposes REST API, Next.js consumes it
-- **Mobile-First PWA**: responsive, offline-capable
-- **i18n from day 1**: German + English (next-intl)
-- **DSGVO compliant**: data encrypted, strict permission model
-- **Freemium-ready**: architecture supports free/premium tiers
+- Monorepo structure: frontend/ and backend/ in one repo
+- API-first: FastAPI backend exposes REST API, Next.js consumes it
+- Mobile-First PWA: responsive, offline-capable
+- i18n from day 1: German and English (next-intl)
+- DSGVO compliant: AES-256 at rest, TLS 1.3 in transit, strict permission model
+- Freemium-ready: architecture supports free/premium tiers
+- Shell: fish shell – always use fish-compatible commands (no heredoc EOF)
 
 ---
 
@@ -45,6 +46,9 @@
 studynexus/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
+│   │   ├── user_story.md
+│   │   ├── bug_report.md
+│   │   └── feature_request.md
 │   ├── workflows/
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── frontend/
@@ -52,64 +56,106 @@ studynexus/
 ├── docs/
 │   ├── architecture/
 │   ├── requirements/
-│   └── sprints/
-├── docker-compose.yml
+│   │   ├── use-cases.md
+│   │   ├── domain-model.md
+│   │   └── nfas.md
+│   ├── sprints/
+│   └── api/
 ├── CLAUDE.md
 └── README.md
 
 ---
 
+## Actors and Domain
+
+### Actors
+- Anonymer Besucher: can only register
+- Studierender: primary user, all features
+- Globale PO-Datenbank: external technical actor
+- KI-Subsystem: internal, not an actor
+
+### Key Use Cases
+- UC02 Studiengang auswaehlen (includes UC03 PO synchronisieren)
+- UC09 PDF-Skripte hochladen (extended by UC10 Karteikarten generieren)
+
+### Domain Classes
+- Studierender, Pruefungsordnung, Modul, Termin, Study Space, Dokument
+
+---
+
+## NFAs Summary
+
+| ID | Kategorie | Wichtigstes Kriterium |
+|---|---|---|
+| NFA-01 | Datenschutz | DSGVO-konform, Noten streng privat |
+| NFA-02 | Sicherheit | AES-256, TLS 1.3, bcrypt |
+| NFA-03 | Portierbarkeit | PWA Score >= 90, Mobile-First |
+| NFA-04 | Zuverlaessigkeit | Offline-faehig, 99.5% Uptime |
+| NFA-05 | Performance | LCP <= 2.5s, API < 500ms |
+| NFA-06 | Wartbarkeit | 80% Test Coverage, ADR Docs |
+| NFA-07 | i18n | DE + EN von Anfang an |
+
+---
+
 ## Current Sprint
 
-**Sprint:** 0 – Project Setup
-**Goal:** Repository, documentation structure, requirements analysis
-**Status:** 🟡 In Progress
+**Sprint:** 0 – Project Setup and Requirements
+**Goal:** Repository, documentation, requirements analysis
+**Status:** 🟢 Abgeschlossen
 
 ---
 
 ## Completed Steps
 
-- [x] GitHub repository created
+- [x] GitHub repository created (public)
 - [x] Local clone and folder structure
-- [x] .gitignore configured
-- [x] README.md created
+- [x] .gitignore configured (fish-shell compatible)
+- [x] README.md created with badges
 - [x] CLAUDE.md created
+- [x] Issue Templates: User Story, Bug Report, Feature Request
+- [x] Pull Request Template
+- [x] Use Cases documented (UC01-UC11) in docs/requirements/
+- [x] Domain Model documented (6 classes) in docs/requirements/
+- [x] NFAs documented (7 measurable requirements) in docs/requirements/
+- [x] Use Case Diagram drawn (with include and extend)
+- [x] Domain Model Diagram drawn (class diagram)
+- [x] All committed and pushed to GitHub
 
 ## Next Steps
 
-- [ ] GitHub Issue Templates
-- [ ] PULL_REQUEST_TEMPLATE.md
-- [ ] Requirements Analysis (Use Cases, Domain Model, NFAs)
-- [ ] Sprint Plan defined
+- [ ] GitHub Projects Scrum Board einrichten
+- [ ] Sprint-Plan definieren (alle Sprints mit Zielen)
 - [ ] docker-compose.yml base setup
-- [ ] Sprint 1 begin
+- [ ] Sprint 1 beginnen: Auth + User Management
 
 ---
 
-## Key Concepts & Domain Language
+## Key Domain Language
 
 | Term | Meaning |
 |---|---|
-| Module | A university course/subject with ECTS credits |
-| PO | Pruefungsordnung – exam regulations document |
-| ECTS | European Credit Transfer System – credit points |
-| GPA | Grade Point Average – calculated from all module grades |
+| Modul | University course with ECTS credits |
+| PO | Pruefungsordnung – exam regulations |
+| ECTS | European Credit Transfer System |
+| GPA | Grade Point Average, calculated dynamically |
 | Skill-Tree | Visual interactive module dependency graph |
 | Study Space | Digital collaborative study group |
-| Mission Hub | Central deadline and event management interface |
-| Sprint | 2-week development cycle (Scrum) |
+| Mission Hub | Central deadline and event management |
+| Sprint | 2-week Scrum development cycle |
 
 ---
 
 ## Important Rules for Claude Code
 
-1. Always check this file first before writing any code
-2. Follow the existing folder structure strictly
-3. Every new component needs a corresponding test file
-4. All API endpoints must be documented in docs/api/
-5. Commit messages follow: type(scope): description
+1. Always read this file first before writing any code
+2. Shell is fish – never use heredoc EOF syntax
+3. Follow existing folder structure strictly
+4. Every new component needs a corresponding test file
+5. All API endpoints must be documented in docs/api/
+6. Commit messages: type(scope): description
    - feat(auth): add login endpoint
    - fix(dashboard): correct GPA calculation
    - docs(readme): update setup guide
-6. Never commit .env files
-7. Update CLAUDE.md at the end of every session
+7. Never commit .env files
+8. Update CLAUDE.md at the end of every session
+9. One step at a time – explain before implementing
