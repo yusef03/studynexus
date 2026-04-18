@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timezone
 from sqlalchemy import Column, String, Boolean, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
@@ -15,5 +16,11 @@ class User(Base):
     is_active = Column(Boolean, default=True, nullable=False)
     is_premium = Column(Boolean, default=False, nullable=False)
     preferred_language = Column(String(2), default="de", nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    # Python default keeps the field populated before DB flush (needed for tests/serialisation)
+    created_at = Column(
+        DateTime(timezone=True),
+        server_default=func.now(),
+        default=lambda: datetime.now(timezone.utc),
+        nullable=False,
+    )
     updated_at = Column(DateTime(timezone=True), onupdate=func.now(), nullable=True)
