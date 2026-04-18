@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS – Gamified Study and Collaboration Platform
-**Status:** 🟡 Sprint 1 – Infrastructure running, Auth next
+**Status:** 🟡 Sprint 1 – Auth backend done, UI next
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-04-18
 
@@ -22,7 +22,7 @@
 | Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Framer Motion |
 | Backend | FastAPI (Python), SQLAlchemy, Alembic, Pydantic |
 | Database | PostgreSQL (primary), Redis (cache/sessions) |
-| Auth | Auth.js v5 (NextAuth) |
+| Auth | JWT (python-jose), bcrypt 4.1.3 (direct, no passlib) |
 | AI | OpenAI API / Claude API via LangChain |
 | DevOps | Docker Compose (local), GitHub Actions (CI/CD) |
 | Testing | pytest (backend), Jest (frontend) |
@@ -36,9 +36,10 @@
 - Mobile-First PWA: responsive, offline-capable
 - i18n from day 1: German and English (next-intl), default locale: de
 - DSGVO compliant: AES-256 at rest, TLS 1.3 in transit, strict permission model
-- Freemium-ready: architecture supports free/premium tiers
-- Shell: fish shell – always use fish-compatible commands (no heredoc EOF)
-- Config: next.config.js (not .ts) – Next.js 14.2.3 does not support .ts config
+- Freemium-ready: is_premium field on User model
+- Shell: fish shell - always use fish-compatible commands (no heredoc EOF)
+- Config: next.config.js (not .ts) - Next.js 14.2.3 does not support .ts config
+- Password hashing: bcrypt 4.1.3 direct (passlib removed - incompatible with bcrypt 5.x)
 
 ---
 
@@ -47,58 +48,39 @@
 studynexus/
 ├── .github/
 │   ├── ISSUE_TEMPLATE/
-│   │   ├── user_story.md
-│   │   ├── bug_report.md
-│   │   └── feature_request.md
 │   ├── workflows/
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── frontend/
 │   ├── src/
-│   │   ├── app/
-│   │   │   ├── [locale]/
-│   │   │   │   ├── layout.tsx
-│   │   │   │   └── page.tsx
-│   │   │   ├── globals.css
-│   │   │   └── layout.tsx
-│   │   ├── components/ui/
-│   │   │   └── button.tsx
+│   │   ├── app/[locale]/
+│   │   ├── components/ui/button.tsx
 │   │   ├── i18n/request.ts
 │   │   ├── lib/utils.ts
 │   │   └── middleware.ts
-│   ├── messages/
-│   │   ├── de.json
-│   │   └── en.json
+│   ├── messages/de.json + en.json
 │   ├── public/manifest.json
 │   ├── next.config.js
-│   ├── package.json
-│   └── package-lock.json
+│   └── package.json + package-lock.json
 ├── backend/
 │   ├── app/
-│   │   ├── core/security.py
+│   │   ├── core/security.py (bcrypt direct)
+│   │   ├── core/dependencies.py (get_current_user)
 │   │   ├── models/user.py
-│   │   ├── routers/health.py
+│   │   ├── routers/health.py + auth.py
 │   │   ├── schemas/user.py
 │   │   ├── config.py
 │   │   ├── database.py
 │   │   └── main.py
-│   ├── alembic/
-│   ├── tests/
-│   ├── requirements.txt
-│   └── Dockerfile
+│   ├── alembic/versions/0001_create_users_table.py
+│   ├── tests/test_health.py + test_auth.py
+│   └── requirements.txt
 ├── docs/
-│   ├── architecture/
 │   ├── requirements/
-│   │   ├── use-cases.md
-│   │   ├── domain-model.md
-│   │   └── nfas.md
-│   ├── sprints/
-│   │   └── sprint-plan.md
-│   └── api/
-│       └── health.md
+│   ├── sprints/sprint-plan.md
+│   └── api/health.md + auth.md
 ├── docker-compose.yml
 ├── .env.example
-├── CLAUDE.md
-└── README.md
+└── CLAUDE.md
 
 ---
 
@@ -110,13 +92,28 @@ docker compose up --build
 Frontend  → http://localhost:3000/de
 API docs  → http://localhost:8000/api/docs
 
+Run migration: docker compose exec backend alembic upgrade head
+Run tests:     docker compose exec backend pytest tests/ -v
+
+---
+
+## API Endpoints
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | /api/v1/ping | Health ping | No |
+| GET | /api/v1/health | Health check | No |
+| POST | /api/v1/auth/register | Register user | No |
+| POST | /api/v1/auth/login | Login, get JWT | No |
+| POST | /api/v1/auth/logout | Logout | Yes |
+
 ---
 
 ## Current Sprint
 
 **Sprint:** 1 – Infrastructure and Authentication
 **Goal:** Working auth system with JWT
-**Status:** 🟡 In Progress
+**Status:** 🟡 In Progress – Backend done, Frontend next
 
 ---
 
@@ -124,40 +121,31 @@ API docs  → http://localhost:8000/api/docs
 
 - [x] GitHub repository created (public)
 - [x] Local clone and folder structure
-- [x] .gitignore configured
-- [x] README.md created with badges
-- [x] CLAUDE.md created
-- [x] Issue Templates: User Story, Bug Report, Feature Request
-- [x] Pull Request Template
-- [x] Use Cases documented (UC01-UC11)
-- [x] Domain Model documented (6 classes)
-- [x] NFAs documented (7 measurable requirements)
-- [x] Sprint Plan documented (Sprint 0-6)
+- [x] .gitignore, README.md, CLAUDE.md
+- [x] Issue Templates + PR Template
+- [x] Use Cases, Domain Model, NFAs documented
+- [x] Sprint Plan (Sprint 0-6) documented
 - [x] GitHub Projects Scrum Board (5 columns)
-- [x] 6 User Stories for Sprint 1 created as Issues
+- [x] 6 User Stories for Sprint 1 as Issues
 - [x] GitHub CLI installed and configured
-- [x] Docker Compose setup (Next.js + FastAPI + PostgreSQL + Redis)
+- [x] Docker Compose (Next.js + FastAPI + PostgreSQL + Redis)
 - [x] Frontend running at localhost:3000/de
 - [x] Backend API running at localhost:8000/api/docs
-- [x] i18n working (de/en)
-- [x] shadcn/ui Button component
-- [x] Health check endpoints (GET /api/v1/ping, GET /api/v1/health)
-- [x] package-lock.json extracted and committed
-
-- [x] Issue #2: POST /auth/register endpoint (FastAPI)
-- [x] Issue #3: POST /auth/login + logout endpoints (FastAPI)
-- [x] Alembic initial migration (users table) – revision 0001
-- [x] get_current_user Bearer dependency (app/core/dependencies.py)
-- [x] Auth tests (test_auth.py – 7 cases)
-- [x] docs/api/auth.md
+- [x] i18n working (de/en), shadcn/ui Button component
+- [x] Issue #1: Docker Compose Setup DONE
+- [x] Issue #2: POST /auth/register DONE
+- [x] Issue #3: POST /auth/login + logout DONE
+- [x] Alembic migration 0001 (users table) executed
+- [x] 10/10 backend tests passing
+- [x] JWT Token working (tested in Swagger)
+- [x] Real user created in PostgreSQL
 
 ## Next Steps
 
-- [ ] Run first Alembic migration inside container: `docker compose exec backend alembic upgrade head`
 - [ ] Issue #4: JWT refresh token system
 - [ ] Issue #5: Login and Register UI pages (Next.js)
 - [ ] Issue #6: Protected routes middleware (Next.js)
-- [ ] Switch Dockerfile npm install back to npm ci
+- [ ] Move Issues #2 and #3 to Done on Scrum Board
 
 ---
 
@@ -181,14 +169,11 @@ API docs  → http://localhost:8000/api/docs
 1. Always read this file first before writing any code
 2. Shell is fish - never use heredoc EOF syntax
 3. Use next.config.js not next.config.ts (Next.js 14.2.3 limitation)
-4. Follow existing folder structure strictly
-5. Every new component needs a corresponding test file
-6. All API endpoints must be documented in docs/api/
-7. Commit messages: type(scope): description
-   - feat(auth): add login endpoint
-   - fix(dashboard): correct GPA calculation
-   - docs(readme): update setup guide
-8. Never commit .env files
-9. Update CLAUDE.md at the end of every session
-10. One step at a time - explain before implementing
+4. Password hashing: use bcrypt directly, never passlib
+5. Follow existing folder structure strictly
+6. Every new component needs a corresponding test file
+7. All API endpoints must be documented in docs/api/
+8. Commit messages: type(scope): description
+9. Never commit .env files
+10. Update CLAUDE.md at the end of every session
 11. Claude Code prompts always in English
