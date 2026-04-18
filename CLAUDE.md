@@ -9,9 +9,9 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS – Gamified Study and Collaboration Platform
-**Status:** 🟡 Sprint 1 – Docker/Infrastructure setup done, Auth next
+**Status:** 🟡 Sprint 1 – Infrastructure running, Auth next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-04-18 (Session 2)
+**Last Updated:** 2026-04-18
 
 ---
 
@@ -34,10 +34,11 @@
 - Monorepo structure: frontend/ and backend/ in one repo
 - API-first: FastAPI backend exposes REST API, Next.js consumes it
 - Mobile-First PWA: responsive, offline-capable
-- i18n from day 1: German and English (next-intl)
+- i18n from day 1: German and English (next-intl), default locale: de
 - DSGVO compliant: AES-256 at rest, TLS 1.3 in transit, strict permission model
 - Freemium-ready: architecture supports free/premium tiers
 - Shell: fish shell – always use fish-compatible commands (no heredoc EOF)
+- Config: next.config.js (not .ts) – Next.js 14.2.3 does not support .ts config
 
 ---
 
@@ -52,7 +53,38 @@ studynexus/
 │   ├── workflows/
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── [locale]/
+│   │   │   │   ├── layout.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── globals.css
+│   │   │   └── layout.tsx
+│   │   ├── components/ui/
+│   │   │   └── button.tsx
+│   │   ├── i18n/request.ts
+│   │   ├── lib/utils.ts
+│   │   └── middleware.ts
+│   ├── messages/
+│   │   ├── de.json
+│   │   └── en.json
+│   ├── public/manifest.json
+│   ├── next.config.js
+│   ├── package.json
+│   └── package-lock.json
 ├── backend/
+│   ├── app/
+│   │   ├── core/security.py
+│   │   ├── models/user.py
+│   │   ├── routers/health.py
+│   │   ├── schemas/user.py
+│   │   ├── config.py
+│   │   ├── database.py
+│   │   └── main.py
+│   ├── alembic/
+│   ├── tests/
+│   ├── requirements.txt
+│   └── Dockerfile
 ├── docs/
 │   ├── architecture/
 │   ├── requirements/
@@ -60,48 +92,31 @@ studynexus/
 │   │   ├── domain-model.md
 │   │   └── nfas.md
 │   ├── sprints/
+│   │   └── sprint-plan.md
 │   └── api/
+│       └── health.md
+├── docker-compose.yml
+├── .env.example
 ├── CLAUDE.md
 └── README.md
 
 ---
 
-## Actors and Domain
+## Running the Stack
 
-### Actors
-- Anonymer Besucher: can only register
-- Studierender: primary user, all features
-- Globale PO-Datenbank: external technical actor
-- KI-Subsystem: internal, not an actor
+cp .env.example .env
+docker compose up --build
 
-### Key Use Cases
-- UC02 Studiengang auswaehlen (includes UC03 PO synchronisieren)
-- UC09 PDF-Skripte hochladen (extended by UC10 Karteikarten generieren)
-
-### Domain Classes
-- Studierender, Pruefungsordnung, Modul, Termin, Study Space, Dokument
-
----
-
-## NFAs Summary
-
-| ID | Kategorie | Wichtigstes Kriterium |
-|---|---|---|
-| NFA-01 | Datenschutz | DSGVO-konform, Noten streng privat |
-| NFA-02 | Sicherheit | AES-256, TLS 1.3, bcrypt |
-| NFA-03 | Portierbarkeit | PWA Score >= 90, Mobile-First |
-| NFA-04 | Zuverlaessigkeit | Offline-faehig, 99.5% Uptime |
-| NFA-05 | Performance | LCP <= 2.5s, API < 500ms |
-| NFA-06 | Wartbarkeit | 80% Test Coverage, ADR Docs |
-| NFA-07 | i18n | DE + EN von Anfang an |
+Frontend  → http://localhost:3000/de
+API docs  → http://localhost:8000/api/docs
 
 ---
 
 ## Current Sprint
 
-**Sprint:** 0 – Project Setup and Requirements
-**Goal:** Repository, documentation, requirements analysis
-**Status:** 🟢 Abgeschlossen
+**Sprint:** 1 – Infrastructure and Authentication
+**Goal:** Working auth system with JWT
+**Status:** 🟡 In Progress
 
 ---
 
@@ -109,33 +124,35 @@ studynexus/
 
 - [x] GitHub repository created (public)
 - [x] Local clone and folder structure
-- [x] .gitignore configured (fish-shell compatible)
+- [x] .gitignore configured
 - [x] README.md created with badges
 - [x] CLAUDE.md created
 - [x] Issue Templates: User Story, Bug Report, Feature Request
 - [x] Pull Request Template
-- [x] Use Cases documented (UC01-UC11) in docs/requirements/
-- [x] Domain Model documented (6 classes) in docs/requirements/
-- [x] NFAs documented (7 measurable requirements) in docs/requirements/
-- [x] Use Case Diagram drawn (with include and extend)
-- [x] Domain Model Diagram drawn (class diagram)
-- [x] All committed and pushed to GitHub
-
-## Completed Steps (Session 2 – Sprint 1 Issue #1)
-
-- [x] docker-compose.yml (Next.js + FastAPI + PostgreSQL + Redis, health checks)
-- [x] .env.example with all required variables
-- [x] frontend/ – Next.js 14 App Router, TypeScript, Tailwind CSS, shadcn/ui, next-intl (DE/EN), PWA manifest
-- [x] backend/ – FastAPI, SQLAlchemy, Alembic, Pydantic v2, User model, security utils
-- [x] backend/tests/ – pytest with mocked DB, conftest, test_health
-- [x] docs/api/health.md
+- [x] Use Cases documented (UC01-UC11)
+- [x] Domain Model documented (6 classes)
+- [x] NFAs documented (7 measurable requirements)
+- [x] Sprint Plan documented (Sprint 0-6)
+- [x] GitHub Projects Scrum Board (5 columns)
+- [x] 6 User Stories for Sprint 1 created as Issues
+- [x] GitHub CLI installed and configured
+- [x] Docker Compose setup (Next.js + FastAPI + PostgreSQL + Redis)
+- [x] Frontend running at localhost:3000/de
+- [x] Backend API running at localhost:8000/api/docs
+- [x] i18n working (de/en)
+- [x] shadcn/ui Button component
+- [x] Health check endpoints (GET /api/v1/ping, GET /api/v1/health)
+- [x] package-lock.json extracted and committed
 
 ## Next Steps
 
-- [ ] GitHub Projects Scrum Board einrichten
-- [ ] Sprint 1: Auth endpoints (register, login, JWT) – backend/app/routers/auth.py
-- [ ] Sprint 1: Auth.js v5 integration on the frontend
-- [ ] Run first Alembic migration for users table
+- [ ] Issue #2: POST /auth/register endpoint (FastAPI)
+- [ ] Issue #3: POST /auth/login + logout endpoint (FastAPI)
+- [ ] Issue #4: JWT refresh token system
+- [ ] Issue #5: Login and Register UI pages (Next.js)
+- [ ] Issue #6: Protected routes middleware (Next.js)
+- [ ] Switch Dockerfile npm install back to npm ci
+- [ ] Run first Alembic migration
 
 ---
 
@@ -144,7 +161,7 @@ studynexus/
 | Term | Meaning |
 |---|---|
 | Modul | University course with ECTS credits |
-| PO | Pruefungsordnung – exam regulations |
+| PO | Pruefungsordnung - exam regulations |
 | ECTS | European Credit Transfer System |
 | GPA | Grade Point Average, calculated dynamically |
 | Skill-Tree | Visual interactive module dependency graph |
@@ -157,14 +174,16 @@ studynexus/
 ## Important Rules for Claude Code
 
 1. Always read this file first before writing any code
-2. Shell is fish – never use heredoc EOF syntax
-3. Follow existing folder structure strictly
-4. Every new component needs a corresponding test file
-5. All API endpoints must be documented in docs/api/
-6. Commit messages: type(scope): description
+2. Shell is fish - never use heredoc EOF syntax
+3. Use next.config.js not next.config.ts (Next.js 14.2.3 limitation)
+4. Follow existing folder structure strictly
+5. Every new component needs a corresponding test file
+6. All API endpoints must be documented in docs/api/
+7. Commit messages: type(scope): description
    - feat(auth): add login endpoint
    - fix(dashboard): correct GPA calculation
    - docs(readme): update setup guide
-7. Never commit .env files
-8. Update CLAUDE.md at the end of every session
-9. One step at a time – explain before implementing
+8. Never commit .env files
+9. Update CLAUDE.md at the end of every session
+10. One step at a time - explain before implementing
+11. Claude Code prompts always in English
