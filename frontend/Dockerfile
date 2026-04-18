@@ -3,8 +3,10 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # ── Install dependencies ────────────────────────────────────────────────────────
+# npm install is used here because package-lock.json does not exist yet.
+# Once the lock file is committed, switch back to `npm ci` for reproducible builds.
 FROM base AS deps
-RUN npm ci
+RUN npm install
 
 # ── Development server ─────────────────────────────────────────────────────────
 FROM base AS dev
