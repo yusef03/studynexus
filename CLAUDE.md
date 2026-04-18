@@ -144,15 +144,20 @@ API docs  → http://localhost:8000/api/docs
 - [x] Health check endpoints (GET /api/v1/ping, GET /api/v1/health)
 - [x] package-lock.json extracted and committed
 
+- [x] Issue #2: POST /auth/register endpoint (FastAPI)
+- [x] Issue #3: POST /auth/login + logout endpoints (FastAPI)
+- [x] Alembic initial migration (users table) – revision 0001
+- [x] get_current_user Bearer dependency (app/core/dependencies.py)
+- [x] Auth tests (test_auth.py – 7 cases)
+- [x] docs/api/auth.md
+
 ## Next Steps
 
-- [ ] Issue #2: POST /auth/register endpoint (FastAPI)
-- [ ] Issue #3: POST /auth/login + logout endpoint (FastAPI)
+- [ ] Run first Alembic migration inside container: `docker compose exec backend alembic upgrade head`
 - [ ] Issue #4: JWT refresh token system
 - [ ] Issue #5: Login and Register UI pages (Next.js)
 - [ ] Issue #6: Protected routes middleware (Next.js)
 - [ ] Switch Dockerfile npm install back to npm ci
-- [ ] Run first Alembic migration
 
 ---
 
