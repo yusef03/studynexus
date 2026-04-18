@@ -1,7 +1,12 @@
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
-export default function HomePage() {
+export default function HomePage({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
   const t = useTranslations("home");
 
   return (
@@ -14,8 +19,12 @@ export default function HomePage() {
           {t("description")}
         </p>
         <div className="flex gap-4 justify-center">
-          <Button size="lg">{t("cta.register")}</Button>
-          <Button variant="outline" size="lg">{t("cta.login")}</Button>
+          <Button size="lg" asChild>
+            <Link href={`/${locale}/register`}>{t("cta.register")}</Link>
+          </Button>
+          <Button variant="outline" size="lg" asChild>
+            <Link href={`/${locale}/login`}>{t("cta.login")}</Link>
+          </Button>
         </div>
       </div>
     </main>
