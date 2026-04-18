@@ -140,12 +140,19 @@ Run tests:     docker compose exec backend pytest tests/ -v
 - [x] JWT Token working (tested in Swagger)
 - [x] Real user created in PostgreSQL
 
+- [x] Issue #5: Login + Register pages (/[locale]/login, /[locale]/register)
+- [x] Issue #6: Protected routes middleware (redirects to /login without cookie)
+- [x] Dashboard placeholder page (/[locale]/dashboard)
+- [x] Next.js API routes proxy FastAPI auth (set httpOnly cookie)
+- [x] Input, Label shadcn/ui components + tests
+- [x] LoginForm, RegisterForm, LogoutButton components + tests
+- [x] BACKEND_API_URL env var for server-side Docker-internal calls
+- [x] i18n auth + dashboard translations (de + en)
+
 ## Next Steps
 
 - [ ] Issue #4: JWT refresh token system
-- [ ] Issue #5: Login and Register UI pages (Next.js)
-- [ ] Issue #6: Protected routes middleware (Next.js)
-- [ ] Move Issues #2 and #3 to Done on Scrum Board
+- [ ] Move Issues #5 and #6 to Done on Scrum Board
 
 ---
 

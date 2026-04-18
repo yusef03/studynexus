@@ -6,5 +6,41 @@
       "register": "Jetzt registrieren",
       "login": "Anmelden"
     }
+  },
+  "auth": {
+    "fields": {
+      "email": "E-Mail-Adresse",
+      "password": "Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "fullName": "Vollständiger Name"
+    },
+    "login": {
+      "title": "Willkommen zurück",
+      "subtitle": "Melde dich mit deiner E-Mail-Adresse an",
+      "submit": "Anmelden",
+      "loading": "Wird angemeldet…",
+      "noAccount": "Noch kein Konto?",
+      "registerLink": "Registrieren"
+    },
+    "register": {
+      "title": "Konto erstellen",
+      "subtitle": "Starte deine Lernreise mit StudyNexus",
+      "submit": "Registrieren",
+      "loading": "Wird registriert…",
+      "hasAccount": "Bereits ein Konto?",
+      "loginLink": "Anmelden",
+      "success": "Registrierung erfolgreich! Bitte melde dich an."
+    },
+    "errors": {
+      "loginFailed": "Anmeldung fehlgeschlagen. Bitte überprüfe deine Daten.",
+      "registerFailed": "Registrierung fehlgeschlagen. Bitte versuche es erneut.",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein.",
+      "networkError": "Netzwerkfehler. Bitte versuche es erneut."
+    },
+    "logout": "Abmelden"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Willkommen bei StudyNexus! Dein Lernbereich wird bald verfügbar sein."
   }
 }
