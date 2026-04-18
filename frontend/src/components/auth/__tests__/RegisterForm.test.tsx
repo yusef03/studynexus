@@ -18,13 +18,33 @@ describe("RegisterForm", () => {
     expect(screen.getByLabelText("fields.confirmPassword")).toBeInTheDocument();
   });
 
+  it("toggles password field visibility", async () => {
+    render(<RegisterForm locale="de" />);
+    const passwordInput = screen.getByLabelText("fields.password");
+    expect(passwordInput).toHaveAttribute("type", "password");
+
+    const toggleButtons = screen.getAllByLabelText("fields.showPassword");
+    fireEvent.click(toggleButtons[0]);
+    expect(passwordInput).toHaveAttribute("type", "text");
+  });
+
+  it("toggles confirm password field visibility independently", async () => {
+    render(<RegisterForm locale="de" />);
+    const confirmInput = screen.getByLabelText("fields.confirmPassword");
+    expect(confirmInput).toHaveAttribute("type", "password");
+
+    const toggleButtons = screen.getAllByLabelText("fields.showPassword");
+    fireEvent.click(toggleButtons[1]);
+    expect(confirmInput).toHaveAttribute("type", "text");
+  });
+
   it("shows password mismatch error", async () => {
     render(<RegisterForm locale="de" />);
 
     await userEvent.type(screen.getByLabelText("fields.password"), "Password1!");
     await userEvent.type(screen.getByLabelText("fields.confirmPassword"), "Different1!");
 
-    fireEvent.submit(screen.getByRole("button").closest("form")!);
+    fireEvent.submit(screen.getByRole("button", { name: "register.submit" }).closest("form")!);
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("errors.passwordMismatch");
@@ -50,7 +70,7 @@ describe("RegisterForm", () => {
     await userEvent.type(screen.getByLabelText("fields.password"), "Password1!");
     await userEvent.type(screen.getByLabelText("fields.confirmPassword"), "Password1!");
 
-    fireEvent.submit(screen.getByRole("button").closest("form")!);
+    fireEvent.submit(screen.getByRole("button", { name: "register.submit" }).closest("form")!);
 
     await waitFor(() => {
       expect(screen.getByRole("alert")).toHaveTextContent("Email already registered");
