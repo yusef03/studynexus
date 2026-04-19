@@ -42,7 +42,63 @@
     "logout": "Abmelden"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "Willkommen bei StudyNexus! Dein Lernbereich wird bald verfügbar sein."
+    "title": "Mein Studienplan",
+    "subtitle": "Verwalte deine Module und Noten",
+    "stats": {
+      "gpa": "Notendurchschnitt",
+      "noGpa": "—",
+      "ects": "ECTS erreicht",
+      "of": "von",
+      "progress": "Fortschritt",
+      "passed": "Bestanden",
+      "open": "Offen",
+      "failed": "Nicht bestanden",
+      "loading": "Statistiken werden geladen…",
+      "loadError": "Fehler beim Laden der Statistiken"
+    },
+    "modules": {
+      "semesterN": "Semester {n}",
+      "noSemester": "Ohne Semesterempfehlung",
+      "noModules": "Keine Module vorhanden",
+      "unknown": "Unbekannt",
+      "loading": "Module werden geladen…",
+      "loadError": "Fehler beim Laden der Module",
+      "ungraded": "Unbenotet",
+      "status": {
+        "PLANNED": "Geplant",
+        "REGISTERED": "Angemeldet",
+        "PASSED": "Bestanden",
+        "FAILED": "Nicht bestanden"
+      }
+    },
+    "modal": {
+      "title": "Modul bearbeiten",
+      "status": "Status",
+      "note": "Note (1,0 – 4,0)",
+      "noteUngraded": "Dieses Modul ist unbenotet",
+      "semester": "Semester (z. B. WS2024/25)",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "close": "Schließen",
+      "saveError": "Fehler beim Speichern"
+    },
+    "setup": {
+      "title": "Studiengang auswählen",
+      "subtitle": "Wähle deinen Studiengang an der Hochschule Hannover aus",
+      "university": "Hochschule",
+      "faculty": "Fakultät",
+      "program": "Studiengang",
+      "examReg": "Prüfungsordnung",
+      "startSemester": "Startsemester",
+      "selectFaculty": "Fakultät auswählen…",
+      "selectProgram": "Studiengang auswählen…",
+      "selectExamReg": "Prüfungsordnung auswählen…",
+      "selectSemester": "Semester auswählen…",
+      "confirm": "Studiengang bestätigen",
+      "loading": "Wird geladen…",
+      "saving": "Wird gespeichert…",
+      "loadError": "Fehler beim Laden der Daten. Bitte Seite neu laden.",
+      "saveError": "Fehler beim Speichern des Studiengangs"
+    }
   }
 }
