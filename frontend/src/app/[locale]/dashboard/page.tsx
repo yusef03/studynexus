@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isRedirectError } from "next/dist/client/components/redirect";
 import { getTranslations } from "next-intl/server";
 import { LogoutButton } from "@/components/auth/LogoutButton";
 import { StudyDashboard } from "@/components/study/StudyDashboard";
@@ -22,7 +23,9 @@ export default async function DashboardPage({
     });
     if (res.status === 401) redirect(`/${locale}/login`);
     if (res.status === 404) redirect(`/${locale}/dashboard/setup`);
-  } catch {
+  } catch (err) {
+    // Re-throw Next.js redirect errors — they must not be swallowed
+    if (isRedirectError(err)) throw err;
     // Backend unreachable — render page, client components will show their own errors
   }
 
