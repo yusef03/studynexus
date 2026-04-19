@@ -20,6 +20,7 @@ def _make_module(benotet=True, max_versuche=3, typ=ModulTyp.PFLICHT):
     m.ist_benotet = benotet
     m.max_versuche = max_versuche
     m.gewichtung = 1.0
+    m.has_prerequisites = False
     return m
 
 
