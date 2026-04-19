@@ -21,26 +21,26 @@ StudyNexus is an integrated, cloud-based B2C SaaS application that combines pers
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
+| Layer    | Technology                                      |
+| -------- | ----------------------------------------------- |
 | Frontend | Next.js 14, TypeScript, Tailwind CSS, shadcn/ui |
-| Backend | FastAPI (Python), SQLAlchemy, Alembic |
-| Database | PostgreSQL, Redis |
-| Auth | Auth.js v5 |
-| AI | OpenAI API / Claude API via LangChain |
-| DevOps | Docker, GitHub Actions |
+| Backend  | FastAPI (Python), SQLAlchemy, Alembic           |
+| Database | PostgreSQL, Redis                               |
+| Auth     | Auth.js v5                                      |
+| AI       | OpenAI API / Claude API via LangChain           |
+| DevOps   | Docker, GitHub Actions                          |
 
 ## Project Structure
 
 \`\`\`
 studynexus/
-├── frontend/        # Next.js App
-├── backend/         # FastAPI App
-├── docs/            # Documentation
-│   ├── architecture/
-│   ├── requirements/
-│   └── sprints/
-├── CLAUDE.md        # AI project memory
+├── frontend/ # Next.js App
+├── backend/ # FastAPI App
+├── docs/ # Documentation
+│ ├── architecture/
+│ ├── requirements/
+│ └── sprints/
+├── CLAUDE.md # AI project memory
 └── docker-compose.yml
 \`\`\`
 
