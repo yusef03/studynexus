@@ -55,9 +55,11 @@ export default function SetupPage({
   // router/locale must NOT be deps: calling router.replace updates the router
   // store, causing a re-render that would re-fire this effect in a tight loop.
   useEffect(() => {
-    fetch("/api/study/program").then((res) => {
-      if (res.ok) router.replace(`/${locale}/dashboard`);
-    });
+    fetch("/api/study/program")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.exam_regulation_id) router.replace(`/${locale}/dashboard`);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
