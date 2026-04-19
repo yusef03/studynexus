@@ -143,4 +143,20 @@ describe("ModuleList", () => {
     fireEvent.click(screen.getByText("Programmieren 1").closest("button")!);
     expect(screen.getByText("dashboard.modal.title")).toBeInTheDocument();
   });
+
+  it("calls onModuleSaved after a successful module save", async () => {
+    const saved = { ...mockGroups[0].modules[0], status: "PASSED" as const, note: 2.0 };
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({ ok: true, json: async () => mockGroups })
+      .mockResolvedValueOnce({ ok: true, json: async () => saved });
+
+    const onModuleSaved = jest.fn();
+    render(<ModuleList onModuleSaved={onModuleSaved} />);
+    await waitFor(() => screen.getByText("Programmieren 1"));
+
+    fireEvent.click(screen.getByText("Programmieren 1").closest("button")!);
+    fireEvent.click(screen.getByText("dashboard.modal.save"));
+
+    await waitFor(() => expect(onModuleSaved).toHaveBeenCalledTimes(1));
+  });
 });
