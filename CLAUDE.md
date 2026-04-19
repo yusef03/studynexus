@@ -8,10 +8,10 @@
 ## Project Overview
 
 **Name:** StudyNexus
-**Type:** B2C SaaS - Gamified Study and Collaboration Platform
-**Status:** 🟡 Sprint 2 – Study Plan backend done, frontend next
+**Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
+**Status:** 🟡 Sprint 2 – Complete (backend + auth UI), Sprint 3 next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-04-18
+**Last Updated:** 2026-04-19
 
 ---
 
@@ -42,19 +42,35 @@
 - Password hashing: bcrypt 4.1.3 direct, never passlib
 - Auth: httpOnly cookie via Next.js API proxy, never localStorage
 - Two API URLs: NEXT_PUBLIC_API_URL (browser) + BACKEND_API_URL (Docker-internal)
+- **HsH-only platform:** registration restricted to @stud.hs-hannover.de email addresses
+- **Admin-managed POs:** exam regulations and module data entered manually by admin (Yusef), not crowdsourced
+- **postgresql.ENUM in migrations:** always use `postgresql.ENUM` from `sqlalchemy.dialects.postgresql`, never `sa.Enum`, to avoid duplicate CREATE TYPE errors
 
 ---
 
 ## Running the Stack
 
+```
 cp .env.example .env
 docker compose up --build
+```
 
 Frontend  -> http://localhost:3000/de
 API docs  -> http://localhost:8000/api/docs
 
-Run migration: docker compose exec backend alembic upgrade head
-Run tests:     docker compose exec backend pytest tests/ -v
+Before building Docker (clears stale pytest cache):
+```
+sudo rm -rf backend/.pytest_cache
+docker compose up --build
+```
+
+Run migrations: `docker compose exec backend alembic upgrade head`
+Run tests:      `docker compose exec backend pytest tests/ -v`
+
+Migration status:
+- 0001: users table ✅
+- 0002: study plan tables + HSH seed data ✅
+- 0003: kuerzel, gewichtung fixes, has_prerequisites, 9 Wahlpflichtmodule ✅
 
 ---
 
@@ -85,16 +101,17 @@ Run tests:     docker compose exec backend pytest tests/ -v
 
 ## Current Sprint
 
-**Sprint:** 2 – Study Plan and Grade Management
-**Goal:** Module, Noten, GPA, ECTS verwalten
-**Status:** 🟡 Backend done, frontend next
+**Sprint:** 3 – Mission Control Dashboard + Email Verification
+**Goal:** Dashboard, Stundenplan, Email-Verifikation, Matrikelnummer
+**Status:** 🔵 Planned
 
 ---
 
-## Sprint 2 – Backend Completed
+## Sprint 2 – Completed ✅
 
+- [x] Password visibility toggle (LoginForm + RegisterForm)
 - [x] 7 new DB models: University, Faculty, Program, ExamRegulation, Module, UserProgram, StudentModule
-- [x] Alembic migration 0002 with all 7 tables + HSH seed data (32 modules, 6 semesters, 180 ECTS)
+- [x] Alembic migration 0002: all 7 tables + HSH seed data (32 modules, 6 semesters, 180 ECTS), enum fix with postgresql.ENUM
 - [x] 5 public endpoints for browsing university/program catalog
 - [x] 8 protected endpoints for study plan and grade management
 - [x] GPA service with weighted formula: sum(note×ects×gewichtung)/sum(ects×gewichtung)
@@ -103,13 +120,31 @@ Run tests:     docker compose exec backend pytest tests/ -v
 - [x] Docs: docs/api/study-plan.md + docs/api/stats.md
 - [x] Alembic migration 0003: has_prerequisites column, kuerzel (BIN-101…BIN-603), gewichtung corrections (Bachelorarbeit=4, Praxisprojekte=0, BWL/Englisch=0.5), ECTS fixes (Praxisprojekt 2→7, Bachelorarbeit→15), 9 Wahlpflichtmodule (BIN-211…BIN-219)
 
-## Next Steps – Sprint 2
+---
 
+## Next Steps – Sprint 3
+
+- [ ] Email verification: 6-digit code sent on register, must verify before login
+- [ ] Matrikelnummer: required field on User model (Sprint 3 migration)
+- [ ] Email domain validation: reject non-@stud.hs-hannover.de addresses on register
 - [ ] Frontend: university/program selection UI
 - [ ] Frontend: module list view grouped by semester
 - [ ] Frontend: grade entry form with validation
 - [ ] Frontend: stats/dashboard with GPA and progress bar
-- [ ] Run Alembic migrations: `docker compose exec backend alembic upgrade head`
+- [ ] Mission Control Dashboard (Stundenplan, Timeline, Kanban)
+
+---
+
+## Strategic Decisions
+
+| Decision | Sprint | Notes |
+|---|---|---|
+| HsH-only platform | Sprint 3 | Registration requires @stud.hs-hannover.de email |
+| Email verification | Sprint 3 | 6-digit code, must verify before first login |
+| Matrikelnummer | Sprint 3 | Required field on User model |
+| Admin panel | Sprint 5 | Yusef-only; used to manage POs and module data |
+| PO management | Sprint 5 | Exam regulations entered manually by admin, not crowdsourced |
+| Branding | Sprint 6 | StudyNexus name + HsH logo, launch-ready styling |
 
 ---
 
@@ -125,6 +160,7 @@ Run tests:     docker compose exec backend pytest tests/ -v
 | Study Space | Digital collaborative study group |
 | Mission Hub | Central deadline and event management |
 | Sprint | 2-week Scrum development cycle |
+| Matrikelnummer | Student ID number (HsH-issued) |
 
 ---
 
@@ -142,3 +178,5 @@ Run tests:     docker compose exec backend pytest tests/ -v
 10. Never commit .env files
 11. Update CLAUDE.md at the end of every session
 12. Claude Code prompts always in English
+13. Before Docker builds: `sudo rm -rf backend/.pytest_cache` to avoid stale cache errors
+14. Migrations: always use `postgresql.ENUM` (sqlalchemy.dialects.postgresql), never `sa.Enum`

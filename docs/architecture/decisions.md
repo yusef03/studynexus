@@ -139,3 +139,87 @@ Alles in einem Repository (Monorepo).
 **Konsequenzen:**
 - Bei größerem Team könnten separate Repos sinnvoller sein
 - CI/CD muss Frontend und Backend separat testen
+
+---
+
+## ADR-007: HsH-only Plattform
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-19
+
+**Kontext:**
+StudyNexus könnte als generische Studienplattform für alle Hochschulen konzipiert werden.
+Die Datengrundlage (POs, Module, Studiengänge) wird jedoch manuell gepflegt und erfordert
+erheblichen Aufwand. Für den MVP und die initiale Nutzerbasis ist eine Beschränkung sinnvoll.
+
+**Entscheidung:**
+StudyNexus ist zunächst ausschließlich für Studierende der Hochschule Hannover (HsH).
+Registrierung ist nur mit einer @stud.hs-hannover.de E-Mail-Adresse möglich.
+
+**Begründung:**
+- Fokus ermöglicht schnellere Markteinführung mit hoher Qualität für eine Zielgruppe
+- PO-Daten können sorgfältig gepflegt werden, bevor weitere Hochschulen ongeboardet werden
+- Vertrauensaufbau in einer bekannten Community (Word-of-Mouth in der HsH)
+- Reduziert Missbrauchsrisiko durch unbekannte externe Nutzer
+- Einfachere DSGVO-Konformität mit überschaubarem Nutzerkreis
+
+**Konsequenzen:**
+- E-Mail-Domainvalidierung im Backend (register-Endpoint) und Frontend (Formularvalidierung)
+- Klare Kommunikation auf der Landing Page: „Für HsH-Studierende"
+- Erweiterung auf andere Hochschulen erst nach stabilem Admin-Panel (Sprint 5+)
+
+---
+
+## ADR-008: E-Mail-Domainvalidierung (@stud.hs-hannover.de)
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-19
+
+**Kontext:**
+Folgt aus ADR-007. Die technische Umsetzung der HsH-Beschränkung muss definiert werden.
+
+**Entscheidung:**
+Der Backend-Register-Endpoint prüft die E-Mail-Domain und lehnt alle Adressen ab, die nicht
+auf `@stud.hs-hannover.de` enden. Das Frontend zeigt vorab eine entsprechende Fehlermeldung.
+Die Validierung wird in Sprint 3 implementiert.
+
+**Begründung:**
+- Server-seitige Validierung als primäre Sicherheitsebene (Frontend ist umgehbar)
+- Frontend-Validierung verbessert UX (sofortiges Feedback)
+- Einfache, wartbare Implementierung via Pydantic-Validator
+
+**Konsequenzen:**
+- Pydantic-Validator auf dem `email`-Feld in `RegisterRequest`
+- Fehlermeldung: HTTP 422 mit klarem Hinweis auf HsH-Domain
+- i18n-Keys für die Fehlermeldung in de.json / en.json
+- Später erweiterbar: Whitelist von zugelassenen Domains in der Konfiguration
+
+---
+
+## ADR-009: Admin-only PO-Verwaltung
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-19
+
+**Kontext:**
+Prüfungsordnungen (POs), Studiengänge und Modulkataloge müssen in der Datenbank gepflegt werden.
+Alternativen wären: automatisches Scraping, Community-Beiträge (Wikipedia-Modell) oder Admin-Pflege.
+
+**Entscheidung:**
+POs und Modulkataloge werden ausschließlich manuell durch den Admin (Yusef) über ein
+Admin-Panel gepflegt. Kein Crowdsourcing, kein Scraping.
+
+**Begründung:**
+- Offizielle PO-Dokumente sind die einzig verlässliche Quelle; Fehler würden Studierende
+  bei Studienplanentscheidungen irreführen
+- Scraping ist fragil und rechtlich unklar
+- Crowdsourcing erfordert Moderationsaufwand und Verifikationsprozesse
+- Als Einzelentwickler und HSH-Student hat Yusef direkten Zugang zu den offiziellen Dokumenten
+- Qualität über Quantität: lieber ein akkurat gepflegter Studiengang als viele fehlerhafte
+
+**Konsequenzen:**
+- `is_admin` Flag auf dem User-Modell (Sprint 5)
+- Admin-Panel als separate Next.js-Route, nur für is_admin=True zugänglich
+- Admin-API-Endpunkte: CRUD für University, Faculty, Program, ExamRegulation, Module
+- PO-Daten werden vorerst per Alembic-Seed-Migrationen eingetragen (Sprints 1–4)
+- Admin-Panel ersetzt manuelle Migrationen ab Sprint 5
