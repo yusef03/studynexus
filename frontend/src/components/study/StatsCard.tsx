@@ -4,13 +4,19 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { StatsResponse } from "@/types/study";
 
-export function StatsCard() {
+interface Props {
+  refreshKey?: number;
+}
+
+export function StatsCard({ refreshKey = 0 }: Props) {
   const t = useTranslations("dashboard.stats");
   const [stats, setStats] = useState<StatsResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    setLoading(true);
+    setError(null);
     fetch("/api/study/stats")
       .then((res) => {
         if (!res.ok) throw new Error();
@@ -19,9 +25,9 @@ export function StatsCard() {
       .then(setStats)
       .catch(() => setError(t("loadError")))
       .finally(() => setLoading(false));
-    // t is stable from next-intl; excluding it avoids spurious re-runs in tests
+    // t is stable from next-intl and excluded intentionally; refreshKey is the only trigger
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [refreshKey]);
 
   if (loading) {
     return (

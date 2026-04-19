@@ -2,8 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { LogoutButton } from "@/components/auth/LogoutButton";
-import { StatsCard } from "@/components/study/StatsCard";
-import { ModuleList } from "@/components/study/ModuleList";
+import { StudyDashboard } from "@/components/study/StudyDashboard";
 import { BACKEND, bearerHeaders } from "@/lib/backend";
 
 export default async function DashboardPage({
@@ -44,8 +43,7 @@ export default async function DashboardPage({
           <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
 
-        <StatsCard />
-        <ModuleList />
+        <StudyDashboard />
       </div>
     </main>
   );

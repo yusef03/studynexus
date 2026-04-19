@@ -13,7 +13,11 @@ const STATUS_BADGE: Record<StudiengangStatus, string> = {
   FAILED: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
 };
 
-export function ModuleList() {
+interface Props {
+  onModuleSaved?: () => void;
+}
+
+export function ModuleList({ onModuleSaved }: Props) {
   const t = useTranslations("dashboard.modules");
   const tStatus = useTranslations("dashboard.modules.status");
 
@@ -48,6 +52,7 @@ export function ModuleList() {
       })),
     );
     setSelected(null);
+    onModuleSaved?.();
   };
 
   if (loading) {
