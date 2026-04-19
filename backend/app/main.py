@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import settings
-from app.routers import auth, health
+from app.routers import auth, health, universities, study_plan, stats
 
 app = FastAPI(
     title="StudyNexus API",
@@ -21,3 +21,6 @@ app.add_middleware(
 
 app.include_router(health.router, prefix="/api/v1")
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(universities.router, prefix="/api/v1")
+app.include_router(study_plan.router, prefix="/api/v1")
+app.include_router(stats.router, prefix="/api/v1")

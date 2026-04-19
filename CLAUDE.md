@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform
-**Status:** 🟢 Sprint 1 Complete - Starting Sprint 2
+**Status:** 🟡 Sprint 2 – Study Plan backend done, frontend next
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-04-18
 
@@ -67,30 +67,48 @@ Run tests:     docker compose exec backend pytest tests/ -v
 | POST | /api/v1/auth/register | Register user | No |
 | POST | /api/v1/auth/login | Login, JWT cookie | No |
 | POST | /api/v1/auth/logout | Logout, clear cookie | Yes |
+| GET | /api/v1/universities | List universities | No |
+| GET | /api/v1/universities/{id}/faculties | List faculties | No |
+| GET | /api/v1/faculties/{id}/programs | List programs | No |
+| GET | /api/v1/programs/{id}/exam-regulations | List exam regs | No |
+| GET | /api/v1/exam-regulations/{id}/modules | Modules by semester | No |
+| POST | /api/v1/me/program | Select degree program | Yes |
+| GET | /api/v1/me/program | Get my program (auto-creates PFLICHT modules) | Yes |
+| PUT | /api/v1/me/program | Change program | Yes |
+| GET | /api/v1/me/modules | All my modules grouped by semester | Yes |
+| POST | /api/v1/me/modules | Add WAHLPFLICHT or custom ERGAENZEND module | Yes |
+| PUT | /api/v1/me/modules/{id} | Update status/note/dates | Yes |
+| DELETE | /api/v1/me/modules/{id} | Remove module (not if PASSED) | Yes |
+| GET | /api/v1/me/stats | GPA, ECTS, progress stats | Yes |
 
 ---
 
 ## Current Sprint
 
-**Sprint:** 2 - Studienplan und Notenmanagement
+**Sprint:** 2 – Study Plan and Grade Management
 **Goal:** Module, Noten, GPA, ECTS verwalten
-**Status:** 🔴 Not Started
+**Status:** 🟡 Backend done, frontend next
 
 ---
 
-## Sprint 1 - Completed
+## Sprint 2 – Backend Completed
 
-All 6 issues closed. 16 story points delivered.
-See: docs/sprints/sprint-1-review.md
+- [x] 7 new DB models: University, Faculty, Program, ExamRegulation, Module, UserProgram, StudentModule
+- [x] Alembic migration 0002 with all 7 tables + HSH seed data (32 modules, 6 semesters, 180 ECTS)
+- [x] 5 public endpoints for browsing university/program catalog
+- [x] 8 protected endpoints for study plan and grade management
+- [x] GPA service (isolated, weighted, ECTS-based, null if no graded passed modules)
+- [x] Stats endpoint (GPA, ECTS, Fortschritt, module counts)
+- [x] 56 new backend tests (64 total passing), 5 new test files
+- [x] Docs: docs/api/study-plan.md + docs/api/stats.md
 
-## Next Steps - Sprint 2
+## Next Steps – Sprint 2
 
-- [ ] Create Sprint 2 GitHub Issues
-- [ ] University and degree program selection
-- [ ] Module management CRUD
-- [ ] Grade entry and GPA calculation
-- [ ] ECTS tracking
-- [ ] Alembic migrations for new models
+- [ ] Frontend: university/program selection UI
+- [ ] Frontend: module list view grouped by semester
+- [ ] Frontend: grade entry form with validation
+- [ ] Frontend: stats/dashboard with GPA and progress bar
+- [ ] Run Alembic migration 0002: `docker compose exec backend alembic upgrade head`
 
 ---
 
