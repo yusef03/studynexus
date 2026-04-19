@@ -54,7 +54,7 @@ export function StatsCard({ refreshKey = 0 }: Props) {
         <div className="flex flex-col gap-1">
           <span className="text-xs text-muted-foreground">{t("gpa")}</span>
           <span className="text-3xl font-bold tracking-tight">
-            {stats.gpa !== null ? stats.gpa.toFixed(2) : t("noGpa")}
+            {stats.gpa !== null ? stats.gpa.toFixed(1).replace(".", ",") : t("noGpa")}
           </span>
         </div>
 

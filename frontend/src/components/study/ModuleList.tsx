@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ModuleModal } from "@/components/study/ModuleModal";
+import { AddModuleModal } from "@/components/study/AddModuleModal";
 import type { StudentModuleResponse, StudentModulesBySemester, StudiengangStatus } from "@/types/study";
 
 const STATUS_BADGE: Record<StudiengangStatus, string> = {
@@ -25,6 +26,7 @@ export function ModuleList({ onModuleSaved }: Props) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selected, setSelected] = useState<StudentModuleResponse | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
 
   const fetchModules = useCallback(() => {
     setLoading(true);
@@ -54,6 +56,30 @@ export function ModuleList({ onModuleSaved }: Props) {
     setSelected(null);
     onModuleSaved?.();
   };
+
+  const handleAdded = (added: StudentModuleResponse) => {
+    const semKey = added.module?.semester_empfehlung ?? null;
+    setGroups((prev) => {
+      const existing = prev.find((g) => g.semester === semKey);
+      if (existing) {
+        return prev.map((g) =>
+          g.semester === semKey ? { ...g, modules: [...g.modules, added] } : g,
+        );
+      }
+      return [...prev, { semester: semKey, modules: [added] }].sort(
+        (a, b) => (a.semester ?? Infinity) - (b.semester ?? Infinity),
+      );
+    });
+    setShowAddModal(false);
+    onModuleSaved?.();
+  };
+
+  const addedModuleIds = new Set(
+    groups
+      .flatMap((g) => g.modules)
+      .map((sm) => sm.module_id)
+      .filter((id): id is string => id !== null),
+  );
 
   if (loading) {
     return (
@@ -133,12 +159,27 @@ export function ModuleList({ onModuleSaved }: Props) {
         ))}
       </div>
 
+      <button
+        onClick={() => setShowAddModal(true)}
+        className="mt-2 text-sm text-primary hover:underline"
+      >
+        {t("addButton")}
+      </button>
+
       {selected && (
         <ModuleModal
           studentModule={selected}
           open={true}
           onClose={() => setSelected(null)}
           onSave={handleSave}
+        />
+      )}
+
+      {showAddModal && (
+        <AddModuleModal
+          alreadyAddedModuleIds={addedModuleIds}
+          onClose={() => setShowAddModal(false)}
+          onAdded={handleAdded}
         />
       )}
     </>

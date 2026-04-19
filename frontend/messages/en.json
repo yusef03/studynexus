@@ -64,12 +64,27 @@
       "loading": "Loading modules…",
       "loadError": "Error loading modules",
       "ungraded": "Ungraded",
+      "addButton": "+ Add module",
       "status": {
         "PLANNED": "Planned",
         "REGISTERED": "Registered",
         "PASSED": "Passed",
         "FAILED": "Failed"
       }
+    },
+    "addModule": {
+      "title": "Add module",
+      "modeWahlpflicht": "Elective from catalogue",
+      "modeCustom": "Custom supplementary module",
+      "selectModule": "Select module…",
+      "customName": "Module name",
+      "customEcts": "ECTS credits",
+      "save": "Add",
+      "saving": "Adding…",
+      "close": "Cancel",
+      "noModules": "All elective modules already added",
+      "loadError": "Error loading module catalogue",
+      "saveError": "Error adding module"
     },
     "modal": {
       "title": "Edit module",

@@ -64,12 +64,27 @@
       "loading": "Module werden geladen…",
       "loadError": "Fehler beim Laden der Module",
       "ungraded": "Unbenotet",
+      "addButton": "+ Modul hinzufügen",
       "status": {
         "PLANNED": "Geplant",
         "REGISTERED": "Angemeldet",
         "PASSED": "Bestanden",
         "FAILED": "Nicht bestanden"
       }
+    },
+    "addModule": {
+      "title": "Modul hinzufügen",
+      "modeWahlpflicht": "Wahlpflichtmodul aus Katalog",
+      "modeCustom": "Eigenes Ergänzungsmodul",
+      "selectModule": "Modul auswählen…",
+      "customName": "Modulname",
+      "customEcts": "ECTS-Punkte",
+      "save": "Hinzufügen",
+      "saving": "Wird hinzugefügt…",
+      "close": "Abbrechen",
+      "noModules": "Alle Wahlpflichtmodule bereits hinzugefügt",
+      "loadError": "Fehler beim Laden des Modulkatalogs",
+      "saveError": "Fehler beim Hinzufügen des Moduls"
     },
     "modal": {
       "title": "Modul bearbeiten",
