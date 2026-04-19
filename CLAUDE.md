@@ -142,6 +142,8 @@ Migration status:
 | HsH-only platform | Sprint 3 | Registration requires @stud.hs-hannover.de email |
 | Email verification | Sprint 3 | 6-digit code, must verify before first login |
 | Matrikelnummer | Sprint 3 | Required field on User model |
+| Vorprüfungs-logic | Sprint 3 | §6 BIN PO: Sem 4 requires Sem 1 passed, Sem 5 requires Sem 1+2 passed, Sem 6 requires Vorprüfung passed |
+| Bachelor/Master compatibility | Sprint 3 / Sprint 5 | DB model already supports both via `abschluss` field on Program. Vorprüfungs-logic Sprint 3; Master programs added by admin Sprint 5 |
 | Admin panel | Sprint 5 | Yusef-only; used to manage POs and module data |
 | PO management | Sprint 5 | Exam regulations entered manually by admin, not crowdsourced |
 | Branding | Sprint 6 | StudyNexus name + HsH logo, launch-ready styling |
@@ -161,6 +163,8 @@ Migration status:
 | Mission Hub | Central deadline and event management |
 | Sprint | 2-week Scrum development cycle |
 | Matrikelnummer | Student ID number (HsH-issued) |
+| Vorprüfung | Checkpoint after Semester 3: all Sem 1–3 modules must be passed before Sem 4+ modules can be registered. Enforced per §6 BIN PO |
+| Abschluss | Bachelor or Master – stored in `Program.abschluss`. System already supports both degree types |
 
 ---
 
@@ -180,3 +184,4 @@ Migration status:
 12. Claude Code prompts always in English
 13. Before Docker builds: `sudo rm -rf backend/.pytest_cache` to avoid stale cache errors
 14. Migrations: always use `postgresql.ENUM` (sqlalchemy.dialects.postgresql), never `sa.Enum`
+15. `Program.abschluss` supports "Bachelor" and "Master" — never hardcode degree type assumptions. Vorprüfungs-logic (semester prerequisites per §6 BIN PO) is a Sprint 3 task
