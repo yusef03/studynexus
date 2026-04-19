@@ -30,11 +30,12 @@ def _make_program(gesamt_ects=180):
     return p
 
 
-def _make_module(ects=6, ist_benotet=True):
+def _make_module(ects=6, ist_benotet=True, gewichtung=1.0):
     m = MagicMock()
     m.id = uuid.uuid4()
     m.ects = ects
     m.ist_benotet = ist_benotet
+    m.gewichtung = gewichtung
     return m
 
 
@@ -102,8 +103,8 @@ def test_stats_no_modules(authed_client, mock_db):
 
 
 def test_stats_with_passed_modules(authed_client, mock_db):
-    m1 = _make_module(ects=6, ist_benotet=True)
-    m2 = _make_module(ects=6, ist_benotet=False)
+    m1 = _make_module(ects=6, ist_benotet=True, gewichtung=1.0)
+    m2 = _make_module(ects=6, ist_benotet=False, gewichtung=0.0)
     sm1 = _make_sm(m1.id, status=StudiengangStatus.PASSED, note=2.0)
     sm2 = _make_sm(m2.id, status=StudiengangStatus.PASSED, note=None)
 

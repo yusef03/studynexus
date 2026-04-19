@@ -97,10 +97,11 @@ Run tests:     docker compose exec backend pytest tests/ -v
 - [x] Alembic migration 0002 with all 7 tables + HSH seed data (32 modules, 6 semesters, 180 ECTS)
 - [x] 5 public endpoints for browsing university/program catalog
 - [x] 8 protected endpoints for study plan and grade management
-- [x] GPA service (isolated, weighted, ECTS-based, null if no graded passed modules)
+- [x] GPA service with weighted formula: sum(note×ects×gewichtung)/sum(ects×gewichtung)
 - [x] Stats endpoint (GPA, ECTS, Fortschritt, module counts)
-- [x] 56 new backend tests (64 total passing), 5 new test files
+- [x] 66 total backend tests passing, 5 test files
 - [x] Docs: docs/api/study-plan.md + docs/api/stats.md
+- [x] Alembic migration 0003: has_prerequisites column, kuerzel (BIN-101…BIN-603), gewichtung corrections (Bachelorarbeit=4, Praxisprojekte=0, BWL/Englisch=0.5), ECTS fixes (Praxisprojekt 2→7, Bachelorarbeit→15), 9 Wahlpflichtmodule (BIN-211…BIN-219)
 
 ## Next Steps – Sprint 2
 
@@ -108,7 +109,7 @@ Run tests:     docker compose exec backend pytest tests/ -v
 - [ ] Frontend: module list view grouped by semester
 - [ ] Frontend: grade entry form with validation
 - [ ] Frontend: stats/dashboard with GPA and progress bar
-- [ ] Run Alembic migration 0002: `docker compose exec backend alembic upgrade head`
+- [ ] Run Alembic migrations: `docker compose exec backend alembic upgrade head`
 
 ---
 

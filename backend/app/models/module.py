@@ -24,3 +24,4 @@ class Module(Base):
     ist_benotet = Column(Boolean, nullable=False, default=True)
     max_versuche = Column(Integer, nullable=False, default=3)
     gewichtung = Column(Float, nullable=False, default=1.0)
+    has_prerequisites = Column(Boolean, nullable=False, default=True)

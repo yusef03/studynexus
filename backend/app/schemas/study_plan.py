@@ -68,6 +68,7 @@ class ModuleResponse(BaseModel):
     ist_benotet: bool
     max_versuche: int
     gewichtung: float
+    has_prerequisites: bool
 
     model_config = {"from_attributes": True}
 
