@@ -42,7 +42,63 @@
     "logout": "Sign out"
   },
   "dashboard": {
-    "title": "Dashboard",
-    "subtitle": "Welcome to StudyNexus! Your study area will be available soon."
+    "title": "My Study Plan",
+    "subtitle": "Manage your modules and grades",
+    "stats": {
+      "gpa": "Grade average",
+      "noGpa": "—",
+      "ects": "ECTS achieved",
+      "of": "of",
+      "progress": "Progress",
+      "passed": "Passed",
+      "open": "Open",
+      "failed": "Failed",
+      "loading": "Loading statistics…",
+      "loadError": "Error loading statistics"
+    },
+    "modules": {
+      "semesterN": "Semester {n}",
+      "noSemester": "No semester recommendation",
+      "noModules": "No modules found",
+      "unknown": "Unknown",
+      "loading": "Loading modules…",
+      "loadError": "Error loading modules",
+      "ungraded": "Ungraded",
+      "status": {
+        "PLANNED": "Planned",
+        "REGISTERED": "Registered",
+        "PASSED": "Passed",
+        "FAILED": "Failed"
+      }
+    },
+    "modal": {
+      "title": "Edit module",
+      "status": "Status",
+      "note": "Grade (1.0 – 4.0)",
+      "noteUngraded": "This module is ungraded",
+      "semester": "Semester (e.g. WS2024/25)",
+      "save": "Save",
+      "saving": "Saving…",
+      "close": "Close",
+      "saveError": "Error saving changes"
+    },
+    "setup": {
+      "title": "Select your degree programme",
+      "subtitle": "Choose your programme at Hochschule Hannover",
+      "university": "University",
+      "faculty": "Faculty",
+      "program": "Programme",
+      "examReg": "Exam regulation",
+      "startSemester": "Start semester",
+      "selectFaculty": "Select faculty…",
+      "selectProgram": "Select programme…",
+      "selectExamReg": "Select exam regulation…",
+      "selectSemester": "Select semester…",
+      "confirm": "Confirm selection",
+      "loading": "Loading…",
+      "saving": "Saving…",
+      "loadError": "Error loading data. Please reload the page.",
+      "saveError": "Error saving programme selection"
+    }
   }
 }

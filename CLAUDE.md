@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** 🟡 Sprint 2 – Complete (backend + auth UI), Sprint 3 next
+**Status:** ✅ Sprint 2 – Complete (backend + frontend), Sprint 3 next
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-04-19
 
@@ -122,15 +122,25 @@ Migration status:
 
 ---
 
+## Sprint 2 – Frontend Completed ✅
+
+- [x] 9 Next.js API proxy routes (study plan + university catalog)
+- [x] `src/types/study.ts` — all TypeScript interfaces for backend models
+- [x] `src/lib/backend.ts` — shared BACKEND constant + bearerHeaders helper
+- [x] StatsCard component: GPA, ECTS, progress bar, module counts
+- [x] ModuleList component: grouped by semester, status badges, click to edit
+- [x] ModuleModal component: status/note/semester editing, PUT to backend
+- [x] `/dashboard/setup` page: multi-step program selection (faculty → program → PO → semester)
+- [x] `/dashboard` page: server-side program check, redirects to setup if none
+- [x] i18n: dashboard.stats, dashboard.modules, dashboard.modal, dashboard.setup keys (DE + EN)
+- [x] 45 total frontend tests passing (including 16 new study component tests)
+- [x] GitHub issues #7, #8, #9, #10, #11 closed
+
 ## Next Steps – Sprint 3
 
 - [ ] Email verification: 6-digit code sent on register, must verify before login
 - [ ] Matrikelnummer: required field on User model (Sprint 3 migration)
 - [ ] Email domain validation: reject non-@stud.hs-hannover.de addresses on register
-- [ ] Frontend: university/program selection UI
-- [ ] Frontend: module list view grouped by semester
-- [ ] Frontend: grade entry form with validation
-- [ ] Frontend: stats/dashboard with GPA and progress bar
 - [ ] Mission Control Dashboard (Stundenplan, Timeline, Kanban)
 
 ---

@@ -1,18 +1,33 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { StatsCard } from "@/components/study/StatsCard";
+import { ModuleList } from "@/components/study/ModuleList";
+import { BACKEND, bearerHeaders } from "@/lib/backend";
 
-export default function DashboardPage({
+export default async function DashboardPage({
   params: { locale },
 }: {
   params: { locale: string };
 }) {
-  // Belt-and-suspenders: middleware already protects this route
-  const token = cookies().get("access_token");
-  if (!token) redirect(`/${locale}/login`);
+  const cookieStore = cookies();
+  const tokenCookie = cookieStore.get("access_token");
+  if (!tokenCookie) redirect(`/${locale}/login`);
 
-  const t = useTranslations("dashboard");
+  // Check program — redirect to setup if not selected yet
+  try {
+    const res = await fetch(`${BACKEND}/me/program`, {
+      headers: bearerHeaders(tokenCookie.value),
+      cache: "no-store",
+    });
+    if (res.status === 401) redirect(`/${locale}/login`);
+    if (res.status === 404) redirect(`/${locale}/dashboard/setup`);
+  } catch {
+    // Backend unreachable — render page, client components will show their own errors
+  }
+
+  const t = await getTranslations("dashboard");
 
   return (
     <main className="min-h-screen bg-background">
@@ -23,9 +38,14 @@ export default function DashboardPage({
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-4 py-12 text-center">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="mt-2 text-muted-foreground">{t("subtitle")}</p>
+      <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+        <div>
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
+
+        <StatsCard />
+        <ModuleList />
       </div>
     </main>
   );
