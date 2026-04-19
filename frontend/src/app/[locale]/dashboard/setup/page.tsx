@@ -50,10 +50,10 @@ export default function SetupPage({
   const [saving, setSaving] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
-  // Redirect to dashboard if program already selected — run once on mount only.
-  // router must NOT be in deps: router.push/replace updates the router store,
-  // which re-renders this component, which would re-fire this effect, causing
-  // rapid router.replace calls that keep canceling the in-flight navigation.
+  // ── Effect 1: redirect if program already selected ────────────────────────
+  // Deps: [] — run ONCE on mount only.
+  // router/locale must NOT be deps: calling router.replace updates the router
+  // store, causing a re-render that would re-fire this effect in a tight loop.
   useEffect(() => {
     fetch("/api/study/program").then((res) => {
       if (res.ok) router.replace(`/${locale}/dashboard`);
@@ -61,7 +61,11 @@ export default function SetupPage({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Fetch university and its faculties on mount
+  // ── Effect 2: load the university list ────────────────────────────────────
+  // Deps: [] — run ONCE on mount only.
+  // On success sets `university`; failure shows error and ends initializing.
+  // The faculties fetch is intentionally separate (Effect 3) so deps remain
+  // stable and the two fetches cannot form a circular dependency chain.
   useEffect(() => {
     fetch("/api/universities")
       .then((res) => {
@@ -72,8 +76,22 @@ export default function SetupPage({
         const hsh = unis[0];
         if (!hsh) throw new Error();
         setUniversity(hsh);
-        return fetch(`/api/universities/${hsh.id}/faculties`);
       })
+      .catch(() => {
+        setLoadError(t("loadError"));
+        setInitializing(false); // faculties effect won't run, so stop here
+      });
+    // t is a stable reference from next-intl; excluded intentionally
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Effect 3: load faculties when university is known ─────────────────────
+  // Deps: [university?.id] — a string primitive so Object.is comparison is
+  // stable; avoids re-running when the university object reference changes
+  // (e.g. React StrictMode double-invoke) while the actual id is the same.
+  useEffect(() => {
+    if (!university) return;
+    fetch(`/api/universities/${university.id}/faculties`)
       .then((res) => {
         if (!res.ok) throw new Error();
         return res.json() as Promise<FacultyResponse[]>;
@@ -81,28 +99,53 @@ export default function SetupPage({
       .then(setFaculties)
       .catch(() => setLoadError(t("loadError")))
       .finally(() => setInitializing(false));
+    // t is stable; excluded intentionally
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [university?.id]);
 
-  // Fetch programs when faculty changes
+  // ── Effect 4: load programs when faculty selection changes ─────────────────
+  // Deps: [facultyId] only — no t, no router, no locale.
   useEffect(() => {
-    if (!facultyId) { setPrograms([]); setProgramId(""); setExamRegs([]); setExamRegId(""); return; }
+    if (!facultyId) {
+      setPrograms([]);
+      setProgramId("");
+      setExamRegs([]);
+      setExamRegId("");
+      return;
+    }
     fetch(`/api/faculties/${facultyId}/programs`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: ProgramResponse[]) => { setPrograms(data); setProgramId(""); setExamRegs([]); setExamRegId(""); })
+      .then((data: ProgramResponse[]) => {
+        setPrograms(data);
+        setProgramId("");
+        setExamRegs([]);
+        setExamRegId("");
+      })
       .catch(() => setLoadError(t("loadError")));
+    // t is stable; excluded intentionally
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [facultyId]);
 
-  // Fetch exam regulations when program changes
+  // ── Effect 5: load exam regulations when program selection changes ─────────
+  // Deps: [programId] only — no t, no router, no locale.
   useEffect(() => {
-    if (!programId) { setExamRegs([]); setExamRegId(""); return; }
+    if (!programId) {
+      setExamRegs([]);
+      setExamRegId("");
+      return;
+    }
     fetch(`/api/programs/${programId}/exam-regulations`)
       .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data: ExamRegulationResponse[]) => { setExamRegs(data); setExamRegId(""); })
+      .then((data: ExamRegulationResponse[]) => {
+        setExamRegs(data);
+        setExamRegId("");
+      })
       .catch(() => setLoadError(t("loadError")));
+    // t is stable; excluded intentionally
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [programId]);
+
+  // ── Submit ─────────────────────────────────────────────────────────────────
 
   const canConfirm = examRegId && startSemester;
 
@@ -121,6 +164,7 @@ export default function SetupPage({
         setSaveError(data.detail ?? t("saveError"));
         return;
       }
+      // router.replace prevents back-navigation to setup after completion
       router.replace(`/${locale}/dashboard`);
     } catch {
       setSaveError(t("saveError"));
@@ -128,6 +172,8 @@ export default function SetupPage({
       setSaving(false);
     }
   };
+
+  // ── Render ─────────────────────────────────────────────────────────────────
 
   if (initializing) {
     return (
