@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
 
   const upstream = await fetch(`${BACKEND}/me/program`, {
     headers: bearerHeaders(token),
+    cache: "no-store",
   });
   const data = await upstream.json();
   return NextResponse.json(data, { status: upstream.status });
