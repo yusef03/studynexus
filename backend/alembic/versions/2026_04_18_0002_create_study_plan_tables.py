@@ -17,13 +17,16 @@ down_revision: Union[str, None] = "0001"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
-modul_typ_enum = sa.Enum("PFLICHT", "WAHLPFLICHT", "ERGAENZEND", name="modul_typ")
-studiengang_status_enum = sa.Enum("PLANNED", "REGISTERED", "PASSED", "FAILED", name="studiengang_status")
+# create_type=False prevents op.create_table() from issuing a second CREATE TYPE;
+# we handle creation explicitly with checkfirst=True below.
+modul_typ_enum = sa.Enum("PFLICHT", "WAHLPFLICHT", "ERGAENZEND", name="modul_typ", create_type=False)
+studiengang_status_enum = sa.Enum("PLANNED", "REGISTERED", "PASSED", "FAILED", name="studiengang_status", create_type=False)
 
 
 def upgrade() -> None:
-    modul_typ_enum.create(op.get_bind(), checkfirst=True)
-    studiengang_status_enum.create(op.get_bind(), checkfirst=True)
+    bind = op.get_bind()
+    sa.Enum("PFLICHT", "WAHLPFLICHT", "ERGAENZEND", name="modul_typ").create(bind, checkfirst=True)
+    sa.Enum("PLANNED", "REGISTERED", "PASSED", "FAILED", name="studiengang_status").create(bind, checkfirst=True)
 
     op.create_table(
         "universities",
