@@ -35,7 +35,7 @@ describe("StatsCard", () => {
     mockFetch(mockStats);
     render(<StatsCard />);
     await waitFor(() => {
-      expect(screen.getByText("2.30")).toBeInTheDocument();
+      expect(screen.getByText("2,3")).toBeInTheDocument();
     });
   });
 
@@ -79,10 +79,10 @@ describe("StatsCard", () => {
       .mockResolvedValueOnce({ ok: true, json: async () => ({ ...mockStats, gpa: 1.7 }) });
 
     const { rerender } = render(<StatsCard refreshKey={0} />);
-    await waitFor(() => expect(screen.getByText("2.30")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("2,3")).toBeInTheDocument());
 
     rerender(<StatsCard refreshKey={1} />);
-    await waitFor(() => expect(screen.getByText("1.70")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("1,7")).toBeInTheDocument());
 
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });

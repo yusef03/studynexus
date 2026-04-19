@@ -50,12 +50,16 @@ export default function SetupPage({
   const [saving, setSaving] = useState(false);
   const [initializing, setInitializing] = useState(true);
 
-  // Redirect to dashboard if program already selected
+  // Redirect to dashboard if program already selected — run once on mount only.
+  // router must NOT be in deps: router.push/replace updates the router store,
+  // which re-renders this component, which would re-fire this effect, causing
+  // rapid router.replace calls that keep canceling the in-flight navigation.
   useEffect(() => {
     fetch("/api/study/program").then((res) => {
       if (res.ok) router.replace(`/${locale}/dashboard`);
     });
-  }, [locale, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Fetch university and its faculties on mount
   useEffect(() => {
@@ -77,7 +81,8 @@ export default function SetupPage({
       .then(setFaculties)
       .catch(() => setLoadError(t("loadError")))
       .finally(() => setInitializing(false));
-  }, [t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Fetch programs when faculty changes
   useEffect(() => {
@@ -86,7 +91,8 @@ export default function SetupPage({
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: ProgramResponse[]) => { setPrograms(data); setProgramId(""); setExamRegs([]); setExamRegId(""); })
       .catch(() => setLoadError(t("loadError")));
-  }, [facultyId, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facultyId]);
 
   // Fetch exam regulations when program changes
   useEffect(() => {
@@ -95,7 +101,8 @@ export default function SetupPage({
       .then((res) => (res.ok ? res.json() : Promise.reject()))
       .then((data: ExamRegulationResponse[]) => { setExamRegs(data); setExamRegId(""); })
       .catch(() => setLoadError(t("loadError")));
-  }, [programId, t]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [programId]);
 
   const canConfirm = examRegId && startSemester;
 
@@ -114,7 +121,7 @@ export default function SetupPage({
         setSaveError(data.detail ?? t("saveError"));
         return;
       }
-      router.push(`/${locale}/dashboard`);
+      router.replace(`/${locale}/dashboard`);
     } catch {
       setSaveError(t("saveError"));
     } finally {
