@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 2 – Complete (backend + frontend), Sprint 3 next
+**Status:** ✅ Sprint 2 – Complete (backend + frontend + bug fixes), Sprint 3 next
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-04-19
 
@@ -130,11 +130,23 @@ Migration status:
 - [x] StatsCard component: GPA, ECTS, progress bar, module counts
 - [x] ModuleList component: grouped by semester, status badges, click to edit
 - [x] ModuleModal component: status/note/semester editing, PUT to backend
+- [x] AddModuleModal component: WAHLPFLICHT catalogue picker + custom Ergänzend entry
+- [x] StudyDashboard wrapper: refreshKey/onModuleSaved coordination between StatsCard and ModuleList
 - [x] `/dashboard/setup` page: multi-step program selection (faculty → program → PO → semester)
 - [x] `/dashboard` page: server-side program check, redirects to setup if none
-- [x] i18n: dashboard.stats, dashboard.modules, dashboard.modal, dashboard.setup keys (DE + EN)
-- [x] 45 total frontend tests passing (including 16 new study component tests)
+- [x] i18n: dashboard.stats, dashboard.modules, dashboard.modal, dashboard.setup, dashboard.addModule keys (DE + EN)
+- [x] 57 total frontend tests passing
 - [x] GitHub issues #7, #8, #9, #10, #11 closed
+- [x] Post-session bug fixes: setup infinite loop, GPA German locale format, add-module UI, stats cache
+
+## Sprint 2 – Bug Fixes Applied ✅
+
+- [x] Bug 1: Setup page `useEffect` deps — removed `router` and `t`; `router.push` → `router.replace`. Eliminated infinite re-render loop after program setup.
+- [x] Bug 2: StatsCard refreshes after module save via `refreshKey`/`StudyDashboard` — already working; stabilised `onModuleSaved` with `useCallback`.
+- [x] Bug 3: GPA display format — `toFixed(1).replace('.', ',')` for German locale (3,0 not 3.00).
+- [x] Bug 4: GPA service logic confirmed correct — only PASSED + gewichtung>0 + note≠null included. Wrong value likely stale test DB data.
+- [x] Bug 5+6: `AddModuleModal` component — WAHLPFLICHT catalogue picker + custom Ergänzend (name+ECTS) free entry. `ModuleList` has "+ Modul hinzufügen" button. New modules inserted into local state without full reload.
+- [x] Bug 7: `cache: "no-store"` added to stats proxy route. Backend chain `UserProgram→ExamReg→Program.gesamt_ects` verified correct in all 66 backend tests.
 
 ## Next Steps – Sprint 3
 
@@ -175,6 +187,13 @@ Migration status:
 | Matrikelnummer | Student ID number (HsH-issued) |
 | Vorprüfung | Checkpoint after Semester 3: all Sem 1–3 modules must be passed before Sem 4+ modules can be registered. Enforced per §6 BIN PO |
 | Abschluss | Bachelor or Master – stored in `Program.abschluss`. System already supports both degree types |
+
+---
+
+## Known Limitations (to address in Sprint 3)
+
+- WAHLPFLICHT catalogue modules (BIN-211…BIN-219) have `semester_empfehlung = NULL` — they appear under "Ohne Semesterempfehlung" when added. Fix in Sprint 3 by adding migration 0004 to assign semester_empfehlung or by changing grouping logic.
+- Catalogue ERGAENZEND modules ("Ergänzendes Fach BWL", etc.) are not shown in the picker — students must enter them as custom modules with the correct name/ECTS.
 
 ---
 
