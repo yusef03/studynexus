@@ -26,7 +26,7 @@ StudyNexus is an integrated, cloud-based B2C SaaS application that combines pers
 | Frontend | Next.js 14, TypeScript, Tailwind CSS, shadcn/ui |
 | Backend  | FastAPI (Python), SQLAlchemy, Alembic           |
 | Database | PostgreSQL, Redis                               |
-| Auth     | Auth.js v5                                      |
+| Auth     | JWT (python-jose), bcrypt 4.1.3, httpOnly proxy |
 | AI       | OpenAI API / Claude API via LangChain           |
 | DevOps   | Docker, GitHub Actions                          |
 
