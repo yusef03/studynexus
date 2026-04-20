@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { isRedirectError } from "next/dist/client/components/redirect";
 import { getTranslations } from "next-intl/server";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { Logo } from "@/components/ui/Logo";
 import { StudyDashboard } from "@/components/study/StudyDashboard";
 import { BACKEND, bearerHeaders } from "@/lib/backend";
 
@@ -34,8 +35,10 @@ export default async function DashboardPage({
   return (
     <main className="min-h-screen bg-background">
       <header className="border-b">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <span className="font-semibold">StudyNexus</span>
+         <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Logo className="h-10 w-auto" />
+          </div>
           <LogoutButton locale={locale} />
         </div>
       </header>

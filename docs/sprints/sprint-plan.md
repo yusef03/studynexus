@@ -7,8 +7,8 @@
 | Sprint 0 | Setup und Anforderungen                    | ✅ Fertig    | 1 Woche  |
 | Sprint 1 | Infrastruktur und Auth                     | ✅ Fertig    | 2 Wochen |
 | Sprint 2 | Studienplan und Noten                      | ✅ Fertig    | 2 Wochen |
-| Sprint 3A | Auth hardening + Dashboard fixes           | 🔵 Aktuell  | 2 Wochen |
-| Sprint 3B | Mission Control                            | Geplant     | 2 Wochen |
+| Sprint 3A | Auth hardening + Dashboard fixes           | ✅ Fertig   | 2 Wochen |
+| Sprint 3B | Mission Control                            | 🔵 Aktuell  | 2 Wochen |
 | Sprint 4 | Community und Kollaboration                | Geplant      | 2 Wochen |
 | Sprint 5 | Gamification, KI und Admin-Panel           | Geplant      | 2 Wochen |
 | Sprint 6 | PWA, i18n, Branding und Launch             | Geplant      | 2 Wochen |
@@ -72,7 +72,7 @@
 
 ---
 
-## Sprint 3A – Auth hardening + Dashboard fixes 🔵
+## Sprint 3A – Auth hardening + Dashboard fixes ✅
 
 **Ziel:** Auth hardening + Dashboard fixes
 
@@ -86,10 +86,11 @@
 
 - [x] E-Mail-Domainvalidierung (@stud.hs-hannover.de) on register
 - [x] E-Mail-Verifikation (6-digit code via Resend)
-- [ ] Matrikelnummer: OPTIONAL field on user profile (not required)
-- [ ] Fix all dashboard bugs from testing session
-- [ ] Introduce TanStack Query (React Query) for data fetching
-- [ ] CSRF protection research + basic implementation
+- [x] Matrikelnummer: OPTIONAL field on user profile (not required)
+- [x] Fix all dashboard bugs from testing session
+- [x] Introduce TanStack Query (React Query) for data fetching
+- [x] CSRF protection research + basic implementation
+- [x] Neues Branding: StudyNexus-Vector-Logo und HsH-Partner-Badge integriert
 
 ---
 
