@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { StudentModuleResponse, StudiengangStatus } from "@/types/study";
+import { useUpdateModule } from "@/hooks/queries/useUpdateModule";
 
 const STATUS_OPTIONS: StudiengangStatus[] = [
   "PLANNED",
@@ -29,45 +30,32 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
   const [status, setStatus] = useState<StudiengangStatus>(sm.status);
   const [note, setNote] = useState<string>(sm.note !== null ? sm.note.toFixed(1) : "");
   const [semester, setSemester] = useState<string>(sm.semester ?? "");
-  const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  const updateModule = useUpdateModule();
 
   const isBenotet = sm.module?.ist_benotet ?? false;
   const displayName = sm.module?.name ?? sm.custom_name ?? "";
 
   if (!open) return null;
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSave = () => {
     setError(null);
 
-    const body: Record<string, unknown> = { status };
-    if (semester.trim()) body.semester = semester.trim();
+    const payload: { status: StudiengangStatus; semester?: string; note?: number } = { status };
+    if (semester.trim()) payload.semester = semester.trim();
     if (isBenotet && note.trim()) {
       const parsed = parseFloat(note);
-      if (!isNaN(parsed)) body.note = parsed;
+      if (!isNaN(parsed)) payload.note = parsed;
     }
 
-    try {
-      const res = await fetch(`/api/study/modules/${sm.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.detail ?? t("saveError"));
-        return;
+    updateModule.mutate(
+      { id: sm.id, ...payload },
+      {
+        onSuccess: (updated) => onSave(updated),
+        onError: (err) => setError(err.message || t("saveError")),
       }
-
-      const updated: StudentModuleResponse = await res.json();
-      onSave(updated);
-    } catch {
-      setError(t("saveError"));
-    } finally {
-      setSaving(false);
-    }
+    );
   };
 
   return (
@@ -157,11 +145,11 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
         </div>
 
         <div className="flex justify-end gap-2 border-t px-6 py-4">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
+          <Button variant="outline" onClick={onClose} disabled={updateModule.isPending}>
             {t("close")}
           </Button>
-          <Button onClick={handleSave} disabled={saving}>
-            {saving ? t("saving") : t("save")}
+          <Button onClick={handleSave} disabled={updateModule.isPending}>
+            {updateModule.isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>

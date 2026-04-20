@@ -16,6 +16,9 @@ def register(payload: UserCreate, background_tasks: BackgroundTasks, db: Session
     if db.query(User).filter(User.email == payload.email).first():
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
 
+    if payload.matrikelnummer and db.query(User).filter(User.matrikelnummer == payload.matrikelnummer).first():
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Matrikelnummer already registered")
+
     code = "".join([str(random.randint(0, 9)) for _ in range(6)])
     expires_at = datetime.now(timezone.utc) + timedelta(minutes=15)
 
@@ -24,6 +27,7 @@ def register(payload: UserCreate, background_tasks: BackgroundTasks, db: Session
         hashed_password=hash_password(payload.password),
         full_name=payload.full_name,
         preferred_language=payload.preferred_language,
+        matrikelnummer=payload.matrikelnummer,
         verification_code=code,
         verification_expires_at=expires_at,
         is_verified=False

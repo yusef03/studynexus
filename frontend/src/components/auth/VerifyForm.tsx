@@ -25,7 +25,7 @@ export function VerifyForm({ locale, email }: VerifyFormProps) {
     try {
       const res = await fetch("/api/auth/verify", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-studynexus-client": "true" },
         body: JSON.stringify({ email, code }),
       });
 
@@ -38,6 +38,7 @@ export function VerifyForm({ locale, email }: VerifyFormProps) {
           errorMessage = body.detail;
         }
         setError(errorMessage);
+        setLoading(false);
         return;
       }
 

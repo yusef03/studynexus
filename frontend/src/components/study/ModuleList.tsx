@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useState } from "react";
+import { useUserModules } from "@/hooks/queries/useUserModules";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ModuleModal } from "@/components/study/ModuleModal";
@@ -14,68 +15,21 @@ const STATUS_BADGE: Record<StudiengangStatus, string> = {
   FAILED: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300",
 };
 
-interface Props {
-  onModuleSaved?: () => void;
-}
-
-export function ModuleList({ onModuleSaved }: Props) {
+export function ModuleList() {
   const t = useTranslations("dashboard.modules");
   const tStatus = useTranslations("dashboard.modules.status");
 
-  const [groups, setGroups] = useState<StudentModulesBySemester[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: groups, isLoading: loading, isError } = useUserModules();
   const [selected, setSelected] = useState<StudentModuleResponse | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
-  const fetchModules = useCallback(() => {
-    setLoading(true);
-    fetch("/api/study/modules")
-      .then((res) => {
-        if (!res.ok) throw new Error();
-        return res.json() as Promise<StudentModulesBySemester[]>;
-      })
-      .then(setGroups)
-      .catch(() => setError(t("loadError")))
-      .finally(() => setLoading(false));
-    // t is stable from next-intl; excluding it avoids an infinite loop in tests
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    fetchModules();
-  }, [fetchModules]);
-
-  const handleSave = (updated: StudentModuleResponse) => {
-    setGroups((prev) =>
-      prev.map((group) => ({
-        ...group,
-        modules: group.modules.map((m) => (m.id === updated.id ? updated : m)),
-      })),
-    );
+  const handleSave = () => {
     setSelected(null);
-    onModuleSaved?.();
   };
 
-  const handleAdded = (added: StudentModuleResponse) => {
-    const semKey = added.module?.semester_empfehlung ?? null;
-    setGroups((prev) => {
-      const existing = prev.find((g) => g.semester === semKey);
-      if (existing) {
-        return prev.map((g) =>
-          g.semester === semKey ? { ...g, modules: [...g.modules, added] } : g,
-        );
-      }
-      return [...prev, { semester: semKey, modules: [added] }].sort(
-        (a, b) => (a.semester ?? Infinity) - (b.semester ?? Infinity),
-      );
-    });
-    setShowAddModal(false);
-    onModuleSaved?.();
-  };
-
+  const currentGroups = groups ?? [];
   const addedModuleIds = new Set(
-    groups
+    currentGroups
       .flatMap((g) => g.modules)
       .map((sm) => sm.module_id)
       .filter((id): id is string => id !== null),
@@ -83,17 +37,23 @@ export function ModuleList({ onModuleSaved }: Props) {
 
   if (loading) {
     return (
-      <p className="text-sm text-muted-foreground">{t("loading")}</p>
+      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <svg className="animate-spin h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        {t("loading")}
+      </div>
     );
   }
 
-  if (error) {
+  if (isError) {
     return (
-      <p className="text-sm text-destructive">{error}</p>
+      <p className="text-sm text-destructive">{t("loadError")}</p>
     );
   }
 
-  if (groups.length === 0) {
+  if (currentGroups.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">{t("noModules")}</p>
     );
@@ -102,7 +62,7 @@ export function ModuleList({ onModuleSaved }: Props) {
   return (
     <>
       <div className="space-y-6">
-        {groups.map((group) => (
+        {currentGroups.map((group) => (
           <section key={group.semester ?? "none"}>
             <h3 className="mb-2 text-sm font-semibold text-muted-foreground uppercase tracking-wide">
               {group.semester !== null
@@ -179,7 +139,6 @@ export function ModuleList({ onModuleSaved }: Props) {
         <AddModuleModal
           alreadyAddedModuleIds={addedModuleIds}
           onClose={() => setShowAddModal(false)}
-          onAdded={handleAdded}
         />
       )}
     </>

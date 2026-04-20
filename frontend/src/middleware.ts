@@ -11,6 +11,24 @@ const intlMiddleware = createMiddleware({
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // CSRF Protection for API proxies
+  if (pathname.startsWith("/api/")) {
+    if (["POST", "PUT", "DELETE", "PATCH"].includes(request.method)) {
+      const origin = request.headers.get("origin") ?? request.headers.get("referer");
+      const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+
+      if (!origin || !origin.startsWith(allowedOrigin)) {
+        return new NextResponse("Forbidden - CSRF Origin Mismatch", { status: 403 });
+      }
+
+      const clientHeader = request.headers.get("x-studynexus-client");
+      if (clientHeader !== "true") {
+        return new NextResponse("Forbidden - Missing Client Header", { status: 403 });
+      }
+    }
+    return NextResponse.next();
+  }
+
   // Strip the locale segment to get the bare path
   const bare = pathname.replace(/^\/(de|en)/, "") || "/";
 
@@ -28,5 +46,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
+  matcher: ["/((?!_next|_vercel|.*\\..*).*)"],
 };

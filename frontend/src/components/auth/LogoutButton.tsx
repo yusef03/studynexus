@@ -16,7 +16,10 @@ export function LogoutButton({ locale }: LogoutButtonProps) {
 
   async function handleLogout() {
     setLoading(true);
-    await fetch("/api/auth/logout", { method: "POST" });
+    await fetch("/api/auth/logout", { 
+      method: "POST",
+      headers: { "x-studynexus-client": "true" }
+    });
     router.push(`/${locale}/login`);
     router.refresh();
   }
