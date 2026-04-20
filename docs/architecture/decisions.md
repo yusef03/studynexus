@@ -223,3 +223,45 @@ Admin-Panel gepflegt. Kein Crowdsourcing, kein Scraping.
 - Admin-API-Endpunkte: CRUD für University, Faculty, Program, ExamRegulation, Module
 - PO-Daten werden vorerst per Alembic-Seed-Migrationen eingetragen (Sprints 1–4)
 - Admin-Panel ersetzt manuelle Migrationen ab Sprint 5
+
+---
+
+## ADR-010: Module Prerequisites via Database Table (not hardcoded)
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-20
+
+**Kontext:**
+Prerequisite rules across different POs vary significantly (e.g. particular modules needed vs. generic ECTS thresholds vs. Vorprüfung).
+
+**Entscheidung:**
+- Never hardcode semester prerequisite logic (e.g. if semester == 4...)
+- Create `module_prerequisites` table in Sprint 3A migration:
+  - id (UUID)
+  - module_id (FK → modules) - the module you want to take
+  - required_module_id (FK → modules, nullable) - specific module required
+  - minimum_ects_required (Integer, nullable) - ECTS threshold required
+  - description (String) - human readable rule
+
+**Begründung:**
+- This supports all PO rules: specific module deps AND ECTS thresholds
+- Replaces has_prerequisites boolean (which is too simple)
+
+---
+
+## ADR-011: Email Provider = Resend
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-20
+
+**Kontext:**
+Wir brauchen einen zuverlässigen E-Mail-Provider für Verifizierungscodes.
+
+**Entscheidung:**
+- Provider: Resend (resend.com)
+- Python SDK: resend (pip install resend)
+- Free tier: 3000 emails/month
+
+**Begründung:**
+- Use case: Email verification codes (6-digit, expires in 15 min)
+- Implement in Sprint 3A

@@ -7,7 +7,8 @@
 | Sprint 0 | Setup und Anforderungen                    | ✅ Fertig    | 1 Woche  |
 | Sprint 1 | Infrastruktur und Auth                     | ✅ Fertig    | 2 Wochen |
 | Sprint 2 | Studienplan und Noten                      | ✅ Fertig    | 2 Wochen |
-| Sprint 3 | Dashboard + E-Mail-Verifikation            | 🔵 Aktuell  | 2 Wochen |
+| Sprint 3A | Auth hardening + Dashboard fixes           | 🔵 Aktuell  | 2 Wochen |
+| Sprint 3B | Mission Control                            | Geplant     | 2 Wochen |
 | Sprint 4 | Community und Kollaboration                | Geplant      | 2 Wochen |
 | Sprint 5 | Gamification, KI und Admin-Panel           | Geplant      | 2 Wochen |
 | Sprint 6 | PWA, i18n, Branding und Launch             | Geplant      | 2 Wochen |
@@ -71,30 +72,43 @@
 
 ---
 
-## Sprint 3 – Dashboard + E-Mail-Verifikation 🔵
+## Sprint 3A – Auth hardening + Dashboard fixes 🔵
 
-**Ziel:** Mission Control Dashboard + HsH-spezifische Registrierung absichern
+**Ziel:** Auth hardening + Dashboard fixes
 
 **User Stories:**
 
 - Als Studierender möchte ich nach der Registrierung meine E-Mail-Adresse bestätigen
 - Als Studierender möchte ich mich nur mit meiner HsH-Adresse registrieren können
-- Als Studierender möchte ich meine Matrikelnummer hinterlegen
+- Als Studierender kann ich optional meine Matrikelnummer hinterlegen
+
+**Technische Tasks:**
+
+- [ ] E-Mail-Domainvalidierung (@stud.hs-hannover.de) on register
+- [ ] E-Mail-Verifikation (6-digit code via Resend)
+- [ ] Matrikelnummer: OPTIONAL field on user profile (not required)
+- [ ] Fix all dashboard bugs from testing session
+- [ ] Introduce TanStack Query (React Query) for data fetching
+- [ ] CSRF protection research + basic implementation
+
+---
+
+## Sprint 3B – Mission Control
+
+**Ziel:** Mission Control Features (Stundenplan, Kanban, Timeline)
+
+**User Stories:**
+
 - Als Studierender möchte ich einen Wochenstundenplan sehen
 - Als Studierender möchte ich Termine eintragen, verschieben und löschen
 - Als Studierender möchte ich meine Aufgaben in einem Kanban-Board verwalten
 
 **Technische Tasks:**
 
-- [ ] E-Mail-Domainvalidierung: nur @stud.hs-hannover.de erlaubt (Backend + Frontend)
-- [ ] E-Mail-Verifikation: 6-stelliger Code per E-Mail, Pflicht vor erstem Login
-- [ ] Matrikelnummer: Pflichtfeld im User-Modell (Alembic Migration 0004)
-- [ ] Frontend: Studienplan-UI (Modulliste, Noteneingabe, Stats-Dashboard)
-- [ ] Termin-Model + API Endpoints
-- [ ] Wochenstundenplan UI (responsive)
-- [ ] Universal Mission Hub UI
-- [ ] Smart Timeline Komponente
-- [ ] Semester Kanban-Board (To Do / In Progress / Exam Ready / Done)
+- [ ] Stundenplan (weekly schedule view)
+- [ ] Deadlines/Termine model + API + UI
+- [ ] Kanban Board (To Do / In Progress / Exam Ready / Done)
+- [ ] Smart Timeline component
 
 ---
 

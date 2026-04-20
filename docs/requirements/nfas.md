@@ -74,12 +74,24 @@ Das System muss als Mobile-First Progressive Web App auf allen Endgeräten laufe
 Das System muss offlinefähig sein und eine hohe Verfügbarkeit bieten.
 
 **Messbare Kriterien:**
-- Kernfunktionen (Stundenplan, Kanban, Notenübersicht) offline verfügbar via Service Worker
-- Datensynchronisation erfolgt automatisch innerhalb von 5 Sekunden nach Verbindungswiederherstellung
+- Read-Only offline in V1. Offline writes (grades, kanban) require conflict resolution and are deferred to V2.
 - System-Verfügbarkeit: >= 99.5% Uptime pro Monat (max. 3.6h Ausfall/Monat)
 - Fehlermeldungen sind immer verständlich auf Deutsch und Englisch
 
 **Test:** Offline-Modus in Chrome DevTools aktivieren – Kernfunktionen müssen weiter funktionieren
+
+---
+
+## NFA-08: CSRF Protection
+
+**Kategorie:** Sicherheit
+**Priorität:** Hoch
+
+**Anforderung:**
+Das System muss vor Cross-Site Request Forgery geschützt sein.
+
+**Messbare Kriterien:**
+- Next.js proxy provides partial protection. Full CSRF tokens to be implemented in Sprint 3B.
 
 ---
 
