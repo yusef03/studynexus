@@ -137,7 +137,7 @@ export function SetupForm({ locale }: SetupFormProps) {
     try {
       const res = await fetch("/api/study/program", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-studynexus-client": "true" },
         body: JSON.stringify({ exam_regulation_id: examRegId, start_semester: startSemester }),
       });
       if (!res.ok) {

@@ -1,46 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import type { StatsResponse } from "@/types/study";
+import { useUserStats } from "@/hooks/queries/useUserStats";
 
-interface Props {
-  refreshKey?: number;
-}
-
-export function StatsCard({ refreshKey = 0 }: Props) {
+export function StatsCard() {
   const t = useTranslations("dashboard.stats");
-  const [stats, setStats] = useState<StatsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    setLoading(true);
-    setError(null);
-    fetch("/api/study/stats")
-      .then((res) => {
-        if (!res.ok) throw new Error();
-        return res.json() as Promise<StatsResponse>;
-      })
-      .then(setStats)
-      .catch(() => setError(t("loadError")))
-      .finally(() => setLoading(false));
-    // t is stable from next-intl and excluded intentionally; refreshKey is the only trigger
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshKey]);
+  const { data: stats, isLoading: loading, isError } = useUserStats();
 
   if (loading) {
     return (
-      <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground">
+      <div className="rounded-lg border bg-card p-6 text-sm text-muted-foreground flex items-center gap-2">
+        <svg className="animate-spin h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
         {t("loading")}
       </div>
     );
   }
 
-  if (error || !stats) {
+  if (isError || !stats) {
     return (
       <div className="rounded-lg border bg-card p-6 text-sm text-destructive">
-        {error}
+        {t("loadError")}
       </div>
     );
   }

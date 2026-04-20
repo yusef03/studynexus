@@ -40,11 +40,12 @@ export function RegisterForm({ locale }: RegisterFormProps) {
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-studynexus-client": "true" },
         body: JSON.stringify({
           email: `${data.get("email")}@stud.hs-hannover.de`,
           password,
           full_name: data.get("full_name") || undefined,
+          matrikelnummer: data.get("matrikelnummer") || undefined,
         }),
       });
 
@@ -57,6 +58,7 @@ export function RegisterForm({ locale }: RegisterFormProps) {
           errorMessage = body.detail;
         }
         setError(errorMessage);
+        setLoading(false);
         return;
       }
 
@@ -82,6 +84,17 @@ export function RegisterForm({ locale }: RegisterFormProps) {
           type="text"
           autoComplete="name"
           placeholder="Max Mustermann"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="matrikelnummer">Matrikelnummer (Optional)</Label>
+        <Input
+          id="matrikelnummer"
+          name="matrikelnummer"
+          type="text"
+          inputMode="numeric"
+          placeholder="z. B. 1234567"
         />
       </div>
 

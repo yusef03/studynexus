@@ -29,7 +29,7 @@ export function LoginForm({ locale, redirectTo }: LoginFormProps) {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "x-studynexus-client": "true" },
         body: JSON.stringify({
           email: `${data.get("email")}@stud.hs-hannover.de`,
           password: data.get("password"),

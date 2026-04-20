@@ -10,8 +10,14 @@ class UserBase(BaseModel):
     preferred_language: str = "de"
 
 
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    matrikelnummer: Optional[str] = None
+
+
 class UserCreate(UserBase):
     password: str
+    matrikelnummer: Optional[str] = None
 
     @field_validator("email")
     @classmethod
@@ -25,6 +31,7 @@ class UserResponse(UserBase):
     id: UUID
     is_active: bool
     is_premium: bool
+    matrikelnummer: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

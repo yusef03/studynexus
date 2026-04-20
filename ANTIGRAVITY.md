@@ -81,6 +81,7 @@ Migration status:
 | GET | /api/v1/ping | Health ping | No |
 | GET | /api/v1/health | Health check | No |
 | POST | /api/v1/auth/register | Register user | No |
+| POST | /api/v1/auth/verify | Verify 6-digit email code | No |
 | POST | /api/v1/auth/login | Login, JWT cookie | No |
 | POST | /api/v1/auth/logout | Logout, clear cookie | Yes |
 | GET | /api/v1/universities | List universities | No |
@@ -99,11 +100,9 @@ Migration status:
 
 ---
 
-## Current Sprint
-
-**Sprint:** 3A – Auth hardening + Dashboard fixes
-**Goal:** E-Mail validation/verification, TanStack Query, Fixes
-**Status:** 🔵 Planned
+## Current Sprint: Sprint 3A - 🟢 Completed
+**Focus:** Authentication Hardening, UI Overhaul, Cache Stability
+*Summary: Successfully enforced email domain validation (@stud.hs-hannover.de), integrated Resend for 6-digit email verification flows, secured forms against array-injection React crashes, migrated manual fetches to TanStack query, and established multi-layer CSRF protection for API mutating proxies.
 
 ---
 
@@ -150,12 +149,13 @@ Migration status:
 
 ## Next Steps – Sprint 3A
 
-- [ ] Email domain validation (@stud.hs-hannover.de) on register
-- [ ] Email verification (6-digit code via Resend)
-- [ ] Matrikelnummer: OPTIONAL field on user profile (not required)
-- [ ] Fix all dashboard bugs from testing session
-- [ ] Introduce TanStack Query (React Query) for data fetching
-- [ ] CSRF protection research + basic implementation
+- [x] Email domain validation (@stud.hs-hannover.de) on register
+- [x] Email verification (6-digit code via Resend)
+- [x] Frontend Auth Form fixes (Prefix parsing, React Crash fixes)
+- [x] Matrikelnummer: OPTIONAL field on user profile (not required)
+- [x] Fix all dashboard bugs from testing session
+- [x] Introduce TanStack Query (React Query) for data fetching
+- [x] CSRF protection research + basic implementation
 
 ---
 
@@ -218,3 +218,4 @@ Migration status:
 14. Migrations: always use `postgresql.ENUM` (sqlalchemy.dialects.postgresql), never `sa.Enum`
 15. `Program.abschluss` supports "Bachelor" and "Master". Never hardcode semester prerequisites (use `module_prerequisites` table, see ADR-010).
 16. TanStack Query Architecture: Install `@tanstack/react-query`, create hooks in `frontend/src/hooks/queries/` (e.g. `useUserStats.ts`). Components only call hooks; no data fetching logic inside components.
+17. TanStack Query Mandate: ALL data fetching and mutations MUST use TanStack Query custom hooks (inside `frontend/src/hooks/queries/`). Manual `useEffect` fetching or passing mutation state via props is strictly forbidden across the entire project. Always invalidate relevant query keys on mutation success.

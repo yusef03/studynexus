@@ -30,6 +30,13 @@ StudyNexus is an integrated, cloud-based B2C SaaS application that combines pers
 | AI       | OpenAI API / Claude API via LangChain           |
 | DevOps   | Docker, GitHub Actions                          |
 
+## Authentication & Security
+
+StudyNexus incorporates strict security mechanisms:
+- **HsH-Only:** Registration strictly verifies the domain for `@stud.hs-hannover.de` prefixing.
+- **Email Verification:** Accounts require a 6-digit confirmation code generated and sent via Resend API prior to login.
+- **Stateless Session Control:** Next.js proxies manage `httpOnly` secure cookies.
+
 ## Project Structure
 
 \`\`\`

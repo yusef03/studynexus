@@ -6,12 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { ModuleResponse, StudentModuleResponse, UserProgramResponse } from "@/types/study";
+import type { ModuleResponse, UserProgramResponse } from "@/types/study";
+import { useAddModule } from "@/hooks/queries/useAddModule";
 
 interface Props {
   alreadyAddedModuleIds: Set<string>;
   onClose: () => void;
-  onAdded: (sm: StudentModuleResponse) => void;
 }
 
 const selectClass = cn(
@@ -21,7 +21,7 @@ const selectClass = cn(
   "disabled:cursor-not-allowed disabled:opacity-50",
 );
 
-export function AddModuleModal({ alreadyAddedModuleIds, onClose, onAdded }: Props) {
+export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
   const t = useTranslations("dashboard.addModule");
 
   const [mode, setMode] = useState<"wahlpflicht" | "custom">("wahlpflicht");
@@ -30,9 +30,10 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose, onAdded }: Prop
   const [customName, setCustomName] = useState("");
   const [customEcts, setCustomEcts] = useState("");
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
+
+  const addModule = useAddModule();
 
   useEffect(() => {
     fetch("/api/study/program")
@@ -59,33 +60,18 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose, onAdded }: Prop
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleSave = async () => {
-    setSaving(true);
+  const handleSave = () => {
     setSaveError(null);
 
-    const body: Record<string, unknown> =
+    const body =
       mode === "wahlpflicht"
         ? { module_id: selectedModuleId }
         : { custom_name: customName.trim(), custom_ects: parseInt(customEcts, 10) };
 
-    try {
-      const res = await fetch("/api/study/modules", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-      if (!res.ok) {
-        const data = await res.json();
-        setSaveError(data.detail ?? t("saveError"));
-        return;
-      }
-      const added: StudentModuleResponse = await res.json();
-      onAdded(added);
-    } catch {
-      setSaveError(t("saveError"));
-    } finally {
-      setSaving(false);
-    }
+    addModule.mutate(body, {
+      onSuccess: () => onClose(),
+      onError: (err) => setSaveError(err.message || t("saveError")),
+    });
   };
 
   const canSave =
@@ -204,14 +190,14 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose, onAdded }: Prop
         </div>
 
         <div className="flex justify-end gap-2 border-t px-6 py-4">
-          <Button variant="outline" onClick={onClose} disabled={saving}>
+          <Button variant="outline" onClick={onClose} disabled={addModule.isPending}>
             {t("close")}
           </Button>
           <Button
             onClick={handleSave}
-            disabled={!canSave || saving || loading || !!loadError}
+            disabled={!canSave || addModule.isPending || loading || !!loadError}
           >
-            {saving ? t("saving") : t("save")}
+            {addModule.isPending ? t("saving") : t("save")}
           </Button>
         </div>
       </div>

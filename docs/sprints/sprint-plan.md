@@ -84,8 +84,8 @@
 
 **Technische Tasks:**
 
-- [ ] E-Mail-Domainvalidierung (@stud.hs-hannover.de) on register
-- [ ] E-Mail-Verifikation (6-digit code via Resend)
+- [x] E-Mail-Domainvalidierung (@stud.hs-hannover.de) on register
+- [x] E-Mail-Verifikation (6-digit code via Resend)
 - [ ] Matrikelnummer: OPTIONAL field on user profile (not required)
 - [ ] Fix all dashboard bugs from testing session
 - [ ] Introduce TanStack Query (React Query) for data fetching
