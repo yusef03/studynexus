@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ENVIRONMENT: str = "development"
     ALLOWED_ORIGINS: List[str] = ["http://localhost:3000"]
+    RESEND_API_KEY: str = ""
 
     model_config = {"env_file": ".env"}
 

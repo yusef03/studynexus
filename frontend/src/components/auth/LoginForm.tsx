@@ -31,14 +31,20 @@ export function LoginForm({ locale, redirectTo }: LoginFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: data.get("email"),
+          email: `${data.get("email")}@stud.hs-hannover.de`,
           password: data.get("password"),
         }),
       });
 
       if (!res.ok) {
         const body = await res.json();
-        setError(body.detail ?? t("errors.loginFailed"));
+        let errorMessage = t("errors.loginFailed");
+        if (Array.isArray(body.detail) && body.detail.length > 0) {
+          errorMessage = body.detail[0].msg;
+        } else if (typeof body.detail === "string") {
+          errorMessage = body.detail;
+        }
+        setError(errorMessage);
         return;
       }
 
@@ -55,14 +61,22 @@ export function LoginForm({ locale, redirectTo }: LoginFormProps) {
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
         <Label htmlFor="email">{t("fields.email")}</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          placeholder="name@example.com"
-        />
+        <div className="flex rounded-md shadow-sm">
+          <Input
+            id="email"
+            name="email"
+            type="text"
+            required
+            pattern="[a-zA-Z0-9.\-_]+"
+            title="Darf keine Leer- oder Sonderzeichen (wie @) enthalten"
+            autoComplete="username"
+            placeholder="max.mustermann"
+            className="rounded-r-none focus-visible:z-10"
+          />
+          <span className="inline-flex items-center rounded-r-md border border-l-0 border-input bg-muted px-3 text-sm text-muted-foreground whitespace-nowrap">
+            @stud.hs-hannover.de
+          </span>
+        </div>
       </div>
 
       <div className="space-y-2">
