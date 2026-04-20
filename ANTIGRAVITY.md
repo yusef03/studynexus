@@ -100,9 +100,9 @@ Migration status:
 
 ---
 
-## Current Sprint: Sprint 3A - 🟢 Completed
-**Focus:** Authentication Hardening, UI Overhaul, Cache Stability
-*Summary: Successfully enforced email domain validation (@stud.hs-hannover.de), integrated Resend for 6-digit email verification flows, secured forms against array-injection React crashes, migrated manual fetches to TanStack query, and established multi-layer CSRF protection for API mutating proxies.
+## Current Sprint: Sprint 3B - 🔵 Planned
+**Focus:** Mission Control Features (Weekly Schedule, Calendar, Kanban, Timeline)
+*Summary: Implementing the core organizational suite for student self-management.*
 
 ---
 
@@ -147,7 +147,7 @@ Migration status:
 - [x] Bug 5+6: `AddModuleModal` component — WAHLPFLICHT catalogue picker + custom Ergänzend (name+ECTS) free entry. `ModuleList` has "+ Modul hinzufügen" button. New modules inserted into local state without full reload.
 - [x] Bug 7: `cache: "no-store"` added to stats proxy route. Backend chain `UserProgram→ExamReg→Program.gesamt_ects` verified correct in all 66 backend tests.
 
-## Next Steps – Sprint 3A
+## Sprint 3A – Completed ✅
 
 - [x] Email domain validation (@stud.hs-hannover.de) on register
 - [x] Email verification (6-digit code via Resend)
@@ -156,6 +156,14 @@ Migration status:
 - [x] Fix all dashboard bugs from testing session
 - [x] Introduce TanStack Query (React Query) for data fetching
 - [x] CSRF protection research + basic implementation
+- [x] Official StudyNexus Branding & Partner Badge integration
+
+## Next Steps – Sprint 3B
+
+- [ ] Interactive Weekly Schedule View (Stundenplan)
+- [ ] Universal deadline/event calendar model + API
+- [ ] Kanban Board implementation (To Do / In Progress / Done)
+- [ ] Interactive Timeline component integration
 
 ---
 

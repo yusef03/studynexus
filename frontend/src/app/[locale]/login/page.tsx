@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { Logo } from "@/components/ui/Logo";
+import { PartnerBadge } from "@/components/ui/PartnerBadge";
 
 export default function LoginPage({
   params: { locale },
@@ -13,6 +15,7 @@ export default function LoginPage({
   return (
     <main className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm space-y-6">
+        <Logo className="h-24 w-auto mx-auto mb-6" />
         <div className="text-center space-y-1">
           <h1 className="text-2xl font-bold tracking-tight">{t("login.title")}</h1>
           <p className="text-sm text-muted-foreground">{t("login.subtitle")}</p>
@@ -25,6 +28,8 @@ export default function LoginPage({
         )}
 
         <LoginForm locale={locale} redirectTo={searchParams.from} />
+
+        <PartnerBadge />
       </div>
     </main>
   );
