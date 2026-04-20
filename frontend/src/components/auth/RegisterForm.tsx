@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { VerifyForm } from "./VerifyForm";
 
 interface RegisterFormProps {
   locale: string;
@@ -19,6 +20,7 @@ export function RegisterForm({ locale }: RegisterFormProps) {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -40,7 +42,7 @@ export function RegisterForm({ locale }: RegisterFormProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: data.get("email"),
+          email: `${data.get("email")}@stud.hs-hannover.de`,
           password,
           full_name: data.get("full_name") || undefined,
         }),
@@ -48,16 +50,26 @@ export function RegisterForm({ locale }: RegisterFormProps) {
 
       if (!res.ok) {
         const body = await res.json();
-        setError(body.detail ?? t("errors.registerFailed"));
+        let errorMessage = t("errors.registerFailed");
+        if (Array.isArray(body.detail) && body.detail.length > 0) {
+          errorMessage = body.detail[0].msg;
+        } else if (typeof body.detail === "string") {
+          errorMessage = body.detail;
+        }
+        setError(errorMessage);
         return;
       }
 
-      router.push(`/${locale}/login?registered=1`);
+      setRegisteredEmail(`${data.get("email")}@stud.hs-hannover.de`);
     } catch {
       setError(t("errors.networkError"));
     } finally {
       setLoading(false);
     }
+  }
+
+  if (registeredEmail) {
+    return <VerifyForm locale={locale} email={registeredEmail} />;
   }
 
   return (
@@ -75,14 +87,22 @@ export function RegisterForm({ locale }: RegisterFormProps) {
 
       <div className="space-y-2">
         <Label htmlFor="email">{t("fields.email")}</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          placeholder="name@example.com"
-        />
+        <div className="flex rounded-md shadow-sm">
+          <Input
+            id="email"
+            name="email"
+            type="text"
+            required
+            pattern="[a-zA-Z0-9.\-_]+"
+            title="Darf keine Leer- oder Sonderzeichen (wie @) enthalten"
+            autoComplete="username"
+            placeholder="max.mustermann"
+            className="rounded-r-none focus-visible:z-10"
+          />
+          <span className="inline-flex items-center rounded-r-md border border-l-0 border-input bg-muted px-3 text-sm text-muted-foreground whitespace-nowrap">
+            @stud.hs-hannover.de
+          </span>
+        </div>
       </div>
 
       <div className="space-y-2">

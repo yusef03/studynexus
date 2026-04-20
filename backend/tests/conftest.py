@@ -24,7 +24,7 @@ def mock_db():
 def mock_user():
     user = MagicMock()
     user.id = _FIXED_UUID
-    user.email = "test@example.com"
+    user.email = "test@stud.hs-hannover.de"
     user.full_name = "Test User"
     user.is_active = True
     user.is_premium = False

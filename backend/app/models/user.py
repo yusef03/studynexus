@@ -15,6 +15,9 @@ class User(Base):
     full_name = Column(String, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     is_premium = Column(Boolean, default=False, nullable=False)
+    is_verified = Column(Boolean, default=False, nullable=False)
+    verification_code = Column(String, nullable=True)
+    verification_expires_at = Column(DateTime(timezone=True), nullable=True)
     preferred_language = Column(String(2), default="de", nullable=False)
     # Python default keeps the field populated before DB flush (needed for tests/serialisation)
     created_at = Column(

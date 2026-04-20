@@ -1,7 +1,7 @@
 from uuid import UUID
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 
 
 class UserBase(BaseModel):
@@ -12,6 +12,13 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+    @field_validator("email")
+    @classmethod
+    def validate_hsh_domain(cls, v: str) -> str:
+        if not str(v).endswith("@stud.hs-hannover.de"):
+            raise ValueError("Registrierung nur mit @stud.hs-hannover.de E-Mail möglich.")
+        return v
 
 
 class UserResponse(UserBase):
@@ -26,6 +33,11 @@ class UserResponse(UserBase):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+
+class VerifyEmailRequest(BaseModel):
+    email: EmailStr
+    code: str
 
 
 class TokenResponse(BaseModel):

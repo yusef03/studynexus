@@ -10,7 +10,7 @@ _FIXED_DT = datetime(2026, 4, 18, 12, 0, 0, tzinfo=timezone.utc)
 def _make_user(**kwargs):
     user = MagicMock()
     user.id = _FIXED_UUID
-    user.email = "test@example.com"
+    user.email = "test@stud.hs-hannover.de"
     user.full_name = "Test User"
     user.preferred_language = "de"
     user.is_active = True
@@ -25,18 +25,18 @@ def _make_user(**kwargs):
 
 def test_register_success(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = None
-    new_user = _make_user(email="new@example.com", full_name="New User")
+    new_user = _make_user(email="new@stud.hs-hannover.de", full_name="New User")
 
     with patch("app.routers.auth.User", return_value=new_user):
         response = client.post("/api/v1/auth/register", json={
-            "email": "new@example.com",
+            "email": "new@stud.hs-hannover.de",
             "password": "Password1!",
             "full_name": "New User",
         })
 
     assert response.status_code == 201
     data = response.json()
-    assert data["email"] == "new@example.com"
+    assert data["email"] == "new@stud.hs-hannover.de"
     assert "hashed_password" not in data
     mock_db.add.assert_called_once()
     mock_db.commit.assert_called_once()
@@ -46,7 +46,7 @@ def test_register_duplicate_email_returns_409(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = _make_user()
 
     response = client.post("/api/v1/auth/register", json={
-        "email": "existing@example.com",
+        "email": "existing@stud.hs-hannover.de",
         "password": "Password1!",
     })
 
@@ -68,7 +68,7 @@ def test_login_success_returns_token(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = user
 
     response = client.post("/api/v1/auth/login", json={
-        "email": "test@example.com",
+        "email": "test@stud.hs-hannover.de",
         "password": "Password1!",
     })
 
@@ -83,7 +83,7 @@ def test_login_wrong_password_returns_401(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = user
 
     response = client.post("/api/v1/auth/login", json={
-        "email": "test@example.com",
+        "email": "test@stud.hs-hannover.de",
         "password": "WrongPass1!",
     })
 
@@ -94,7 +94,7 @@ def test_login_unknown_email_returns_401(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = None
 
     response = client.post("/api/v1/auth/login", json={
-        "email": "nobody@example.com",
+        "email": "nobody@stud.hs-hannover.de",
         "password": "Password1!",
     })
 
@@ -106,7 +106,7 @@ def test_login_inactive_user_returns_403(client, mock_db):
     mock_db.query.return_value.filter.return_value.first.return_value = user
 
     response = client.post("/api/v1/auth/login", json={
-        "email": "test@example.com",
+        "email": "test@stud.hs-hannover.de",
         "password": "Password1!",
     })
 

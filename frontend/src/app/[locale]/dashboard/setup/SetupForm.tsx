@@ -145,7 +145,7 @@ export function SetupForm({ locale }: SetupFormProps) {
         setSaveError(data.detail ?? t("saveError"));
         return;
       }
-      router.replace(`/${locale}/dashboard`);
+      window.location.href = `/${locale}/dashboard`;
     } catch {
       setSaveError(t("saveError"));
     } finally {
