@@ -11,9 +11,10 @@ StudyNexus is an integrated, cloud-based B2C SaaS application that combines pers
 
 ## Core Features (Planned)
 
-- 📊 **Mission Control Dashboard** — GPA tracker, ECTS progress, weekly schedule
-- 🗺️ **Visual Study Plan** — Interactive module graph (Skill-Tree) synced with your exam regulations
-- 📅 **Universal Mission Hub** — Deadlines, exams, and routines in one place
+- ✅ **Mission Control Dashboard** — GPA tracker, ECTS progress, weekly schedule
+- ⏳ **Visual Study Plan** — Interactive module graph (Skill-Tree) synced with your exam regulations
+- ✅ **Universal Mission Hub** — Deadlines, exams, and routines in one place
+- ✅ **Mobile-First Experience** — Optimized Agenda view and Quick Add floating action button
 - 🤝 **Study Spaces** — Digital study groups with shared Kanban boards
 - 📚 **Module Wiki** — Community knowledge base with anonymous module reviews
 - 🤖 **AI Planning** — Smart recommendations and auto-scheduling

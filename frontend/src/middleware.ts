@@ -15,10 +15,18 @@ export default function middleware(request: NextRequest) {
   if (pathname.startsWith("/api/")) {
     if (["POST", "PUT", "DELETE", "PATCH"].includes(request.method)) {
       const origin = request.headers.get("origin") ?? request.headers.get("referer");
+      const host = request.headers.get("host");
       const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
-      if (!origin || !origin.startsWith(allowedOrigin)) {
-        return new NextResponse("Forbidden - CSRF Origin Mismatch", { status: 403 });
+      if (origin) {
+        try {
+          const originUrl = new URL(origin);
+          if (originUrl.host !== host && !origin.startsWith(allowedOrigin)) {
+            return new NextResponse("Forbidden - CSRF Origin Mismatch", { status: 403 });
+          }
+        } catch {
+          return new NextResponse("Forbidden - Invalid Origin", { status: 403 });
+        }
       }
 
       const clientHeader = request.headers.get("x-studynexus-client");

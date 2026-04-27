@@ -19,7 +19,7 @@
 | | semester | Integer | Geplantes Semester laut Studienplan |
 | Termin | titel | String | Bezeichnung des Termins |
 | | datum | DateTime | Datum und Uhrzeit |
-| | termin_art | Enum | Klausur / Abgabe / Vorlesung / Sonstiges |
+| | termin_art | Enum | Klausur / Abgabe / Vorlesung / Fokuszeit / Sonstiges |
 | | ort | String | Raum oder online |
 | Study Space | name | String | Name der Lerngruppe |
 | | beschreibung | String | Kurzbeschreibung |
