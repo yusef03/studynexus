@@ -42,6 +42,12 @@
     "logout": "Abmelden"
   },
   "dashboard": {
+    "nav": {
+      "overview": "Mission Hub",
+      "modules": "Studienplan",
+      "kanban": "Kanban",
+      "schedule": "Stundenplan"
+    },
     "title": "Mein Studienplan",
     "subtitle": "Verwalte deine Module und Noten",
     "stats": {

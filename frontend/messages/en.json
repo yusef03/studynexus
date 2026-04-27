@@ -42,6 +42,12 @@
     "logout": "Sign out"
   },
   "dashboard": {
+    "nav": {
+      "overview": "Mission Hub",
+      "modules": "Study Plan",
+      "kanban": "Kanban",
+      "schedule": "Schedule"
+    },
     "title": "My Study Plan",
     "subtitle": "Manage your modules and grades",
     "stats": {
