@@ -87,7 +87,7 @@ export function Logo({
 <stop stopColor="#00B4D8"/>
 <stop offset="1" stopColor="#0096C7"/>
 </linearGradient>
-<linearGradient id="paint4_linear_1_59" x1="-nan" y1="-nan" x2="-nan" y2="-nan" gradientUnits="userSpaceOnUse">
+<linearGradient id="paint4_linear_1_59" x1="0" y1="0" x2="0" y2="0" gradientUnits="userSpaceOnUse">
 <stop stopColor="#00B4D8"/>
 <stop offset="1" stopColor="#0096C7"/>
 </linearGradient>

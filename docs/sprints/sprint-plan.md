@@ -8,7 +8,7 @@
 | Sprint 1 | Infrastruktur und Auth                     | ✅ Fertig    | 2 Wochen |
 | Sprint 2 | Studienplan und Noten                      | ✅ Fertig    | 2 Wochen |
 | Sprint 3A | Auth hardening + Dashboard fixes           | ✅ Fertig   | 2 Wochen |
-| Sprint 3B | Mission Control                            | 🔵 Aktuell  | 2 Wochen |
+| Sprint 3B | Mission Control                            | ✅ Fertig    | 2 Wochen |
 | Sprint 4 | Community und Kollaboration                | Geplant      | 2 Wochen |
 | Sprint 5 | Gamification, KI und Admin-Panel           | Geplant      | 2 Wochen |
 | Sprint 6 | PWA, i18n, Branding und Launch             | Geplant      | 2 Wochen |
@@ -96,7 +96,7 @@
 
 ## Sprint 3B – Mission Control
 
-**Ziel:** Mission Control Features (Stundenplan, Kanban, Timeline)
+**Ziel:** Mission Control Features (Stundenplan, Kanban, Timeline, Mobile-First)
 
 **User Stories:**
 
@@ -106,10 +106,13 @@
 
 **Technische Tasks:**
 
-- [ ] Stundenplan (weekly schedule view)
-- [ ] Deadlines/Termine model + API + UI
-- [ ] Kanban Board (To Do / In Progress / Exam Ready / Done)
-- [ ] Smart Timeline component
+- [x] Stundenplan (weekly schedule view + Kollisions-Detection)
+- [x] Deadlines/Termine model + API + UI
+- [x] Kanban Board (To Do / In Progress / Exam Ready / Done)
+- [x] Smart Timeline component + Daily Focus
+- [x] Abgaben-Support (is_submission) und Fokuszeiten (FOCUS)
+- [x] Exam Countdown Widget für anstehende Klausuren
+- [x] Mobile-First Ergonomie (Mobile Nav, Quick Add FAB, Mobile Agenda View)
 
 ---
 

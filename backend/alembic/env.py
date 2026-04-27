@@ -5,6 +5,7 @@ from alembic import context
 from app.database import Base
 from app.models import user  # noqa: register models with metadata
 from app.models import university, faculty, program, exam_regulation, module, user_program, student_module  # noqa
+from app.models import task, event  # noqa
 from app.config import settings
 
 config = context.config
