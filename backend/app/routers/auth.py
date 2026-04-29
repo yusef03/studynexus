@@ -28,6 +28,8 @@ def register(payload: UserCreate, background_tasks: BackgroundTasks, db: Session
         full_name=payload.full_name,
         preferred_language=payload.preferred_language,
         matrikelnummer=payload.matrikelnummer,
+        birth_date=payload.birth_date,
+        university=payload.university,
         verification_code=code,
         verification_expires_at=expires_at,
         is_verified=False

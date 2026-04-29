@@ -2,7 +2,7 @@
 
 import { Event } from "@/types/event";
 
-const DAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"];
+import { useTranslations } from "next-intl";
 
 interface Props {
   events: Event[];
@@ -11,6 +11,10 @@ interface Props {
 }
 
 export function MobileAgendaView({ events, onEventClick, showGhosts }: Props) {
+  const t = useTranslations("dashboard.schedule.modal");
+  const tBoard = useTranslations("dashboard.schedule.board");
+  const DAYS = t.raw("days") as string[];
+  
   const eventsByDay = Array.from({ length: 7 }, () => [] as Event[]);
 
   events.forEach(evt => {
@@ -84,7 +88,7 @@ export function MobileAgendaView({ events, onEventClick, showGhosts }: Props) {
         );
       })}
       {events.length === 0 && (
-         <div className="p-8 text-center text-muted-foreground">Keine Termine im Stundenplan.</div>
+         <div className="p-8 text-center text-muted-foreground">{tBoard("noEvents")}</div>
       )}
     </div>
   );

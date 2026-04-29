@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, X } from "lucide-react";
+import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, X, Settings, UserCircle, Map } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 
@@ -18,6 +18,9 @@ export function MobileNav({ locale }: { locale: string }) {
     { href: `/${locale}/dashboard/modules`, label: t("modules"), icon: BookOpen },
     { href: `/${locale}/dashboard/kanban`, label: t("kanban"), icon: ListTodo },
     { href: `/${locale}/dashboard/schedule`, label: t("schedule"), icon: Calendar },
+    { href: `/${locale}/dashboard/study-plan`, label: t("studyPlan"), icon: Map },
+    { href: `/${locale}/dashboard/profile`, label: t("profile"), icon: UserCircle },
+    { href: `/${locale}/dashboard/settings`, label: t("settings"), icon: Settings },
   ];
 
   return (
@@ -39,7 +42,7 @@ export function MobileNav({ locale }: { locale: string }) {
           <div className="relative w-72 max-w-[80%] bg-background h-full shadow-2xl flex flex-col animate-in slide-in-from-left-4 duration-300">
             <div className="h-14 flex items-center justify-between px-6 border-b">
               <Link href={`/${locale}/dashboard`} className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-                <Logo className="h-6 w-auto" />
+                <Logo className="h-8 w-auto" />
               </Link>
               <button 
                 onClick={() => setIsOpen(false)}

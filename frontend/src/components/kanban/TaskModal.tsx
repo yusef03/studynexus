@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Task, TaskPriority, TaskStatus, TaskUpdate } from "@/types/task";
 import { useUserModules } from "@/hooks/queries/useUserModules";
+import { useTranslations } from "next-intl";
 
 const selectClass = cn(
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2",
@@ -31,6 +32,7 @@ interface Props {
 }
 
 export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) {
+  const t = useTranslations("dashboard.kanban.modal");
   const [title, setTitle] = useState(task.title);
   const [description, setDescription] = useState(task.description || "");
   const [priority, setPriority] = useState<TaskPriority>(task.priority);
@@ -64,32 +66,32 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
 
       <div className="relative w-full max-w-lg rounded-xl border bg-background shadow-2xl flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-lg font-semibold">{task.id ? "Aufgabe bearbeiten" : "Neuer Task"}</h2>
+          <h2 className="text-lg font-semibold">{task.id ? t("editTitle") : t("newTitle")}</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
 
         <div className="px-6 py-6 space-y-5 overflow-y-auto">
           {/* Title */}
           <div className="space-y-1.5">
-            <Label>Titel</Label>
-            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. Mathe Übung 3..." />
+            <Label>{t("titleLabel")}</Label>
+            <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
           </div>
 
           {/* Description */}
           <div className="space-y-1.5">
-            <Label>Beschreibung / Notizen</Label>
+            <Label>{t("descLabel")}</Label>
             <textarea
               className={textareaClass}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Füge Notizen oder Details hinzu..."
+              placeholder={t("descPlaceholder")}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             {/* Status */}
             <div className="space-y-1.5">
-              <Label>Spalte (Status)</Label>
+              <Label>{t("statusLabel")}</Label>
               <select className={selectClass} value={status} onChange={(e) => setStatus(e.target.value as TaskStatus)}>
                 <option value="TODO">To Do</option>
                 <option value="IN_PROGRESS">In Progress</option>
@@ -100,7 +102,7 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
 
             {/* Priority */}
             <div className="space-y-1.5">
-              <Label>Priorität</Label>
+              <Label>{t("priorityLabel")}</Label>
               <select className={selectClass} value={priority} onChange={(e) => setPriority(e.target.value as TaskPriority)}>
                 <option value="LOW">Low</option>
                 <option value="MEDIUM">Medium</option>
@@ -112,7 +114,7 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
           <div className="grid grid-cols-2 gap-4">
             {/* Due Date */}
             <div className="space-y-1.5">
-              <Label>Fälligkeitsdatum</Label>
+              <Label>{t("dueDateLabel")}</Label>
               <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
               
               <div className="flex items-center gap-2 mt-2 pt-1">
@@ -124,16 +126,16 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
                   className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4"
                 />
                 <label htmlFor="is_submission" className="text-xs font-medium cursor-pointer">
-                  Ist eine Abgabe / Hausarbeit 📄
+                  {t("isSubmissionLabel")}
                 </label>
               </div>
             </div>
 
             {/* Module Link */}
             <div className="space-y-1.5">
-              <Label>Studienmodul verknüpfen</Label>
+              <Label>{t("moduleLabel")}</Label>
               <select className={selectClass} value={moduleId} onChange={(e) => setModuleId(e.target.value)}>
-                <option value="">-- Kein Modul --</option>
+                <option value="">{t("noModule")}</option>
                 {allModules.map(sm => (
                   <option key={sm.id} value={sm.id}>
                     {sm.module?.name || sm.custom_name}
@@ -148,14 +150,14 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
           <div>
             {task.id && (
               <Button variant="destructive" onClick={() => onDelete(task.id)} disabled={isSaving}>
-                Löschen
+                {t("deleteBtn")}
               </Button>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} disabled={isSaving}>Abbrechen</Button>
+            <Button variant="outline" onClick={onClose} disabled={isSaving}>{t("cancelBtn")}</Button>
             <Button onClick={handleSave} disabled={isSaving || !title.trim()}>
-              {isSaving ? "Speichert..." : "Speichern"}
+              {isSaving ? t("savingBtn") : t("saveBtn")}
             </Button>
           </div>
         </div>

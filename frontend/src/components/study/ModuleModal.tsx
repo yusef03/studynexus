@@ -29,7 +29,6 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
 
   const [status, setStatus] = useState<StudiengangStatus>(sm.status);
   const [note, setNote] = useState<string>(sm.note !== null ? sm.note.toFixed(1) : "");
-  const [semester, setSemester] = useState<string>(sm.semester ?? "");
   const [error, setError] = useState<string | null>(null);
   
   const updateModule = useUpdateModule();
@@ -42,8 +41,7 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
   const handleSave = () => {
     setError(null);
 
-    const payload: { status: StudiengangStatus; semester?: string; note?: number } = { status };
-    if (semester.trim()) payload.semester = semester.trim();
+    const payload: { status: StudiengangStatus; note?: number } = { status };
     if (isBenotet && note.trim()) {
       const parsed = parseFloat(note);
       if (!isNaN(parsed)) payload.note = parsed;
@@ -125,16 +123,7 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
             <p className="text-sm text-muted-foreground">{t("noteUngraded")}</p>
           )}
 
-          {/* Semester */}
-          <div className="space-y-1.5">
-            <Label htmlFor="modal-semester">{t("semester")}</Label>
-            <Input
-              id="modal-semester"
-              value={semester}
-              onChange={(e) => setSemester(e.target.value)}
-              placeholder="WS2024/25"
-            />
-          </div>
+
 
           {/* Error */}
           {error && (

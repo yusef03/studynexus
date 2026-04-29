@@ -6,8 +6,11 @@ import { EventModal } from "@/components/schedule/EventModal";
 import { useTasks } from "@/hooks/queries/useTasks";
 import { useEvents } from "@/hooks/queries/useEvents";
 import { Task } from "@/types/task";
+import { Plus, BookOpen, Calendar, Clock, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function MobileQuickAdd() {
+  const t = useTranslations("dashboard.widgets.quickAdd");
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState<"NONE" | "TASK" | "SUBMISSION" | "EVENT">("NONE");
   
@@ -75,30 +78,29 @@ export function MobileQuickAdd() {
 
   return (
     <>
-      <div className="fixed bottom-6 right-6 z-40 md:hidden flex flex-col items-end">
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end">
         {/* Menu Items */}
         {isOpen && (
           <div className="flex flex-col gap-3 mb-4 items-end animate-in slide-in-from-bottom-5 fade-in duration-200">
-            <button 
-              onClick={() => setModalType("SUBMISSION")}
-              className="flex items-center gap-3 bg-card border shadow-lg px-4 py-2.5 rounded-full font-medium text-sm text-foreground active:scale-95 transition-transform"
-            >
-              <span>Abgabe</span>
-              <span className="bg-purple-100 text-purple-600 dark:bg-purple-900 dark:text-purple-400 w-8 h-8 rounded-full flex items-center justify-center">📄</span>
+            <button onClick={() => setModalType("SUBMISSION")} className="flex flex-col items-center gap-2 group">
+              <div className="w-14 h-14 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center shadow-lg border border-blue-500/20 active:scale-95 transition-transform">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-medium bg-background/80 px-2 py-0.5 rounded-full">{t("newModule")}</span>
             </button>
-            <button 
-              onClick={() => setModalType("TASK")}
-              className="flex items-center gap-3 bg-card border shadow-lg px-4 py-2.5 rounded-full font-medium text-sm text-foreground active:scale-95 transition-transform"
-            >
-              <span>Aufgabe</span>
-              <span className="bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400 w-8 h-8 rounded-full flex items-center justify-center">📝</span>
+
+            <button onClick={() => setModalType("TASK")} className="flex flex-col items-center gap-2 group">
+              <div className="w-14 h-14 rounded-full bg-orange-500/10 text-orange-500 flex items-center justify-center shadow-lg border border-orange-500/20 active:scale-95 transition-transform">
+                <Clock className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-medium bg-background/80 px-2 py-0.5 rounded-full">{t("studySession")}</span>
             </button>
-            <button 
-              onClick={() => setModalType("EVENT")}
-              className="flex items-center gap-3 bg-card border shadow-lg px-4 py-2.5 rounded-full font-medium text-sm text-foreground active:scale-95 transition-transform"
-            >
-              <span>Termin</span>
-              <span className="bg-emerald-100 text-emerald-600 dark:bg-emerald-900 dark:text-emerald-400 w-8 h-8 rounded-full flex items-center justify-center">📅</span>
+
+            <button onClick={() => setModalType("EVENT")} className="flex flex-col items-center gap-2 group">
+              <div className="w-14 h-14 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center shadow-lg border border-red-500/20 active:scale-95 transition-transform">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <span className="text-xs font-medium bg-background/80 px-2 py-0.5 rounded-full">{t("examDate")}</span>
             </button>
           </div>
         )}

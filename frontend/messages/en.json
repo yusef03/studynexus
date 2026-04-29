@@ -46,7 +46,59 @@
       "overview": "Mission Hub",
       "modules": "Study Plan",
       "kanban": "Kanban",
-      "schedule": "Schedule"
+      "schedule": "Schedule",
+      "studyPlan": "Degree Plan",
+      "profile": "ID Card",
+      "settings": "Settings"
+    },
+    "overview": {
+      "welcome": "Welcome, {name} 👋",
+      "welcomeFallback": "Welcome 👋",
+      "subtitle": "Here is your radar for the upcoming days in the Mission Hub."
+    },
+    "widgets": {
+      "dailyFocus": {
+        "title": "Daily Focus",
+        "subtitle": "Your daily goal",
+        "todayMission": "Today's Mission",
+        "focusTime": "Focus Time",
+        "completeAll": "Complete All",
+        "loading": "Loading radar...",
+        "tomorrow": "Tomorrow",
+        "today": "Today",
+        "noEvents": "No upcoming events."
+      },
+      "examCountdown": {
+        "title": "Exam Countdown",
+        "subtitle": "Your upcoming exams at a glance",
+        "days": "Days",
+        "today": "Today!",
+        "loading": "Loading countdowns...",
+        "noExams": "No upcoming exams!"
+      },
+      "smartTimeline": {
+        "title": "Smart Timeline",
+        "subtitle": "Your academic progress",
+        "today": "Today",
+        "upcoming": "Upcoming",
+        "past": "Past",
+        "loading": "Loading timeline...",
+        "openTasks": "{count} open tasks",
+        "emptyState": {
+          "title": "Your Kanban board is empty.",
+          "subtitle": "No upcoming tasks."
+        },
+        "labels": {
+          "exam": "EXAM PREP",
+          "submission": "📄 SUBMISSION",
+          "highPrio": "HIGH PRIO"
+        }
+      },
+      "quickAdd": {
+        "newModule": "New Module",
+        "studySession": "Study Session",
+        "examDate": "Exam Date"
+      }
     },
     "title": "My Study Plan",
     "subtitle": "Manage your modules and grades",
@@ -76,6 +128,102 @@
         "REGISTERED": "Registered",
         "PASSED": "Passed",
         "FAILED": "Failed"
+      }
+    },
+    "kanban": {
+      "title": "Kanban",
+      "description": "Organize your tasks and deadlines on the Kanban board.",
+      "board": {
+        "loading": "Loading Board...",
+        "error": "Error loading board.",
+        "newTask": "New Task",
+        "columns": {
+          "todo": "To Do",
+          "in_progress": "In Progress",
+          "exam_ready": "Exam Ready",
+          "done": "Done"
+        }
+      },
+      "modal": {
+        "editTitle": "Edit Task",
+        "newTitle": "New Task",
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g., Math Assignment 3...",
+        "descLabel": "Description / Notes",
+        "descPlaceholder": "Add notes or details...",
+        "statusLabel": "Column (Status)",
+        "priorityLabel": "Priority",
+        "dueDateLabel": "Due Date",
+        "isSubmissionLabel": "Is a submission / assignment 📄",
+        "moduleLabel": "Link Study Module",
+        "noModule": "-- No Module --",
+        "deleteBtn": "Delete",
+        "cancelBtn": "Cancel",
+        "saveBtn": "Save",
+        "savingBtn": "Saving..."
+      }
+    },
+    "schedule": {
+      "title": "Schedule",
+      "description": "Your interactive timetable and calendar.",
+      "board": {
+        "loading": "Loading Schedule...",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "showGhosts": "Show ghost blocks (hidden)",
+        "collisionWarning": "Time overlap with",
+        "deadline": "Deadline",
+        "noEvents": "No events in schedule."
+      },
+      "modal": {
+        "editTitle": "Edit Block",
+        "newTitle": "Create New Block",
+        "collisionAlert": "Time Conflict!",
+        "collisionQuestion": "Do you want to save anyway?",
+        "titleLabel": "Title",
+        "titlePlaceholder": "e.g., Computer Graphics Lecture",
+        "typeLabel": "Type",
+        "types": {
+          "LECTURE": "Lecture",
+          "EXERCISE": "Exercise",
+          "TUTORIAL": "Tutorial",
+          "SEMINAR": "Seminar",
+          "PRACTICUM": "Practicum",
+          "CUSTOM_STUDY": "Study Session",
+          "FOCUS": "🎧 Focus / Deep Work",
+          "EXAM": "Exam",
+          "WORK": "Part-time Job / Work",
+          "LIFE": "Private (Life)"
+        },
+        "moduleLabel": "Module (Optional)",
+        "noModule": "-- No Module --",
+        "semesterGroup": "Semester {n}",
+        "freeGroup": "Free/Elective",
+        "recurringLabel": "Repeat weekly",
+        "ghostingLabel": "Ghosting (Hidden)",
+        "dayLabel": "Day of the week",
+        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "dateLabel": "Specific Date",
+        "fromLabel": "From",
+        "toLabel": "To",
+        "locationLabel": "Location / Room",
+        "locationPlaceholder": "e.g., Bldg 1, R. 238",
+        "lecturerLabel": "Lecturer",
+        "lecturerPlaceholder": "e.g., Prof. Miller",
+        "deleteBtn": "Delete",
+        "cancelBtn": "Cancel",
+        "saveBtn": "Save",
+        "savingBtn": "Saving...",
+        "forceSaveBtn": "Save Anyway"
+      }
+    },
+    "studyPlan": {
+      "title": "Degree Plan",
+      "description": "Visualize and plan your studies. Drag and drop your modules into the corresponding semesters.",
+      "board": {
+        "unplanned": "Unplanned",
+        "semester": "Semester {n}",
+        "dropHere": "Drop here",
+        "custom": "Custom"
       }
     },
     "addModule": {
@@ -121,5 +269,61 @@
       "loadError": "Error loading data. Please reload the page.",
       "saveError": "Error saving programme selection"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "description": "Manage your account, profile, and app preferences.",
+    "tabs": {
+      "profile": "Personal Data",
+      "account": "Account & Security",
+      "appearance": "Appearance"
+    },
+    "profile": {
+      "title": "Personal Data",
+      "description": "These details are shown on your digital student ID and cannot be changed.",
+      "fullName": "Full Name",
+      "matrikelnummer": "Matriculation Number",
+      "birthDate": "Date of Birth",
+      "university": "University"
+    },
+    "account": {
+      "title": "Account & Security",
+      "description": "Manage your email address and password.",
+      "emailLabel": "Email Address",
+      "emailHint": "The email address cannot be changed.",
+      "changePasswordTitle": "Change Password",
+      "oldPassword": "Old Password",
+      "newPassword": "New Password",
+      "confirmPassword": "Confirm Password",
+      "passwordMismatch": "Passwords do not match.",
+      "passwordSuccess": "Password changed successfully!",
+      "passwordError": "Error changing password.",
+      "networkError": "Network error.",
+      "saveButton": "Change Password",
+      "savingButton": "Saving..."
+    },
+    "appearance": {
+      "title": "Appearance",
+      "description": "Customize the system to your needs.",
+      "language": "Language",
+      "theme": "Theme (Coming soon)",
+      "themeSystem": "System Default",
+      "themeLight": "Light",
+      "themeDark": "Dark"
+    }
+  },
+  "profile": {
+    "title": "Your Student ID",
+    "description": "Digital representation of your StudyNexus profile.",
+    "idSubtitle": "Valid for the current semester",
+    "unknown": "Unknown",
+    "empty": "—",
+    "fields": {
+      "name": "Name",
+      "matrikelnummer": "Matriculation No.",
+      "birthDate": "Date of Birth",
+      "university": "University"
+    },
+    "editLink": "View profile in settings"
   }
 }

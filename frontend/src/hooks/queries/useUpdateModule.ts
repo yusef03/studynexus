@@ -6,7 +6,6 @@ import type { StudentModuleResponse, StudiengangStatus } from "@/types/study";
 interface UpdatePayload {
   id: string;
   status: StudiengangStatus;
-  semester?: string;
   note?: number;
 }
 
@@ -20,6 +19,12 @@ export function useUpdateModule() {
         headers: { "Content-Type": "application/json", "x-studynexus-client": "true" },
         body: JSON.stringify(body),
       });
+
+      if (res.status === 401) {
+        // Token expired – force re-login
+        window.location.href = "/login";
+        throw new Error("Sitzung abgelaufen. Bitte erneut anmelden.");
+      }
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));

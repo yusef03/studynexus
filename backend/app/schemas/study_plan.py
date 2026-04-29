@@ -117,7 +117,7 @@ class StudentModuleResponse(BaseModel):
 
 
 class StudentModulesBySemester(BaseModel):
-    semester: Optional[int]
+    semester: Optional[str]
     modules: List[StudentModuleResponse]
 
 

@@ -46,7 +46,59 @@
       "overview": "Mission Hub",
       "modules": "Studienplan",
       "kanban": "Kanban",
-      "schedule": "Stundenplan"
+      "schedule": "Stundenplan",
+      "studyPlan": "Studienverlauf",
+      "profile": "ID Card",
+      "settings": "Einstellungen"
+    },
+    "overview": {
+      "welcome": "Willkommen, {name} 👋",
+      "welcomeFallback": "Willkommen 👋",
+      "subtitle": "Hier ist dein Radar für die kommenden Tage im Mission Hub."
+    },
+    "widgets": {
+      "dailyFocus": {
+        "title": "Daily Focus",
+        "subtitle": "Dein Tagesziel",
+        "todayMission": "Heutige Mission",
+        "focusTime": "Fokus-Zeitraum",
+        "completeAll": "Alle abschließen",
+        "loading": "Lade Radar...",
+        "tomorrow": "Morgen",
+        "today": "Heute",
+        "noEvents": "Keine anstehenden Termine mehr."
+      },
+      "examCountdown": {
+        "title": "Klausuren-Countdown",
+        "subtitle": "Deine nächsten Prüfungen im Blick",
+        "days": "Tage",
+        "today": "Heute!",
+        "loading": "Lade Countdowns...",
+        "noExams": "Keine anstehenden Klausuren!"
+      },
+      "smartTimeline": {
+        "title": "Smart Timeline",
+        "subtitle": "Dein akademischer Fortschritt",
+        "today": "Heute",
+        "upcoming": "Anstehend",
+        "past": "Vergangen",
+        "loading": "Lade Timeline...",
+        "openTasks": "{count} offene Tasks",
+        "emptyState": {
+          "title": "Dein Kanban Board ist leer.",
+          "subtitle": "Keine anstehenden Aufgaben."
+        },
+        "labels": {
+          "exam": "KLAUSURVORBEREITUNG",
+          "submission": "📄 ABGABE",
+          "highPrio": "HOHE PRIO"
+        }
+      },
+      "quickAdd": {
+        "newModule": "Neues Modul",
+        "studySession": "Lern-Session",
+        "examDate": "Klausurtermin"
+      }
     },
     "title": "Mein Studienplan",
     "subtitle": "Verwalte deine Module und Noten",
@@ -76,6 +128,102 @@
         "REGISTERED": "Angemeldet",
         "PASSED": "Bestanden",
         "FAILED": "Nicht bestanden"
+      }
+    },
+    "kanban": {
+      "title": "Kanban",
+      "description": "Organisiere deine Aufgaben und Deadlines im Kanban-Board.",
+      "board": {
+        "loading": "Lade Board...",
+        "error": "Fehler beim Laden des Boards.",
+        "newTask": "Neuer Task",
+        "columns": {
+          "todo": "To Do",
+          "in_progress": "In Progress",
+          "exam_ready": "Exam Ready",
+          "done": "Done"
+        }
+      },
+      "modal": {
+        "editTitle": "Aufgabe bearbeiten",
+        "newTitle": "Neuer Task",
+        "titleLabel": "Titel",
+        "titlePlaceholder": "z. B. Mathe Übung 3...",
+        "descLabel": "Beschreibung / Notizen",
+        "descPlaceholder": "Füge Notizen oder Details hinzu...",
+        "statusLabel": "Spalte (Status)",
+        "priorityLabel": "Priorität",
+        "dueDateLabel": "Fälligkeitsdatum",
+        "isSubmissionLabel": "Ist eine Abgabe / Hausarbeit 📄",
+        "moduleLabel": "Studienmodul verknüpfen",
+        "noModule": "-- Kein Modul --",
+        "deleteBtn": "Löschen",
+        "cancelBtn": "Abbrechen",
+        "saveBtn": "Speichern",
+        "savingBtn": "Speichert..."
+      }
+    },
+    "schedule": {
+      "title": "Stundenplan",
+      "description": "Dein interaktiver Stundenplan und Kalender.",
+      "board": {
+        "loading": "Lade Stundenplan...",
+        "days": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"],
+        "showGhosts": "Geister-Blöcke (ausgeblendet) anzeigen",
+        "collisionWarning": "Überschneidet sich zeitlich mit",
+        "deadline": "Deadline",
+        "noEvents": "Keine Termine im Stundenplan."
+      },
+      "modal": {
+        "editTitle": "Block bearbeiten",
+        "newTitle": "Neuen Block erstellen",
+        "collisionAlert": "Zeit-Konflikt!",
+        "collisionQuestion": "Möchtest du trotzdem speichern?",
+        "titleLabel": "Titel",
+        "titlePlaceholder": "z. B. Vorlesung Computergrafik",
+        "typeLabel": "Typ",
+        "types": {
+          "LECTURE": "Vorlesung",
+          "EXERCISE": "Übung",
+          "TUTORIAL": "Tutorium",
+          "SEMINAR": "Seminar",
+          "PRACTICUM": "Praktikum",
+          "CUSTOM_STUDY": "Lern-Session",
+          "FOCUS": "🎧 Fokuszeit / Deep Work",
+          "EXAM": "Klausur / Prüfung",
+          "WORK": "Nebenjob / Arbeit",
+          "LIFE": "Privates (Life)"
+        },
+        "moduleLabel": "Modul (Optional)",
+        "noModule": "-- Kein Modul --",
+        "semesterGroup": "Semester {n}",
+        "freeGroup": "Semester Frei/Wahl",
+        "recurringLabel": "Wöchentlich wiederholen",
+        "ghostingLabel": "Ghosting (Versteckt)",
+        "dayLabel": "Wochentag",
+        "days": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
+        "dateLabel": "Spezifisches Datum",
+        "fromLabel": "Von",
+        "toLabel": "Bis",
+        "locationLabel": "Ort / Raum",
+        "locationPlaceholder": "z. B. Geb. 1, R. 238",
+        "lecturerLabel": "Dozent/in",
+        "lecturerPlaceholder": "z. B. Prof. Müller",
+        "deleteBtn": "Löschen",
+        "cancelBtn": "Abbrechen",
+        "saveBtn": "Speichern",
+        "savingBtn": "Speichert...",
+        "forceSaveBtn": "Trotzdem Speichern"
+      }
+    },
+    "studyPlan": {
+      "title": "Studienplan",
+      "description": "Visualisiere und plane dein Studium. Ziehe deine Module in die entsprechenden Semester.",
+      "board": {
+        "unplanned": "Ungeplant",
+        "semester": "Semester {n}",
+        "dropHere": "Hier ablegen",
+        "custom": "Eigenes"
       }
     },
     "addModule": {
@@ -121,5 +269,61 @@
       "loadError": "Fehler beim Laden der Daten. Bitte Seite neu laden.",
       "saveError": "Fehler beim Speichern des Studiengangs"
     }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "description": "Verwalte dein Konto, dein Profil und deine App-Präferenzen.",
+    "tabs": {
+      "profile": "Persönliche Daten",
+      "account": "Konto & Sicherheit",
+      "appearance": "Erscheinungsbild"
+    },
+    "profile": {
+      "title": "Persönliche Daten",
+      "description": "Diese Daten werden auf deinem digitalen Studentenausweis angezeigt und können nicht geändert werden.",
+      "fullName": "Vollständiger Name",
+      "matrikelnummer": "Matrikelnummer",
+      "birthDate": "Geburtsdatum",
+      "university": "Hochschule"
+    },
+    "account": {
+      "title": "Konto & Sicherheit",
+      "description": "Verwalte deine E-Mail-Adresse und dein Passwort.",
+      "emailLabel": "E-Mail Adresse",
+      "emailHint": "Die E-Mail-Adresse kann nicht geändert werden.",
+      "changePasswordTitle": "Passwort ändern",
+      "oldPassword": "Altes Passwort",
+      "newPassword": "Neues Passwort",
+      "confirmPassword": "Passwort bestätigen",
+      "passwordMismatch": "Passwörter stimmen nicht überein.",
+      "passwordSuccess": "Passwort erfolgreich geändert!",
+      "passwordError": "Fehler beim Ändern des Passworts.",
+      "networkError": "Netzwerkfehler.",
+      "saveButton": "Passwort ändern",
+      "savingButton": "Speichern..."
+    },
+    "appearance": {
+      "title": "Erscheinungsbild",
+      "description": "Passe das System an deine Bedürfnisse an.",
+      "language": "Sprache",
+      "theme": "Theme (In Kürze verfügbar)",
+      "themeSystem": "System Standard",
+      "themeLight": "Hell",
+      "themeDark": "Dunkel"
+    }
+  },
+  "profile": {
+    "title": "Dein Studentenausweis",
+    "description": "Digitale Repräsentation deines Profils bei StudyNexus.",
+    "idSubtitle": "Gültig für das aktuelle Semester",
+    "unknown": "Unbekannt",
+    "empty": "—",
+    "fields": {
+      "name": "Name",
+      "matrikelnummer": "Matrikel-Nr.",
+      "birthDate": "Geburtsdatum",
+      "university": "Hochschule"
+    },
+    "editLink": "Profil in den Einstellungen ansehen"
   }
 }

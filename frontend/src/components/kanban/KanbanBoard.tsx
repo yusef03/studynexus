@@ -5,6 +5,17 @@ import { useTasks } from "@/hooks/queries/useTasks";
 import { Task, TaskStatus, TaskUpdate } from "@/types/task";
 import { TaskModal } from "./TaskModal";
 import { useUserModules } from "@/hooks/queries/useUserModules";
+import { polyfill } from "mobile-drag-drop";
+import "mobile-drag-drop/default.css";
+import { useTranslations, useLocale } from "next-intl";
+
+// Polyfill for mobile drag and drop
+if (typeof window !== "undefined") {
+  polyfill({
+    dragImageCenterOnTouch: true,
+  });
+  window.addEventListener("touchmove", () => {}, { passive: false });
+}
 
 const COLUMNS: { id: TaskStatus; title: string }[] = [
   { id: "TODO", title: "To Do" },
@@ -14,6 +25,8 @@ const COLUMNS: { id: TaskStatus; title: string }[] = [
 ];
 
 export function KanbanBoard() {
+  const t = useTranslations("dashboard.kanban.board");
+  const locale = useLocale();
   const { tasks, isLoading, isError, updateTask, createTask, deleteTask } = useTasks();
   const { data: modulesBySemester } = useUserModules();
   const [localTasks, setLocalTasks] = useState<Task[]>([]);
@@ -38,8 +51,8 @@ export function KanbanBoard() {
   }, [tasks]);
 
   if (!isMounted) return null;
-  if (isLoading) return <div className="text-muted-foreground p-8">Lade Board...</div>;
-  if (isError) return <div className="text-red-500 p-8">Fehler beim Laden des Boards.</div>;
+  if (isLoading) return <div className="text-muted-foreground p-8">{t("loading")}</div>;
+  if (isError) return <div className="text-red-500 p-8">{t("error")}</div>;
 
   const handleDragStart = (e: React.DragEvent, id: string) => {
     e.dataTransfer.setData("text/plain", id);
@@ -145,7 +158,7 @@ export function KanbanBoard() {
           className="h-10 px-4 rounded-md bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 flex items-center gap-2 shadow-sm"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          Neuer Task
+          {t("newTask")}
         </button>
       </div>
 
@@ -163,7 +176,7 @@ export function KanbanBoard() {
               onDrop={(e) => handleDrop(e, col.id)}
             >
               <div className="p-4 flex items-center justify-between border-b border-border/50">
-                <h3 className="font-semibold">{col.title}</h3>
+                <h3 className="font-semibold">{t(`columns.${col.id.toLowerCase()}`)}</h3>
                 <span className="text-xs bg-muted text-muted-foreground px-2 py-1 rounded-full">
                   {colTasks.length}
                 </span>
@@ -179,7 +192,7 @@ export function KanbanBoard() {
                     draggable
                     onDragStart={(e) => handleDragStart(e, task.id)}
                     onClick={() => setSelectedTask(task)}
-                    className={`bg-card p-4 rounded-lg shadow-sm border transition-all cursor-pointer hover:border-primary/50 relative group ${
+                    className={`bg-card p-4 rounded-lg shadow-sm border transition-all cursor-pointer hover:border-primary/50 relative group touch-none ${
                       draggedId === task.id ? "opacity-50" : ""
                     } ${task.status === "EXAM_READY" ? "border-red-500/50 shadow-[0_0_10px_rgba(239,68,68,0.2)]" : ""}`}
                   >
@@ -188,7 +201,7 @@ export function KanbanBoard() {
                     </div>
 
                     <h4 className="font-medium text-sm mb-2 pr-5">
-                      {task.is_submission && <span className="mr-1" title="Abgabe">📄</span>}
+                      {task.is_submission && <span className="mr-1" title="Submission">📄</span>}
                       {task.title}
                     </h4>
                     
@@ -213,7 +226,7 @@ export function KanbanBoard() {
                       {task.due_date && (
                         <span className="text-[10px] flex items-center gap-1 text-muted-foreground bg-muted px-2 py-0.5 rounded-md">
                           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                          {new Date(task.due_date).toLocaleDateString("de-DE", { day: "2-digit", month: "2-digit" })}
+                          {new Date(task.due_date).toLocaleDateString(locale === "en" ? "en-US" : "de-DE", { day: "2-digit", month: "2-digit" })}
                         </span>
                       )}
                     </div>
