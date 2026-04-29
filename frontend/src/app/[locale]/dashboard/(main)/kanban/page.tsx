@@ -7,9 +7,9 @@ export default async function KanbanPage() {
   return (
     <div className="p-6 lg:p-10 h-full flex flex-col">
       <div className="mb-8 flex-shrink-0">
-        <h1 className="text-3xl font-bold tracking-tight">{t("nav.kanban")}</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("kanban.title")}</h1>
         <p className="mt-2 text-muted-foreground">
-          Organisiere deine Aufgaben und Deadlines im Kanban-Board.
+          {t("kanban.description")}
         </p>
       </div>
       <div className="flex-1 overflow-hidden">

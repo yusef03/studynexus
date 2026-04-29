@@ -114,7 +114,11 @@ def get_my_modules(
     grouped: dict = defaultdict(list)
     for sm in student_modules:
         module = modules_by_id.get(sm.module_id) if sm.module_id else None
-        semester_key = module.semester_empfehlung if module else None
+        semester_key = sm.semester
+        if semester_key is None:
+            # Fallback to recommended semester
+            semester_key = str(module.semester_empfehlung) if module and module.semester_empfehlung else "Ungeplant"
+            
         grouped[semester_key].append(_build_sm_response(sm, module))
 
     return [

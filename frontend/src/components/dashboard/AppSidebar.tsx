@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu } from "lucide-react";
+import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, Settings, UserCircle, Map } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 
@@ -16,13 +16,16 @@ export function AppSidebar({ locale }: { locale: string }) {
     { href: `/${locale}/dashboard/modules`, label: t("modules"), icon: BookOpen },
     { href: `/${locale}/dashboard/kanban`, label: t("kanban"), icon: ListTodo },
     { href: `/${locale}/dashboard/schedule`, label: t("schedule"), icon: Calendar },
+    { href: `/${locale}/dashboard/study-plan`, label: t("studyPlan"), icon: Map },
+    { href: `/${locale}/dashboard/profile`, label: t("profile"), icon: UserCircle },
+    { href: `/${locale}/dashboard/settings`, label: t("settings"), icon: Settings },
   ];
 
   return (
     <aside className="w-64 border-r bg-muted/20 hidden md:flex flex-col h-screen sticky top-0">
       <div className="h-14 flex items-center px-6 border-b">
         <Link href={`/${locale}/dashboard`} className="flex items-center gap-2">
-          <Logo className="h-6 w-auto" />
+          <Logo className="h-8 w-auto" />
         </Link>
       </div>
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">

@@ -3,14 +3,19 @@
 import { useTasks } from "@/hooks/queries/useTasks";
 import { useUserModules } from "@/hooks/queries/useUserModules";
 import { formatDistanceToNow } from "date-fns";
-import { de } from "date-fns/locale";
+import { de, enUS } from "date-fns/locale";
+import { useTranslations, useLocale } from "next-intl";
+import { CalendarDays } from "lucide-react";
 
 export function SmartTimeline() {
+  const t = useTranslations("dashboard.widgets.smartTimeline");
+  const locale = useLocale();
+  const dateFnsLocale = locale === "en" ? enUS : de;
   const { tasks, isLoading: tasksLoading } = useTasks();
   const { data: modulesBySemester, isLoading: modulesLoading } = useUserModules();
 
   if (tasksLoading || modulesLoading) {
-    return <div className="p-6 border rounded-xl bg-card shadow-sm min-h-[300px] flex items-center justify-center text-muted-foreground animate-pulse">Lade Timeline...</div>;
+    return <div className="p-6 border rounded-xl bg-card shadow-sm min-h-[300px] flex items-center justify-center text-muted-foreground animate-pulse">{t("loading")}</div>;
   }
 
   // Helper to find module name
@@ -54,11 +59,11 @@ export function SmartTimeline() {
     <div className="p-6 border rounded-xl bg-card shadow-sm min-h-[300px] flex flex-col">
       <div className="flex justify-between items-end mb-6">
         <h2 className="font-semibold text-lg flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-          Smart Timeline
+          <CalendarDays className="w-5 h-5 text-primary" />
+          {t("title")}
         </h2>
         <span className="text-xs font-medium px-2 py-1 bg-muted rounded-md text-muted-foreground">
-          {activeTasks.length} offene Tasks
+          {t("openTasks", { count: activeTasks.length })}
         </span>
       </div>
 
@@ -67,11 +72,11 @@ export function SmartTimeline() {
            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <span className="text-2xl">🌱</span>
            </div>
-           <p className="text-muted-foreground">Dein Kanban Board ist leer.</p>
-           <p className="text-xs text-muted-foreground mt-1">Keine anstehenden Aufgaben.</p>
+           <p className="text-muted-foreground">{t("emptyState.title")}</p>
+           <p className="text-xs text-muted-foreground mt-1">{t("emptyState.subtitle")}</p>
         </div>
       ) : (
-        <div className="relative pl-4 flex-1 overflow-y-auto pr-2 space-y-6 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-muted-foreground/20 before:to-transparent">
+        <div className="relative pl-6 flex-1 overflow-y-auto pr-2 space-y-6 before:absolute before:inset-0 before:ml-7 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-muted-foreground/20 before:to-transparent">
           {sortedTasks.map((task) => {
             const isExam = task.status === "EXAM_READY";
             const modName = getModuleName(task.module_id);
@@ -85,7 +90,7 @@ export function SmartTimeline() {
             if (task.due_date) {
                const diffDays = (new Date(task.due_date).getTime() - new Date().getTime()) / (1000 * 3600 * 24);
                deadlineUrgent = diffDays <= 3;
-               deadlineText = formatDistanceToNow(new Date(task.due_date), { addSuffix: true, locale: de });
+               deadlineText = formatDistanceToNow(new Date(task.due_date), { addSuffix: true, locale: dateFnsLocale });
             }
 
             return (
@@ -110,17 +115,17 @@ export function SmartTimeline() {
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     {isExam && (
                        <span className="text-[10px] font-bold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 bg-red-50 dark:bg-red-900/20 px-1.5 py-0.5 rounded">
-                         KLAUSURVORBEREITUNG
+                         {t("labels.exam")}
                        </span>
                     )}
                     {task.is_submission && (
                        <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-900/50 bg-purple-50 dark:bg-purple-900/20 px-1.5 py-0.5 rounded">
-                         📄 ABGABE
+                         {t("labels.submission")}
                        </span>
                     )}
                     {task.priority === "HIGH" && !isExam && !task.is_submission && (
                        <span className="text-[10px] font-bold text-orange-600 dark:text-orange-400 border border-orange-200 dark:border-orange-900/50 bg-orange-50 dark:bg-orange-900/20 px-1.5 py-0.5 rounded">
-                         HOHE PRIO
+                         {t("labels.highPrio")}
                        </span>
                     )}
                     {modName && (

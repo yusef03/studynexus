@@ -4,6 +4,8 @@ import { isRedirectError } from "next/dist/client/components/redirect";
 import { BACKEND, bearerHeaders } from "@/lib/backend";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { LogoutButton } from "@/components/auth/LogoutButton";
+import { Settings, UserCircle } from "lucide-react";
+import Link from "next/link";
 import { MobileQuickAdd } from "@/components/dashboard/MobileQuickAdd";
 import { MobileNav } from "@/components/dashboard/MobileNav";
 
@@ -37,7 +39,16 @@ export default async function DashboardMainLayout({
         <header className="h-14 border-b flex items-center justify-between px-6">
           <MobileNav locale={locale} />
           <div className="flex-1"></div>
-          <LogoutButton locale={locale} />
+          <div className="flex items-center gap-5">
+            <Link href={`/${locale}/dashboard/settings`} className="text-muted-foreground hover:text-primary transition-colors">
+              <Settings className="w-5 h-5" />
+            </Link>
+            <Link href={`/${locale}/dashboard/profile`} className="text-muted-foreground hover:text-primary transition-colors">
+              <UserCircle className="w-5 h-5" />
+            </Link>
+            <div className="h-5 w-px bg-border mx-1"></div>
+            <LogoutButton locale={locale} />
+          </div>
         </header>
         <main className="flex-1 overflow-y-auto relative">
           {children}

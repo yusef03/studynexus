@@ -3,6 +3,8 @@
 import { useEvents } from "@/hooks/queries/useEvents";
 import { useEffect, useState } from "react";
 import { Event } from "@/types/event";
+import { Clock, Trophy } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 function getDayOfWeek(date: Date) {
   // Convert JS Sunday=0 to Monday=0, Sunday=6
@@ -10,6 +12,7 @@ function getDayOfWeek(date: Date) {
 }
 
 export function DailyFocus() {
+  const t = useTranslations("dashboard.widgets.dailyFocus");
   const { events, isLoading } = useEvents("WiSe2425"); // MVP hardcoded semester tag for now
   const [isTomorrow, setIsTomorrow] = useState(false);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
@@ -63,18 +66,21 @@ export function DailyFocus() {
   }, [events]);
 
   if (isLoading) {
-    return <div className="p-6 border rounded-xl bg-card shadow-sm min-h-[300px] flex items-center justify-center text-muted-foreground animate-pulse">Lade Radar...</div>;
+    return <div className="p-6 border rounded-xl bg-card shadow-sm min-h-[300px] flex items-center justify-center text-muted-foreground animate-pulse">{t("loading")}</div>;
   }
 
   return (
-    <div className="p-6 border rounded-xl bg-card shadow-sm min-h-[300px] flex flex-col">
-      <div className="flex justify-between items-end mb-6">
-        <h2 className="font-semibold text-lg flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-          Daily Focus
-        </h2>
+    <div className="bg-gradient-to-br from-card to-muted/20 border rounded-xl p-6 shadow-sm min-h-[300px] flex flex-col">
+      <div className="flex justify-between items-start mb-6">
+        <div>
+          <h3 className="font-semibold text-lg flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-500" />
+            {t("title")}
+          </h3>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
         <span className="text-xs font-medium px-2 py-1 bg-muted rounded-md text-muted-foreground">
-          {isTomorrow ? "Morgen" : "Heute"}
+          {isTomorrow ? t("tomorrow") : t("today")}
         </span>
       </div>
 
@@ -83,11 +89,14 @@ export function DailyFocus() {
            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
               <span className="text-2xl">🎉</span>
            </div>
-           <p className="text-muted-foreground">Keine anstehenden Termine mehr.</p>
-           <p className="text-xs text-muted-foreground mt-1">Geniess die freie Zeit!</p>
+           <p className="text-muted-foreground">{t("noEvents")}</p>
         </div>
       ) : (
-        <div className="space-y-3 flex-1 overflow-y-auto pr-2">
+        <div className="space-y-4 flex-1 overflow-y-auto pr-2">
+          <div className="flex justify-between text-xs font-medium text-muted-foreground px-2">
+            <span>{t("todayMission")}</span>
+            <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {t("focusTime")}: 120min</span>
+          </div>
           {filteredEvents.map((evt) => {
             let colorClass = "bg-blue-500/10 border-blue-500/30 text-blue-800 dark:text-blue-200 border-l-4 border-l-blue-500";
             if (evt.event_type === "WORK") colorClass = "bg-orange-500/10 border-orange-500/30 text-orange-800 dark:text-orange-200 border-l-4 border-l-orange-500";

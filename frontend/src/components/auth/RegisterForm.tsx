@@ -44,8 +44,10 @@ export function RegisterForm({ locale }: RegisterFormProps) {
         body: JSON.stringify({
           email: `${data.get("email")}@stud.hs-hannover.de`,
           password,
-          full_name: data.get("full_name") || undefined,
-          matrikelnummer: data.get("matrikelnummer") || undefined,
+          full_name: data.get("full_name") as string,
+          matrikelnummer: data.get("matrikelnummer") as string,
+          birth_date: data.get("birth_date") ? new Date(data.get("birth_date") as string).toISOString() : undefined,
+          university: data.get("university") as string,
         }),
       });
 
@@ -84,18 +86,43 @@ export function RegisterForm({ locale }: RegisterFormProps) {
           type="text"
           autoComplete="name"
           placeholder="Max Mustermann"
+          required
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="matrikelnummer">Matrikelnummer (Optional)</Label>
+        <Label htmlFor="matrikelnummer">Matrikelnummer</Label>
         <Input
           id="matrikelnummer"
           name="matrikelnummer"
           type="text"
           inputMode="numeric"
           placeholder="z. B. 1234567"
+          required
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label htmlFor="birth_date">Geburtsdatum</Label>
+          <Input
+            id="birth_date"
+            name="birth_date"
+            type="date"
+            required
+          />
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="university">Hochschule</Label>
+          <Input
+            id="university"
+            name="university"
+            type="text"
+            placeholder="Hochschule Hannover"
+            required
+          />
+        </div>
       </div>
 
       <div className="space-y-2">

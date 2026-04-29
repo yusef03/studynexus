@@ -13,11 +13,22 @@ class UserBase(BaseModel):
 class UserUpdate(BaseModel):
     full_name: Optional[str] = None
     matrikelnummer: Optional[str] = None
+    birth_date: Optional[datetime] = None
+    university: Optional[str] = None
+    profile_picture_url: Optional[str] = None
+
+
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
 
 
 class UserCreate(UserBase):
+    full_name: str
     password: str
-    matrikelnummer: Optional[str] = None
+    matrikelnummer: str
+    birth_date: datetime
+    university: str
 
     @field_validator("email")
     @classmethod
@@ -32,6 +43,9 @@ class UserResponse(UserBase):
     is_active: bool
     is_premium: bool
     matrikelnummer: Optional[str] = None
+    birth_date: Optional[datetime] = None
+    university: Optional[str] = None
+    profile_picture_url: Optional[str] = None
     created_at: datetime
 
     model_config = {"from_attributes": True}

@@ -20,6 +20,11 @@ class User(Base):
     verification_code = Column(String, nullable=True)
     verification_expires_at = Column(DateTime(timezone=True), nullable=True)
     preferred_language = Column(String(2), default="de", nullable=False)
+    
+    # Profile fields
+    birth_date = Column(DateTime(timezone=True), nullable=True)
+    university = Column(String, nullable=True)
+    profile_picture_url = Column(String, nullable=True)
     # Python default keeps the field populated before DB flush (needed for tests/serialisation)
     created_at = Column(
         DateTime(timezone=True),

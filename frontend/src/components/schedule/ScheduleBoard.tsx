@@ -7,8 +7,8 @@ import { EventUpdate } from "@/types/event";
 import { EventModal } from "./EventModal";
 import { MobileAgendaView } from "./MobileAgendaView";
 import { Event } from "@/types/event";
+import { useTranslations } from "next-intl";
 
-const DAYS = ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"];
 const START_HOUR = 8;
 const END_HOUR = 20;
 const TOTAL_ROWS = (END_HOUR - START_HOUR) * 4; // 48 quarters
@@ -23,6 +23,7 @@ function timeToRow(timeStr: string | null): number {
 }
 
 export function ScheduleBoard() {
+  const t = useTranslations("dashboard.schedule.board");
   const { events, isLoading, createEvent, updateEvent, deleteEvent } = useEvents();
   const { tasks } = useTasks();
   
@@ -92,7 +93,7 @@ export function ScheduleBoard() {
           if (err.message === "Collision detected") {
             // we clean the detail string since we appended |COLLISION|
             const parts = err.collisionData?.split("|COLLISION|");
-            setCollisionWarning(`Überschneidet sich zeitlich mit "${parts ? parts[1] : 'einem anderen Event'}".`);
+            setCollisionWarning(`${t("collisionWarning")} "${parts ? parts[1] : '...'}".`);
           }
         }
       });
@@ -107,7 +108,7 @@ export function ScheduleBoard() {
     });
   };
 
-  if (isLoading) return <div className="p-8 text-muted-foreground">Lade Stundenplan...</div>;
+  if (isLoading) return <div className="p-8 text-muted-foreground">{t("loading")}</div>;
 
   const deadlineTasks = tasks.filter(t => t.due_date && t.status !== "DONE");
 
@@ -146,7 +147,7 @@ export function ScheduleBoard() {
         <div className="flex gap-4 items-center">
           <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
             <input type="checkbox" checked={showGhosts} onChange={e => setShowGhosts(e.target.checked)} className="rounded" />
-            Geister-Blöcke (ausgeblendet) anzeigen
+            {t("showGhosts")}
           </label>
         </div>
       </div>
@@ -160,9 +161,8 @@ export function ScheduleBoard() {
             gridTemplateRows: `40px repeat(${TOTAL_ROWS}, minmax(18px, 1fr))`
           }}
         >
-          {/* Header Row */}
           <div className="border-b border-r bg-muted/30 sticky top-0 z-20"></div>
-          {DAYS.map((day, i) => (
+          {(t.raw("days") as string[]).map((day, i) => (
              <div key={day} className="border-b border-r bg-muted/30 p-2 text-center font-medium sticky top-0 z-20 text-sm">
               {day}
             </div>
@@ -274,7 +274,7 @@ export function ScheduleBoard() {
                 style={{ gridRow: row + 1, gridColumn: dayIdx + 2 }}
               >
                 <div className="absolute top-1 right-1 text-[9px] bg-red-600/90 backdrop-blur-sm text-white px-1 rounded-sm whitespace-nowrap shadow-sm">
-                  Deadline: {task.title}
+                  {t("deadline")}: {task.title}
                 </div>
               </div>
             );

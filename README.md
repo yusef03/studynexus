@@ -9,6 +9,14 @@
 
 StudyNexus is an integrated, cloud-based B2C SaaS application that combines personal study management, social collaboration tools, and gamified learning processes in one central platform — independent of outdated university IT infrastructure.
 
+### The Engineering Approach 🤖
+StudyNexus is a modern full-stack project that I developed in the role of **Product Owner & AI Engineer**. While the entire system architecture, UX/UI concepts, and problem-solving strategies are my own, I heavily orchestrated state-of-the-art AI agents (e.g., Claude) for code generation and refactoring. This AI-driven workflow reduced development time by over 90%. 
+
+My primary focus during this project was on:
+- **System Architecture** (Docker, FastAPI, Next.js, PostgreSQL)
+- **Prompt Engineering & AI Orchestration**
+- **UX/UI Design & Product Strategy**
+- **Deployment & Security** (CSRF, JWT, TanStack Query)
 ## Core Features (Planned)
 
 - ✅ **Mission Control Dashboard** — GPA tracker, ECTS progress, weekly schedule

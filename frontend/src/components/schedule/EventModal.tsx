@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { Event, EventType, EventUpdate } from "@/types/event";
 import { useUserModules } from "@/hooks/queries/useUserModules";
+import { useTranslations } from "next-intl";
 
 const selectClass = cn(
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2",
@@ -27,6 +28,7 @@ interface Props {
 }
 
 export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSaving, semesterTag, collisionWarning }: Props) {
+  const t = useTranslations("dashboard.schedule.modal");
   const [title, setTitle] = useState(event?.title || "");
   const [eventType, setEventType] = useState<EventType>(event?.event_type || "LECTURE");
   const [dayOfWeek, setDayOfWeek] = useState(event?.day_of_week ?? initialDate?.day_of_week ?? 0);
@@ -90,7 +92,7 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
 
       <div className="relative w-full max-w-lg rounded-xl border bg-background shadow-2xl flex flex-col max-h-[90vh]">
         <div className="flex items-center justify-between border-b px-6 py-4">
-          <h2 className="text-lg font-semibold">{event ? "Block bearbeiten" : "Neuen Block erstellen"}</h2>
+          <h2 className="text-lg font-semibold">{event ? t("editTitle") : t("newTitle")}</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">✕</button>
         </div>
 
@@ -99,41 +101,41 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
             <div className="p-3 mb-4 rounded-md bg-yellow-500/10 border border-yellow-500/50 text-sm text-yellow-800 dark:text-yellow-200">
               <span className="font-bold flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
-                Zeit-Konflikt!
+                {t("collisionAlert")}
               </span>
               <div className="mt-1 opacity-90">{collisionWarning}</div>
-              <div className="mt-2 font-medium">Möchtest du trotzdem speichern?</div>
+              <div className="mt-2 font-medium">{t("collisionQuestion")}</div>
             </div>
           )}
 
           <div className="space-y-1.5">
-             <Label>Titel</Label>
-             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="z. B. Vorlesung Computergrafik" />
+             <Label>{t("titleLabel")}</Label>
+             <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={t("titlePlaceholder")} />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Typ</Label>
+              <Label>{t("typeLabel")}</Label>
               <select className={selectClass} value={eventType} onChange={(e) => setEventType(e.target.value as EventType)}>
-                <option value="LECTURE">Vorlesung</option>
-                <option value="EXERCISE">Übung</option>
-                <option value="TUTORIAL">Tutorium</option>
-                <option value="SEMINAR">Seminar</option>
-                <option value="PRACTICUM">Praktikum</option>
-                <option value="CUSTOM_STUDY">Lern-Session</option>
-                <option value="FOCUS" className="text-amber-600 font-bold">🎧 Fokuszeit / Deep Work</option>
-                <option value="EXAM" className="text-red-500 font-bold">Klausur / Prüfung</option>
-                <option value="WORK" className="text-orange-500">Nebenjob / Arbeit</option>
-                <option value="LIFE" className="text-purple-500">Privates (Life)</option>
+                <option value="LECTURE">{t("types.LECTURE")}</option>
+                <option value="EXERCISE">{t("types.EXERCISE")}</option>
+                <option value="TUTORIAL">{t("types.TUTORIAL")}</option>
+                <option value="SEMINAR">{t("types.SEMINAR")}</option>
+                <option value="PRACTICUM">{t("types.PRACTICUM")}</option>
+                <option value="CUSTOM_STUDY">{t("types.CUSTOM_STUDY")}</option>
+                <option value="FOCUS" className="text-amber-600 font-bold">{t("types.FOCUS")}</option>
+                <option value="EXAM" className="text-red-500 font-bold">{t("types.EXAM")}</option>
+                <option value="WORK" className="text-orange-500">{t("types.WORK")}</option>
+                <option value="LIFE" className="text-purple-500">{t("types.LIFE")}</option>
               </select>
             </div>
 
             <div className="space-y-1.5">
-              <Label>Modul (Optional)</Label>
+              <Label>{t("moduleLabel")}</Label>
               <select className={selectClass} value={moduleId} onChange={(e) => setModuleId(e.target.value)}>
-                <option value="">-- Kein Modul --</option>
+                <option value="">{t("noModule")}</option>
                 {modulesBySemester?.map((group, idx) => (
-                  <optgroup key={idx} label={`Semester ${group.semester ?? 'Frei/Wahl'}`}>
+                  <optgroup key={idx} label={group.semester ? t("semesterGroup", { n: group.semester }) : t("freeGroup")}>
                     {group.modules.map((sm: any) => (
                       <option key={sm.id} value={sm.id}>
                         {sm.module?.name || sm.custom_name}
@@ -154,12 +156,12 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
                 disabled={eventType === "EXAM"}
                 className="rounded border-gray-300" 
               />
-              Wöchentlich wiederholen
+              {t("recurringLabel")}
             </label>
             
             <label className="flex items-center gap-2 cursor-pointer text-sm text-muted-foreground">
               <input type="checkbox" checked={isHidden} onChange={e => setIsHidden(e.target.checked)} className="rounded border-gray-300" />
-              Ghosting (Versteckt)
+              {t("ghostingLabel")}
             </label>
           </div>
 
@@ -167,20 +169,16 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
             <div className="space-y-1.5">
               {isRecurring ? (
                 <>
-                  <Label>Wochentag</Label>
+                  <Label>{t("dayLabel")}</Label>
                   <select className={selectClass} value={dayOfWeek} onChange={(e) => setDayOfWeek(Number(e.target.value))}>
-                    <option value={0}>Montag</option>
-                    <option value={1}>Dienstag</option>
-                    <option value={2}>Mittwoch</option>
-                    <option value={3}>Donnerstag</option>
-                    <option value={4}>Freitag</option>
-                    <option value={5}>Samstag</option>
-                    <option value={6}>Sonntag</option>
+                    {(t.raw("days") as string[]).map((day, idx) => (
+                      <option key={idx} value={idx}>{day}</option>
+                    ))}
                   </select>
                 </>
               ) : (
                 <>
-                  <Label>Spezifisches Datum</Label>
+                  <Label>{t("dateLabel")}</Label>
                   <Input type="date" value={eventDate} onChange={e => setEventDate(e.target.value)} />
                 </>
               )}
@@ -188,11 +186,11 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
             
             <div className="grid grid-cols-2 gap-2">
               <div className="space-y-1.5">
-                <Label>Von</Label>
+                <Label>{t("fromLabel")}</Label>
                 <Input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label>Bis</Label>
+                <Label>{t("toLabel")}</Label>
                 <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
               </div>
             </div>
@@ -200,12 +198,12 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label>Ort / Raum</Label>
-              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="z. B. Geb. 1, R. 238" />
+              <Label>{t("locationLabel")}</Label>
+              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={t("locationPlaceholder")} />
             </div>
             <div className="space-y-1.5">
-              <Label>Dozent/in</Label>
-              <Input value={lecturer} onChange={(e) => setLecturer(e.target.value)} placeholder="z. B. Prof. Müller" />
+              <Label>{t("lecturerLabel")}</Label>
+              <Input value={lecturer} onChange={(e) => setLecturer(e.target.value)} placeholder={t("lecturerPlaceholder")} />
             </div>
           </div>
         </div>
@@ -214,14 +212,14 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
           <div>
             {event && (
               <Button variant="destructive" onClick={() => onDelete(event.id)} disabled={isSaving}>
-                Löschen
+                {t("deleteBtn")}
               </Button>
             )}
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} disabled={isSaving}>Abbrechen</Button>
+            <Button variant="outline" onClick={onClose} disabled={isSaving}>{t("cancelBtn")}</Button>
             <Button onClick={handleSave} disabled={isSaving || !title.trim() || (!isRecurring && !eventDate)}>
-              {isSaving ? "Speichert..." : (collisionWarning ? "Trotzdem Speichern" : "Speichern")}
+              {isSaving ? t("savingBtn") : (collisionWarning ? t("forceSaveBtn") : t("saveBtn"))}
             </Button>
           </div>
         </div>
