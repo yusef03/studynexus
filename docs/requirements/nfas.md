@@ -38,9 +38,9 @@ Alle sensiblen Daten müssen verschlüsselt gespeichert und übertragen werden.
 - Datenverschlüsselung at rest: AES-256
 - Datenverschlüsselung in transit: TLS 1.3 (kein TLS 1.2 oder älter)
 - Passwörter werden ausschließlich als bcrypt-Hash (cost factor >= 12) gespeichert
-- JWT-Tokens laufen nach 15 Minuten ab, Refresh Tokens nach 7 Tagen
+- JWT-Tokens laufen nach 7 Tagen ab (Development); in Produktion kürzer konfigurierbar via `ACCESS_TOKEN_EXPIRE_MINUTES`
 - Rate Limiting: maximal 10 Login-Versuche pro Minute pro IP
-- Alle API-Endpunkte erfordern Authentifizierung (außer Login/Register)
+- Alle API-Endpunkte erfordern Authentifizierung (außer Login/Register/Verify)
 
 **Test:** OWASP Top 10 Security Audit zeigt keine kritischen Schwachstellen
 
@@ -86,12 +86,15 @@ Das System muss offlinefähig sein und eine hohe Verfügbarkeit bieten.
 
 **Kategorie:** Sicherheit
 **Priorität:** Hoch
+**Status:** ✅ Implementiert (Sprint 3B)
 
 **Anforderung:**
 Das System muss vor Cross-Site Request Forgery geschützt sein.
 
-**Messbare Kriterien:**
-- Next.js proxy provides partial protection. Full CSRF tokens to be implemented in Sprint 3B.
+**Implementierung:**
+- Next.js Middleware validiert `x-studynexus-client: true` Custom Header auf allen mutierenden Requests (POST, PUT, DELETE, PATCH)
+- Origin/Host Header-Prüfung gegen CSRF-Angriffe von fremden Domains
+- httpOnly Cookies verhindern JavaScript-Zugriff auf den JWT-Token
 
 ---
 
@@ -136,6 +139,7 @@ Der Code muss verständlich, testbar und erweiterbar sein.
 
 **Kategorie:** Usability
 **Priorität:** Mittel
+**Status:** ✅ Vollständig implementiert (Sprint 3.7)
 
 **Anforderung:**
 Das System muss von Beginn an mehrsprachig sein.
@@ -146,4 +150,10 @@ Das System muss von Beginn an mehrsprachig sein.
 - Alle Fehlermeldungen, Labels und UI-Texte übersetzt
 - Datumsformate passen sich der Sprache an (DE: 18.04.2026 / EN: Apr 18, 2026)
 
-**Test:** Alle UI-Texte in beiden Sprachen vorhanden, kein hardcodierter deutscher/englischer Text im Code
+**Implementierung:**
+- `next-intl` mit `messages/de.json` und `messages/en.json`
+- `useTranslations()` Hook in allen Komponenten
+- `useLocale()` + `date-fns` Locale für dynamische Datumsformatierung
+- Sprachwechsel via Next.js Locale-Routing (URL-Prefix `/de/` bzw. `/en/`)
+
+**Test:** Alle UI-Texte in beiden Sprachen vorhanden, kein hardcodierter deutscher/englischer Text im Code ✅

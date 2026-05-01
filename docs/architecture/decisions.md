@@ -265,3 +265,83 @@ Wir brauchen einen zuverlässigen E-Mail-Provider für Verifizierungscodes.
 **Begründung:**
 - Use case: Email verification codes (6-digit, expires in 15 min)
 - Implement in Sprint 3A
+
+---
+
+## ADR-012: CSRF Protection via Custom Header
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-26
+
+**Kontext:**
+Als SPA mit httpOnly Cookies ist das System anfällig für CSRF-Angriffe. Klassische CSRF-Token
+erfordern serverseitige Session-State, was dem JWT-Ansatz widerspricht.
+
+**Entscheidung:**
+- Next.js Middleware validiert einen Custom Header `x-studynexus-client: true` auf allen
+  mutierenden Requests (POST, PUT, DELETE, PATCH)
+- Zusätzlich: Origin/Host Header-Prüfung gegen Cross-Origin Requests
+- Erlaubte Origin wird über `NEXT_PUBLIC_APP_URL` Umgebungsvariable konfiguriert
+
+**Begründung:**
+- Custom Headers können von Cross-Origin Requests nicht ohne CORS-Preflight gesetzt werden
+- Einfacher als Token-basierter CSRF-Schutz, aber effektiv gegen die meisten Angriffsvektoren
+- Kombiniert mit httpOnly Cookies und SameSite=lax bietet dies ein solides Sicherheitsniveau
+
+**Konsequenzen:**
+- Alle Frontend fetch-Calls müssen `x-studynexus-client: true` Header mitsenden
+- API-Proxy-Routes leiten den Header nicht weiter (er wird nur von der Middleware geprüft)
+
+---
+
+## ADR-013: Vollständige i18n via next-intl
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-29
+
+**Kontext:**
+Internationalisierung war ursprünglich für Sprint 6 geplant. Die Professionalisierung der
+Plattform in Sprint 3.7 erforderte jedoch eine sofortige Umsetzung.
+
+**Entscheidung:**
+- `next-intl` als i18n-Bibliothek (bereits im Projekt vorhanden, aber nur teilweise genutzt)
+- Alle UI-Strings in `messages/de.json` und `messages/en.json` ausgelagert
+- `useTranslations()` Hook in allen Komponenten, keine hardcodierten Strings
+- Locale-basiertes URL-Routing (`/de/...` und `/en/...`)
+- Datumsformatierung via `useLocale()` + `date-fns` Locale-Objekte
+
+**Begründung:**
+- next-intl integriert sich nahtlos mit dem Next.js App Router
+- URL-basiertes Routing ermöglicht SEO-freundliche mehrsprachige Seiten
+- Kein Build-Time i18n nötig – alles dynamisch zur Runtime
+
+**Konsequenzen:**
+- Jede neue Komponente muss Translation-Keys verwenden, nie hardcodierte Strings
+- Neue Sprachen (z.B. Türkisch) können durch einfaches Hinzufügen einer JSON-Datei ergänzt werden
+- Performance: Minimal – next-intl lädt nur die aktive Sprach-Datei
+
+---
+
+## ADR-014: Token Lifetime 7 Tage (Development)
+
+**Status:** Akzeptiert
+**Datum:** 2026-04-29
+
+**Kontext:**
+Die ursprüngliche Token-Lebensdauer von 30 Minuten führte zu häufigen "Not authenticated"
+Fehlern während normaler Nutzung. Studierende arbeiten oft in langen Sessions.
+
+**Entscheidung:**
+- `ACCESS_TOKEN_EXPIRE_MINUTES=10080` (7 Tage) in der `.env`-Datei
+- Cookie `maxAge` auf `60 * 60 * 24 * 7` (7 Tage) synchronisiert
+- Frontend: Bei 401-Antworten wird automatisch zum Login weitergeleitet
+
+**Begründung:**
+- 30 Minuten ist für eine Studien-App inakzeptabel kurz
+- Studierende loggen sich einmal ein und erwarten, dass die App "einfach funktioniert"
+- In Produktion kann der Wert angepasst werden, ohne Code-Änderungen
+
+**Konsequenzen:**
+- Kompromiss: Längere Token-Gültigkeit = größeres Fenster bei Token-Diebstahl
+- Mitigiert durch: httpOnly Cookie (nicht per JS auslesbar), SameSite=lax, CSRF-Schutz
+- Für Produktion: Wert sollte auf 1–3 Tage reduziert werden + Refresh Token Mechanismus

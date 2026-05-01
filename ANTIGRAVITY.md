@@ -9,9 +9,9 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 2 – Complete (backend + frontend + bug fixes), Sprint 3 next
+**Status:** ✅ Sprint 3.7 Phase 2 Complete — Phase 3 (Mobile Kanban Rework) next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-04-20
+**Last Updated:** 2026-05-01
 
 ---
 
@@ -20,6 +20,7 @@
 | Layer | Technology |
 |---|---|
 | Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Framer Motion |
+| i18n | next-intl (DE + EN), date-fns locale-aware formatting |
 | Backend | FastAPI (Python), SQLAlchemy, Alembic, Pydantic |
 | Database | PostgreSQL (primary), Redis (cache/sessions) |
 | Auth | JWT (python-jose), bcrypt 4.1.3 (direct, no passlib), httpOnly cookies |
@@ -45,6 +46,9 @@
 - **HsH-only platform:** registration restricted to @stud.hs-hannover.de email addresses
 - **Admin-managed POs:** exam regulations and module data entered manually by admin (Yusef), not crowdsourced
 - **postgresql.ENUM in migrations:** always use `postgresql.ENUM` from `sqlalchemy.dialects.postgresql`, never `sa.Enum`, to avoid duplicate CREATE TYPE errors
+- **CSRF Protection:** Next.js middleware validates `x-studynexus-client: true` header on all mutating requests (POST, PUT, DELETE, PATCH) + Origin/Host check
+- **Token Lifetime:** JWT access tokens expire after 7 days (10080 minutes) in development. Cookie maxAge matches.
+- **i18n Full Coverage:** All UI strings use `useTranslations()` from next-intl. Zero hardcoded German/English strings. Date formatting is locale-aware (`date-fns`, `toLocaleDateString`).
 
 ---
 
@@ -71,99 +75,143 @@ Migration status:
 - 0001: users table ✅
 - 0002: study plan tables + HSH seed data ✅
 - 0003: kuerzel, gewichtung fixes, has_prerequisites, 9 Wahlpflichtmodule ✅
+- 0004: email verification fields (is_verified, verification_code, verification_code_expires) ✅
+- 0005: tasks + events tables for Mission Control ✅
+- 0006: matrikelnummer field on users ✅
+- 0007: semester_tag, event_date, lecturer fields on events ✅
+- 0008: focus type + is_submission on tasks ✅
+- 0009: profile fields (birth_date, hochschule) on users ✅
 
 ---
 
 ## API Endpoints
 
+### Auth (`/api/v1/auth`)
+
 | Method | Path | Description | Auth |
 |---|---|---|---|
-| GET | /api/v1/ping | Health ping | No |
-| GET | /api/v1/health | Health check | No |
-| POST | /api/v1/auth/register | Register user | No |
-| POST | /api/v1/auth/verify | Verify 6-digit email code | No |
-| POST | /api/v1/auth/login | Login, JWT cookie | No |
-| POST | /api/v1/auth/logout | Logout, clear cookie | Yes |
-| GET | /api/v1/universities | List universities | No |
-| GET | /api/v1/universities/{id}/faculties | List faculties | No |
-| GET | /api/v1/faculties/{id}/programs | List programs | No |
-| GET | /api/v1/programs/{id}/exam-regulations | List exam regs | No |
-| GET | /api/v1/exam-regulations/{id}/modules | Modules by semester | No |
-| POST | /api/v1/me/program | Select degree program | Yes |
-| GET | /api/v1/me/program | Get my program (auto-creates PFLICHT modules) | Yes |
-| PUT | /api/v1/me/program | Change program | Yes |
-| GET | /api/v1/me/modules | All my modules grouped by semester | Yes |
-| POST | /api/v1/me/modules | Add WAHLPFLICHT or custom ERGAENZEND module | Yes |
-| PUT | /api/v1/me/modules/{id} | Update status/note/dates | Yes |
-| DELETE | /api/v1/me/modules/{id} | Remove module (not if PASSED) | Yes |
-| GET | /api/v1/me/stats | GPA, ECTS, progress stats | Yes |
+| POST | /auth/register | Register user (requires @stud.hs-hannover.de) | No |
+| POST | /auth/verify | Verify 6-digit email code | No |
+| POST | /auth/login | Login, JWT in httpOnly cookie | No |
+| POST | /auth/logout | Logout, clear cookie | Yes |
+
+### User Profile (`/api/v1/me`)
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | /me | Get current user profile | Yes |
+| PUT | /me/profile | Update profile fields | Yes |
+| PUT | /me/password | Change password (old + new) | Yes |
+
+### Study Plan (`/api/v1/me`)
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | /universities | List universities | No |
+| GET | /universities/{id}/faculties | List faculties | No |
+| GET | /faculties/{id}/programs | List programs | No |
+| GET | /programs/{id}/exam-regulations | List exam regs | No |
+| GET | /exam-regulations/{id}/modules | Modules by semester | No |
+| POST | /me/program | Select degree program | Yes |
+| GET | /me/program | Get my program (auto-creates PFLICHT modules) | Yes |
+| PUT | /me/program | Change program | Yes |
+| GET | /me/modules | All my modules grouped by semester | Yes |
+| POST | /me/modules | Add WAHLPFLICHT or custom ERGAENZEND module | Yes |
+| PUT | /me/modules/{id} | Update status/note/dates | Yes |
+| DELETE | /me/modules/{id} | Remove module (not if PASSED) | Yes |
+| GET | /me/stats | GPA, ECTS, progress stats | Yes |
+
+### Mission Control - Tasks (`/api/v1/mission/tasks`)
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | /mission/tasks/ | List all tasks for current user | Yes |
+| POST | /mission/tasks/ | Create a new task | Yes |
+| PUT | /mission/tasks/{id} | Update task (status, priority, etc.) | Yes |
+| DELETE | /mission/tasks/{id} | Delete a task | Yes |
+
+### Mission Control - Events (`/api/v1/mission/events`)
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | /mission/events/?semester_tag=X | List events for semester | Yes |
+| POST | /mission/events/ | Create a new event (collision detection) | Yes |
+| PUT | /mission/events/{id} | Update event | Yes |
+| DELETE | /mission/events/{id} | Delete event | Yes |
+
+### System
+
+| Method | Path | Description | Auth |
+|---|---|---|---|
+| GET | /ping | Health ping | No |
+| GET | /health | Health check | No |
 
 ---
 
-## Current Sprint: Sprint 3B - 🔵 Planned
-**Focus:** Mission Control Features (Weekly Schedule, Calendar, Kanban, Timeline)
-*Summary: Implementing the core organizational suite for student self-management.*
+## Sprint Completion Log
+
+### Sprint 1 – Infrastructure & Auth ✅
+- Docker Compose, FastAPI, Next.js boilerplate
+- JWT Authentication, httpOnly cookies
+- Login/Register UI
+
+### Sprint 2 – Study Plan & Grades ✅
+- 7 DB models (University → StudentModule)
+- GPA & ECTS calculation engine
+- HSH seed data (32 modules, 6 semesters, 180 ECTS)
+- Full frontend: Setup wizard, ModuleList, ModuleModal, AddModuleModal, StatsCard
+
+### Sprint 3A – Auth Hardening ✅
+- Email domain validation (@stud.hs-hannover.de)
+- Email verification (6-digit code via Resend)
+- TanStack Query migration
+- CSRF protection (middleware)
+- StudyNexus branding
+
+### Sprint 3B – Mission Control ✅
+- Interactive Schedule Board (15-min CSS Grid)
+- Kanban Board (Drag & Drop, 4 columns)
+- Smart Timeline, Daily Focus, Exam Countdown widgets
+- Soft collision detection (HTTP 409)
+- Semester binding, block events, ghosting mode
+- Event types: LECTURE, EXERCISE, TUTORIAL, SEMINAR, PRACTICUM, CUSTOM_STUDY, FOCUS, EXAM, WORK, LIFE
+
+### Sprint 3.5 – Mobile Ergonomics ✅
+- Mobile Quick Add FAB (global floating action button)
+- Mobile Agenda View (replaces grid on small screens)
+- Submissions support (is_submission flag on tasks)
+- iOS Safari auto-zoom fix
+
+### Sprint 3.6 – UX Polish ✅
+- Mobile Drag & Drop (mobile-drag-drop polyfill)
+- Visual Study Plan Board (Drag & Drop semester columns)
+- Digital ID Card (glassmorphism design)
+- Settings page (tabs: Personal, Security, Appearance)
+- Dashboard greeting with real user name
+
+### Sprint 3.7 – Rework (Phase 1+2 Complete) ✅
+- **Phase 1:** Registration fields (matrikelnummer, birth_date, hochschule) as required
+- **Phase 2:** Settings with real data, password change API (`PUT /me/password`), language switcher
+- **i18n Full Coverage:** Every UI string in all pages/modals/widgets translated via next-intl (de.json + en.json)
+- **Bugfixes:** Token lifetime 30min→7days, semester-field removal from ModuleModal, 401 auto-redirect
+- **Date formatting:** locale-aware via date-fns + toLocaleDateString
 
 ---
 
-## Sprint 2 – Completed ✅
+## Next Steps – Sprint 3.7 Phase 3
 
-- [x] Password visibility toggle (LoginForm + RegisterForm)
-- [x] 7 new DB models: University, Faculty, Program, ExamRegulation, Module, UserProgram, StudentModule
-- [x] Alembic migration 0002: all 7 tables + HSH seed data (32 modules, 6 semesters, 180 ECTS), enum fix with postgresql.ENUM
-- [x] 5 public endpoints for browsing university/program catalog
-- [x] 8 protected endpoints for study plan and grade management
-- [x] GPA service with weighted formula: sum(note×ects×gewichtung)/sum(ects×gewichtung)
-- [x] Stats endpoint (GPA, ECTS, Fortschritt, module counts)
-- [x] 66 total backend tests passing, 5 test files
-- [x] Docs: docs/api/study-plan.md + docs/api/stats.md
-- [x] Alembic migration 0003: has_prerequisites column, kuerzel (BIN-101…BIN-603), gewichtung corrections (Bachelorarbeit=4, Praxisprojekte=0, BWL/Englisch=0.5), ECTS fixes (Praxisprojekt 2→7, Bachelorarbeit→15), 9 Wahlpflichtmodule (BIN-211…BIN-219)
+- [ ] Mobile Kanban Rework (replace HTML5 DnD with @dnd-kit or Tap-to-Move)
+- [ ] Phase 4: Studienplan Builder (dynamic semester containers)
+- [ ] Phase 5: Context-sensitive Quick Add button
 
 ---
 
-## Sprint 2 – Frontend Completed ✅
+## Known Limitations
 
-- [x] 9 Next.js API proxy routes (study plan + university catalog)
-- [x] `src/types/study.ts` — all TypeScript interfaces for backend models
-- [x] `src/lib/backend.ts` — shared BACKEND constant + bearerHeaders helper
-- [x] StatsCard component: GPA, ECTS, progress bar, module counts
-- [x] ModuleList component: grouped by semester, status badges, click to edit
-- [x] ModuleModal component: status/note/semester editing, PUT to backend
-- [x] AddModuleModal component: WAHLPFLICHT catalogue picker + custom Ergänzend entry
-- [x] StudyDashboard wrapper: refreshKey/onModuleSaved coordination between StatsCard and ModuleList
-- [x] `/dashboard/setup` page: multi-step program selection (faculty → program → PO → semester)
-- [x] `/dashboard` page: server-side program check, redirects to setup if none
-- [x] i18n: dashboard.stats, dashboard.modules, dashboard.modal, dashboard.setup, dashboard.addModule keys (DE + EN)
-- [x] 57 total frontend tests passing
-- [x] GitHub issues #7, #8, #9, #10, #11 closed
-- [x] Post-session bug fixes: setup infinite loop, GPA German locale format, add-module UI, stats cache
-
-## Sprint 2 – Bug Fixes Applied ✅
-
-- [x] Bug 1: Setup page `useEffect` deps — removed `router` and `t`; `router.push` → `router.replace`. Eliminated infinite re-render loop after program setup.
-- [x] Bug 2: StatsCard refreshes after module save via `refreshKey`/`StudyDashboard` — already working; stabilised `onModuleSaved` with `useCallback`.
-- [x] Bug 3: GPA display format — `toFixed(1).replace('.', ',')` for German locale (3,0 not 3.00).
-- [x] Bug 4: GPA service logic confirmed correct — only PASSED + gewichtung>0 + note≠null included. Wrong value likely stale test DB data.
-- [x] Bug 5+6: `AddModuleModal` component — WAHLPFLICHT catalogue picker + custom Ergänzend (name+ECTS) free entry. `ModuleList` has "+ Modul hinzufügen" button. New modules inserted into local state without full reload.
-- [x] Bug 7: `cache: "no-store"` added to stats proxy route. Backend chain `UserProgram→ExamReg→Program.gesamt_ects` verified correct in all 66 backend tests.
-
-## Sprint 3A – Completed ✅
-
-- [x] Email domain validation (@stud.hs-hannover.de) on register
-- [x] Email verification (6-digit code via Resend)
-- [x] Frontend Auth Form fixes (Prefix parsing, React Crash fixes)
-- [x] Matrikelnummer: OPTIONAL field on user profile (not required)
-- [x] Fix all dashboard bugs from testing session
-- [x] Introduce TanStack Query (React Query) for data fetching
-- [x] CSRF protection research + basic implementation
-- [x] Official StudyNexus Branding & Partner Badge integration
-
-## Next Steps – Sprint 3B
-
-- [ ] Interactive Weekly Schedule View (Stundenplan)
-- [ ] Universal deadline/event calendar model + API
-- [ ] Kanban Board implementation (To Do / In Progress / Done)
-- [ ] Interactive Timeline component integration
+- WAHLPFLICHT catalogue modules (BIN-211…BIN-219) have `semester_empfehlung = NULL` — they appear under "Ungeplant" when added.
+- Catalogue ERGAENZEND modules are not shown in the picker — students must enter them as custom modules.
+- Mobile Kanban Drag & Drop is unreliable (HTML5 polyfill) — rework planned in Phase 3.
+- Studienplan Board has basic DnD but no dynamic "Add Semester" button yet — planned in Phase 4.
 
 ---
 
@@ -174,12 +222,13 @@ Migration status:
 | HsH-only platform | Sprint 3A | Registration requires @stud.hs-hannover.de email |
 | Email Provider | Sprint 3A | Resend (resend.com) via Python SDK (ADR-011) |
 | Email verification | Sprint 3A | 6-digit code, expires in 15 min |
-| Matrikelnummer | Sprint 3A | OPTIONAL (not required) - student can add it in profile settings. Reduces DSGVO liability. |
+| Matrikelnummer | Sprint 3A | OPTIONAL (not required) - student can add it in profile settings |
 | Vorprüfungs-logic | Sprint 3A | Replaced by module_prerequisites table (ADR-010) |
-| Bachelor/Master compatibility | Sprint 3 / Sprint 5 | DB model already supports both via `abschluss` field on Program. Vorprüfungs-logic Sprint 3; Master programs added by admin Sprint 5 |
+| Bachelor/Master compatibility | Sprint 3 / Sprint 5 | DB model supports both via `abschluss` field on Program |
 | Admin panel | Sprint 5 | Yusef-only; used to manage POs and module data |
-| PO management | Sprint 5 | Exam regulations entered manually by admin, not crowdsourced |
-| Branding | Sprint 6 | StudyNexus name + HsH logo, launch-ready styling |
+| CSRF Protection | Sprint 3B | Custom header `x-studynexus-client` + Origin check (ADR-012) |
+| i18n Full Integration | Sprint 3.7 | next-intl with DE/EN, originally planned for Sprint 6, pulled forward (ADR-013) |
+| Token Lifetime | Sprint 3.7 | 7 days in dev, was 30 min causing constant re-logins (ADR-014) |
 
 ---
 
@@ -191,24 +240,17 @@ Migration status:
 | PO | Pruefungsordnung - exam regulations |
 | ECTS | European Credit Transfer System |
 | GPA | Grade Point Average, calculated dynamically |
-| Skill-Tree | Visual interactive module dependency graph |
-| Study Space | Digital collaborative study group |
+| Skill-Tree | Visual interactive module dependency graph (planned) |
+| Study Space | Digital collaborative study group (planned) |
 | Mission Hub | Central deadline and event management |
 | Sprint | 2-week Scrum development cycle |
 | Matrikelnummer | Student ID number (HsH-issued) |
-| Vorprüfung | Checkpoint after Semester 3: all Sem 1–3 modules must be passed before Sem 4+ modules can be registered. Enforced per §6 BIN PO |
-| Abschluss | Bachelor or Master – stored in `Program.abschluss`. System already supports both degree types |
+| Semester-Tag | Unique identifier for a semester period (e.g. WiSe2425) |
+| Ghosting | Temporarily hiding schedule events without deleting them |
 
 ---
 
-## Known Limitations (to address in Sprint 3)
-
-- WAHLPFLICHT catalogue modules (BIN-211…BIN-219) have `semester_empfehlung = NULL` — they appear under "Ohne Semesterempfehlung" when added. Fix in Sprint 3 by adding migration 0004 to assign semester_empfehlung or by changing grouping logic.
-- Catalogue ERGAENZEND modules ("Ergänzendes Fach BWL", etc.) are not shown in the picker — students must enter them as custom modules with the correct name/ECTS.
-
----
-
-## Important Rules for ANTIGRAVITY Code
+## Important Rules for AI Code Generation
 
 1. Always read this file first before writing any code
 2. Shell is fish - never use heredoc EOF syntax
@@ -221,9 +263,11 @@ Migration status:
 9. Commit messages: type(scope): description
 10. Never commit .env files
 11. Update ANTIGRAVITY.md at the end of every session
-12. ANTIGRAVITY Code prompts always in English
+12. AI Code prompts always in English
 13. .dockerignore handles cache exclusions (`.pytest_cache`, `__pycache__`, etc.) during Docker builds.
 14. Migrations: always use `postgresql.ENUM` (sqlalchemy.dialects.postgresql), never `sa.Enum`
-15. `Program.abschluss` supports "Bachelor" and "Master". Never hardcode semester prerequisites (use `module_prerequisites` table, see ADR-010).
-16. TanStack Query Architecture: Install `@tanstack/react-query`, create hooks in `frontend/src/hooks/queries/` (e.g. `useUserStats.ts`). Components only call hooks; no data fetching logic inside components.
-17. TanStack Query Mandate: ALL data fetching and mutations MUST use TanStack Query custom hooks (inside `frontend/src/hooks/queries/`). Manual `useEffect` fetching or passing mutation state via props is strictly forbidden across the entire project. Always invalidate relevant query keys on mutation success.
+15. `Program.abschluss` supports "Bachelor" and "Master". Never hardcode semester prerequisites.
+16. TanStack Query Architecture: Install `@tanstack/react-query`, create hooks in `frontend/src/hooks/queries/`. Components only call hooks; no data fetching logic inside components.
+17. TanStack Query Mandate: ALL data fetching and mutations MUST use TanStack Query custom hooks. Manual `useEffect` fetching is strictly forbidden.
+18. i18n Mandate: ALL user-facing strings MUST use `useTranslations()` from next-intl. No hardcoded strings in components. Keys organized under `dashboard.*` namespace in `messages/de.json` and `messages/en.json`.
+19. Date formatting: Always use locale-aware formatting (`useLocale()` from next-intl + `date-fns` locale or `toLocaleDateString`).

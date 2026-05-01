@@ -2,16 +2,19 @@
 
 ## Übersicht
 
-| Sprint   | Thema                                      | Status       | Dauer    |
-| -------- | ------------------------------------------ | ------------ | -------- |
-| Sprint 0 | Setup und Anforderungen                    | ✅ Fertig    | 1 Woche  |
-| Sprint 1 | Infrastruktur und Auth                     | ✅ Fertig    | 2 Wochen |
-| Sprint 2 | Studienplan und Noten                      | ✅ Fertig    | 2 Wochen |
-| Sprint 3A | Auth hardening + Dashboard fixes           | ✅ Fertig   | 2 Wochen |
-| Sprint 3B | Mission Control                            | ✅ Fertig    | 2 Wochen |
-| Sprint 4 | Community und Kollaboration                | Geplant      | 2 Wochen |
-| Sprint 5 | Gamification, KI und Admin-Panel           | Geplant      | 2 Wochen |
-| Sprint 6 | PWA, i18n, Branding und Launch             | Geplant      | 2 Wochen |
+| Sprint    | Thema                                      | Status        | Dauer    |
+| --------- | ------------------------------------------ | ------------- | -------- |
+| Sprint 0  | Setup und Anforderungen                    | ✅ Fertig     | 1 Woche  |
+| Sprint 1  | Infrastruktur und Auth                     | ✅ Fertig     | 2 Wochen |
+| Sprint 2  | Studienplan und Noten                      | ✅ Fertig     | 2 Wochen |
+| Sprint 3A | Auth hardening + Dashboard fixes           | ✅ Fertig     | 2 Wochen |
+| Sprint 3B | Mission Control                            | ✅ Fertig     | 2 Wochen |
+| Sprint 3.5| Mobile Ergonomics                          | ✅ Fertig     | 1 Woche  |
+| Sprint 3.6| UX Polish & Visual Features                | ✅ Fertig     | 1 Woche  |
+| Sprint 3.7| Dashboard Rework, Auth & i18n              | 🟡 Phase 1+2  | laufend  |
+| Sprint 4  | Community und Kollaboration                | Geplant       | 2 Wochen |
+| Sprint 5  | Gamification, KI und Admin-Panel           | Geplant       | 2 Wochen |
+| Sprint 6  | PWA, Branding und Launch                   | Geplant       | 2 Wochen |
 
 ---
 
@@ -63,12 +66,12 @@
 - [x] 66 Backend-Tests, alle grün
 - [x] Docs: docs/api/study-plan.md + docs/api/stats.md
 
-**Ausstehend (auf Sprint 3 verschoben):**
+**Frontend (in Sprint 3A erledigt):**
 
-- [ ] Frontend: Hochschul-/Studiengangsauswahl UI
-- [ ] Frontend: Modulliste gruppiert nach Semester
-- [ ] Frontend: Noteneingabe-Formular mit Validierung
-- [ ] Frontend: Stats-Dashboard mit GPA und Fortschrittsbalken
+- [x] Frontend: Hochschul-/Studiengangsauswahl UI (Setup Wizard)
+- [x] Frontend: Modulliste gruppiert nach Semester
+- [x] Frontend: Noteneingabe-Formular mit Validierung
+- [x] Frontend: Stats-Dashboard mit GPA und Fortschrittsbalken
 
 ---
 
@@ -116,6 +119,62 @@
 
 ---
 
+## Sprint 3.5 – Mobile Ergonomics ✅
+
+**Ziel:** Mobile-First Optimierung für das tägliche Studienmanagement auf dem Smartphone.
+
+**Erledigte Tasks:**
+
+- [x] Mobile Quick Add FAB (global Floating Action Button)
+- [x] Mobile Agenda View (Listenansicht statt CSS-Grid auf Smartphones)
+- [x] Exam Countdown Widget (Dashboard)
+- [x] Submissions Support (`is_submission` Flag auf Tasks)
+- [x] Focus Time Event-Typ (`FOCUS` / 🎧)
+- [x] iOS Safari Auto-Zoom Fix
+- [x] CSRF Origin Mismatch Fix
+
+---
+
+## Sprint 3.6 – UX Polish & Visual Features ✅
+
+**Ziel:** Aus dem MVP eine professionelle, responsive Applikation formen.
+
+**Erledigte Tasks:**
+
+- [x] Mobile Drag & Drop (mobile-drag-drop Polyfill)
+- [x] Visual Study Plan Board (Semester-Spalten mit DnD)
+- [x] Digitaler Studentenausweis (ID Card, Glassmorphism)
+- [x] Einstellungsbereich (3 Tabs: Persönlich, Konto, Erscheinungsbild)
+- [x] Dashboard-Begrüßung mit echtem Nutzernamen
+- [x] Global Quick Add auch auf Desktop
+
+---
+
+## Sprint 3.7 – Dashboard Rework, Auth & i18n 🟡
+
+**Ziel:** Professionalisierung: echte Daten, funktionierende Settings, vollständige Zweisprachigkeit.
+
+**Erledigte Tasks (Phase 1+2):**
+
+- [x] Registrierung: matrikelnummer, birth_date, hochschule als Pflichtfelder
+- [x] Server-Fetch Fix: Auth-Cookie korrekt an Server Components
+- [x] ID-Card mit echten Daten
+- [x] Settings: Persönliche Daten (read-only aus DB)
+- [x] Settings: Passwort ändern (`PUT /me/password`)
+- [x] Settings: Sprachwechsel (DE ↔ EN)
+- [x] Vollständige i18n-Integration (alle Seiten, Modals, Widgets)
+- [x] Token-Lifetime 30min → 7 Tage
+- [x] Semester-Bug Fix (ModuleModal)
+- [x] Locale-aware Datumsformatierung
+
+**Offene Tasks (Phase 3–5):**
+
+- [ ] Mobile Kanban Rework (Tap-to-Move / @dnd-kit)
+- [ ] Studienplan Builder (dynamische Semester-Container)
+- [ ] Kontext-sensitiver Quick Add Button
+
+---
+
 ## Sprint 4 – Community und Kollaboration
 
 **Ziel:** Soziale Features – Wiki, Evaluationen, Study Spaces
@@ -142,47 +201,32 @@
 
 **Ziel:** XP-System, Badges, KI-Planung und Admin-Verwaltung für POs
 
-**User Stories:**
-
-- Als Studierender möchte ich XP für abgeschlossene Aufgaben verdienen
-- Als Studierender möchte ich Badges für Meilensteine erhalten
-- Als Studierender möchte ich KI-Empfehlungen für meinen Studienplan
-- Als Studierender möchte ich aus PDFs automatisch Karteikarten generieren
-- Als Admin möchte ich Studiengänge und POs im Admin-Panel verwalten
-
 **Technische Tasks:**
 
 - [ ] XP- und Badge-System (Backend)
 - [ ] Streak-Tracking
 - [ ] Skill-Tree Visualisierung (interaktiver Modul-Graph)
 - [ ] LangChain Integration (OpenAI / Claude API)
-- [ ] PDF-Analyse Endpoint
-- [ ] Karteikarten-Generator
-- [ ] Admin-Panel (Yusef-only): Studiengänge, POs, Module anlegen/bearbeiten
-- [ ] is_admin Flag auf User-Modell + Admin-Auth-Guard
-- [ ] Admin-API: CRUD für University, Faculty, Program, ExamRegulation, Module
+- [ ] PDF-Analyse Endpoint + Karteikarten-Generator
+- [ ] Admin-Panel (Yusef-only)
+- [ ] is_admin Flag + Admin-Auth-Guard
 
 ---
 
-## Sprint 6 – PWA, i18n, Branding und Launch
+## Sprint 6 – PWA, Branding und Launch
 
-**Ziel:** Produktionsreife App – offline, mehrsprachig, mit HsH-Branding deployed
+**Ziel:** Produktionsreife App – offline-fähig, deployed, launch-ready.
 
-**User Stories:**
-
-- Als Nutzer möchte ich die App auch offline nutzen können
-- Als Nutzer möchte ich die Sprache zwischen Deutsch und Englisch wechseln
-- Als Nutzer möchte ich die App auf meinem Handy installieren können
+> **Hinweis:** i18n (next-intl DE/EN) und Branding wurden in Sprint 3.7 bzw. 3A vorgezogen und sind bereits erledigt.
 
 **Technische Tasks:**
 
 - [ ] Service Worker und Offline-Cache
-- [ ] next-intl Integration (DE / EN)
+- [x] ~~next-intl Integration (DE / EN)~~ → vorgezogen in Sprint 3.7 ✅
 - [ ] Lighthouse PWA Score >= 90 erreichen
 - [ ] GitHub Actions CI/CD Pipeline
 - [ ] Security Audit (OWASP Top 10)
 - [ ] Cloud Deployment (Railway oder Render)
 - [ ] Produktions-Docker-Compose
-- [ ] Branding: StudyNexus-Logo + HsH-Farbschema + offizielle Typografie
-- [ ] HsH-Logo-Integration (Lizenzklärung)
+- [x] ~~Branding: StudyNexus-Logo + HsH-Farbschema~~ → vorgezogen in Sprint 3A ✅
 - [ ] Launch-Landing-Page

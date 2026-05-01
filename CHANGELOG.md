@@ -3,8 +3,36 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Planned
+- **Sprint 3.7 Phase 3**: Mobile Kanban Rework (replace HTML5 DnD with Tap-to-Move or @dnd-kit)
+- **Sprint 3.7 Phase 4**: Dynamic Studienplan Builder (add/remove semester containers)
+- **Sprint 4**: Community & Collaboration (Study Spaces, Module Wikis, PDF sharing)
+
+## [v0.3.7] - 2026-04-29 (Sprint 3.7 - Settings, Auth & i18n)
 ### Added
-- **Community & Collaboration (Sprint 4)**: Pending implementation of Study Spaces, Module Wikis, and PDF sharing.
+- **Registration Overhaul**: `matrikelnummer`, `birth_date`, and `hochschule` are now collected during registration.
+- **Password Change API**: Secure `PUT /me/password` endpoint requiring old password verification.
+- **Settings - Real Data**: Personal data fields (Name, Matrikelnummer, Hochschule, Geburtsdatum) populated from database, set to read-only.
+- **Settings - Security**: Actual email displayed, functional password change form with old/new password flow.
+- **Full i18n Coverage**: Every single UI string across all pages, modals, and widgets is now translated via `next-intl`. Zero hardcoded strings remain.
+- **Locale-aware Dates**: `date-fns` and `toLocaleDateString` now dynamically switch between `de-DE` and `en-US` based on the active locale.
+- **401 Auto-Redirect**: Expired tokens now redirect to login automatically instead of showing cryptic errors.
+
+### Changed
+- **Token Lifetime**: JWT access tokens extended from 30 minutes to 7 days (development). Cookie `maxAge` updated accordingly.
+
+### Fixed
+- **Semester Column Bug**: Removed free-text semester input from ModuleModal that caused modules to be displaced into arbitrary new columns. Semester assignment now exclusively via Drag & Drop in the Study Plan.
+- **"Not authenticated" on Save**: Token expiry caused silent 401 errors when saving grades. Fixed by extending token lifetime and adding explicit 401 handling.
+
+## [v0.3.6] - 2026-04-28 (Sprint 3.6 - UX Polish & Visual Features)
+### Added
+- **Visual Study Plan Board**: Horizontal Kanban-style board with semester columns. Modules can be dragged between semesters with ECTS auto-calculation per column.
+- **Digital ID Card**: Premium glassmorphism-styled student ID card at `/dashboard/profile` showing name, matrikelnummer, university, and UUID-based barcode.
+- **Settings Page**: Three-tab layout (Personal Data, Account & Security, Appearance) at `/dashboard/settings`.
+- **Mobile Drag & Drop**: Tasks and modules can now be moved via touch on iOS/Android using `mobile-drag-drop` polyfill.
+- **Dashboard Greeting**: Personalized "Welcome, [Name] 👋" using real user data from the database.
+- **Global Quick Add (Desktop)**: The floating `+` button now appears on desktop as well, not just mobile.
 
 ## [v0.3.5] - 2026-04-27 (Sprint 3.5 - Mobile Ergonomics)
 ### Added

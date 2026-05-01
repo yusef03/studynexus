@@ -17,22 +17,28 @@ My primary focus during this project was on:
 - **Prompt Engineering & AI Orchestration**
 - **UX/UI Design & Product Strategy**
 - **Deployment & Security** (CSRF, JWT, TanStack Query)
-## Core Features (Planned)
 
-- ✅ **Mission Control Dashboard** — GPA tracker, ECTS progress, weekly schedule
-- ⏳ **Visual Study Plan** — Interactive module graph (Skill-Tree) synced with your exam regulations
-- ✅ **Universal Mission Hub** — Deadlines, exams, and routines in one place
-- ✅ **Mobile-First Experience** — Optimized Agenda view and Quick Add floating action button
-- 🤝 **Study Spaces** — Digital study groups with shared Kanban boards
-- 📚 **Module Wiki** — Community knowledge base with anonymous module reviews
-- 🤖 **AI Planning** — Smart recommendations and auto-scheduling
-- 🏆 **Gamification** — XP, Badges, Streaks
+## Core Features
+
+- ✅ **Mission Control Dashboard** — GPA tracker, ECTS progress, Smart Timeline, Exam Countdown
+- ✅ **Interactive Schedule Board** — 15-min CSS Grid engine with collision detection, ghosting mode, and semester binding
+- ✅ **Kanban Board** — Drag & Drop task management with columns: To Do, In Progress, Exam Ready, Done
+- ✅ **Visual Study Plan** — Interactive semester columns with Drag & Drop module assignment
+- ✅ **Digital ID Card** — Premium glassmorphism student ID with real university data
+- ✅ **Settings & Profile** — Password change, personal data, language switcher
+- ✅ **Mobile-First Experience** — Agenda view, Quick Add FAB, responsive navigation
+- ✅ **Bilingual (DE/EN)** — Full i18n with next-intl, zero hardcoded strings
+- 🤝 **Study Spaces** — Digital study groups with shared Kanban boards *(planned)*
+- 📚 **Module Wiki** — Community knowledge base with anonymous module reviews *(planned)*
+- 🤖 **AI Planning** — Smart recommendations and auto-scheduling *(planned)*
+- 🏆 **Gamification** — XP, Badges, Streaks *(planned)*
 
 ## Tech Stack
 
 | Layer    | Technology                                      |
 | -------- | ----------------------------------------------- |
 | Frontend | Next.js 14, TypeScript, Tailwind CSS, shadcn/ui |
+| i18n     | next-intl (DE + EN), date-fns locale-aware      |
 | Backend  | FastAPI (Python), SQLAlchemy, Alembic           |
 | Database | PostgreSQL, Redis                               |
 | Auth     | JWT (python-jose), bcrypt 4.1.3, httpOnly proxy |
@@ -42,33 +48,75 @@ My primary focus during this project was on:
 ## Authentication & Security
 
 StudyNexus incorporates strict security mechanisms:
-- **HsH-Only:** Registration strictly verifies the domain for `@stud.hs-hannover.de` prefixing.
-- **Email Verification:** Accounts require a 6-digit confirmation code generated and sent via Resend API prior to login.
-- **Stateless Session Control:** Next.js proxies manage `httpOnly` secure cookies.
+- **HsH-Only:** Registration strictly verifies the domain for `@stud.hs-hannover.de`.
+- **Email Verification:** Accounts require a 6-digit confirmation code generated and sent via Resend API.
+- **Stateless Session Control:** Next.js proxies manage `httpOnly` secure cookies (7-day lifetime).
+- **CSRF Protection:** Custom header validation (`x-studynexus-client`) + Origin/Host matching on all mutating requests.
 
 ## Project Structure
 
-\`\`\`
+```
 studynexus/
-├── frontend/ # Next.js App
-├── backend/ # FastAPI App
-├── docs/ # Documentation
-│ ├── architecture/
-│ ├── requirements/
-│ └── sprints/
-├── CLAUDE.md # AI project memory
-└── docker-compose.yml
-\`\`\`
+├── frontend/               # Next.js App (App Router)
+│   ├── messages/            # i18n translations (de.json, en.json)
+│   ├── src/
+│   │   ├── app/             # Pages & API routes
+│   │   ├── components/      # UI components (kanban, schedule, study, dashboard)
+│   │   ├── hooks/queries/   # TanStack Query hooks
+│   │   └── types/           # TypeScript interfaces
+├── backend/                 # FastAPI App
+│   ├── app/
+│   │   ├── routers/         # API endpoints
+│   │   ├── models/          # SQLAlchemy models
+│   │   ├── schemas/         # Pydantic schemas
+│   │   └── core/            # Auth, security, config
+│   └── alembic/             # Database migrations
+├── docs/                    # Documentation
+│   ├── api/                 # API endpoint documentation
+│   ├── architecture/        # Architecture Decision Records (ADR)
+│   ├── requirements/        # Domain model, use cases, NFAs
+│   └── sprints/             # Sprint plans & reviews
+├── ANTIGRAVITY.md           # AI project memory
+├── CHANGELOG.md             # Version history
+└── docker-compose.yml       # Development environment
+```
 
 ## Documentation
 
 - [Architecture Decisions](docs/architecture/)
 - [Requirements & Use Cases](docs/requirements/)
-- [Sprint Plans](docs/sprints/)
+- [Sprint Plans & Reviews](docs/sprints/)
+- [API Documentation](docs/api/)
 
 ## Development Setup
 
-> Coming soon — Docker Compose setup guide
+```bash
+# 1. Clone the repository
+git clone https://github.com/yusef03/studynexus.git
+cd studynexus
+
+# 2. Configure environment
+cp .env.example .env
+
+# 3. Start all services
+docker compose up --build
+
+# 4. Run database migrations
+docker compose exec backend alembic upgrade head
+```
+
+**Access:**
+- Frontend: http://localhost:3000/de
+- API Docs: http://localhost:8000/api/docs
+
+**Useful commands:**
+```bash
+# Run backend tests
+docker compose exec backend pytest tests/ -v
+
+# Access database
+docker compose exec db psql -U studynexus -d studynexus
+```
 
 ## License
 
