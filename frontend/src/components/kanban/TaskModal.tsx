@@ -93,10 +93,10 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
             <div className="space-y-1.5">
               <Label>{t("statusLabel")}</Label>
               <select className={selectClass} value={status} onChange={(e) => setStatus(e.target.value as TaskStatus)}>
-                <option value="TODO">To Do</option>
-                <option value="IN_PROGRESS">In Progress</option>
-                <option value="EXAM_READY">Exam Ready</option>
-                <option value="DONE">Done</option>
+                <option value="TODO">{t("statusOptions.todo")}</option>
+                <option value="IN_PROGRESS">{t("statusOptions.inProgress")}</option>
+                <option value="EXAM_READY">{t("statusOptions.examReady")}</option>
+                <option value="DONE">{t("statusOptions.done")}</option>
               </select>
             </div>
 
@@ -104,9 +104,9 @@ export function TaskModal({ task, onClose, onSave, onDelete, isSaving }: Props) 
             <div className="space-y-1.5">
               <Label>{t("priorityLabel")}</Label>
               <select className={selectClass} value={priority} onChange={(e) => setPriority(e.target.value as TaskPriority)}>
-                <option value="LOW">Low</option>
-                <option value="MEDIUM">Medium</option>
-                <option value="HIGH">High</option>
+                <option value="LOW">{t("priorityOptions.low")}</option>
+                <option value="MEDIUM">{t("priorityOptions.medium")}</option>
+                <option value="HIGH">{t("priorityOptions.high")}</option>
               </select>
             </div>
           </div>

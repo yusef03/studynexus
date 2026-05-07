@@ -50,7 +50,7 @@ export function EventModal({ event, initialDate, onClose, onSave, onDelete, isSa
         const mod = group.modules.find(m => m.id === moduleId);
         if (mod) {
           const modName = mod.module?.name || mod.custom_name;
-          if (title === "" || title.length < 3) {
+          if (modName && (title === "" || title.length < 3)) {
             setTitle(modName);
           }
           break;

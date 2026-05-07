@@ -160,7 +160,18 @@
         "deleteBtn": "Delete",
         "cancelBtn": "Cancel",
         "saveBtn": "Save",
-        "savingBtn": "Saving..."
+        "savingBtn": "Saving...",
+        "statusOptions": {
+          "todo": "To Do",
+          "inProgress": "In Progress",
+          "examReady": "Exam Ready",
+          "done": "Done"
+        },
+        "priorityOptions": {
+          "low": "Low",
+          "medium": "Medium",
+          "high": "High"
+        }
       }
     },
     "schedule": {
@@ -223,7 +234,8 @@
         "unplanned": "Unplanned",
         "semester": "Semester {n}",
         "dropHere": "Drop here",
-        "custom": "Custom"
+        "custom": "Custom",
+        "addSemester": "+ Add Semester"
       }
     },
     "addModule": {

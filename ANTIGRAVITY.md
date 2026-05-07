@@ -9,9 +9,9 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 3.7 Phase 2 Complete — Phase 3 (Mobile Kanban Rework) next
+**Status:** ✅ Sprint 3.7 Complete (all 5 Phases) — Sprint 4 (Community & Collaboration) next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-05-01
+**Last Updated:** 2026-05-07
 
 ---
 
@@ -196,13 +196,19 @@ Migration status:
 - **Bugfixes:** Token lifetime 30min→7days, semester-field removal from ModuleModal, 401 auto-redirect
 - **Date formatting:** locale-aware via date-fns + toLocaleDateString
 
+### Sprint 3.7 – Phases 3–5 (Complete) ✅
+- **Phase 3 – Mobile Kanban Rework:** Replaced `mobile-drag-drop` polyfill with `@dnd-kit/core` + `@dnd-kit/sortable`. Native PointerSensor with 8px activation, DragOverlay, extracted KanbanCard/KanbanColumn components.
+- **Phase 4 – Studienplan Builder:** Rewrote StudyPlanBoard with `@dnd-kit`. Dynamic `+ Neues Semester` button. Extracted StudyPlanCard/StudyPlanColumn. Optimistic mutations.
+- **Phase 5 – Smart FAB:** MobileQuickAdd uses `usePathname()` to hide on /settings, /profile, /setup.
+- **Bugfixes:** React hook-order violations, missing FOCUS EventType, StudentModule/UserStats import errors, EventModal null-crash, semester type mismatch.
+
 ---
 
-## Next Steps – Sprint 3.7 Phase 3
+## Next Steps – Sprint 4
 
-- [ ] Mobile Kanban Rework (replace HTML5 DnD with @dnd-kit or Tap-to-Move)
-- [ ] Phase 4: Studienplan Builder (dynamic semester containers)
-- [ ] Phase 5: Context-sensitive Quick Add button
+- [ ] Community & Collaboration (Study Spaces, Module Wikis, PDF sharing)
+- [ ] Gamification basics (XP, Streaks, Leaderboard)
+- [ ] Push notifications for deadlines
 
 ---
 
@@ -210,8 +216,7 @@ Migration status:
 
 - WAHLPFLICHT catalogue modules (BIN-211…BIN-219) have `semester_empfehlung = NULL` — they appear under "Ungeplant" when added.
 - Catalogue ERGAENZEND modules are not shown in the picker — students must enter them as custom modules.
-- Mobile Kanban Drag & Drop is unreliable (HTML5 polyfill) — rework planned in Phase 3.
-- Studienplan Board has basic DnD but no dynamic "Add Semester" button yet — planned in Phase 4.
+- 404/500 prerender warnings during `next build` (Next.js + next-intl standalone mode issue — does not affect runtime).
 
 ---
 

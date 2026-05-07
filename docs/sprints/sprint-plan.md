@@ -11,7 +11,7 @@
 | Sprint 3B | Mission Control                            | ✅ Fertig     | 2 Wochen |
 | Sprint 3.5| Mobile Ergonomics                          | ✅ Fertig     | 1 Woche  |
 | Sprint 3.6| UX Polish & Visual Features                | ✅ Fertig     | 1 Woche  |
-| Sprint 3.7| Dashboard Rework, Auth & i18n              | 🟡 Phase 1+2  | laufend  |
+| Sprint 3.7| Dashboard Rework, Auth & i18n              | ✅ Fertig     | 3 Wochen |
 | Sprint 4  | Community und Kollaboration                | Geplant       | 2 Wochen |
 | Sprint 5  | Gamification, KI und Admin-Panel           | Geplant       | 2 Wochen |
 | Sprint 6  | PWA, Branding und Launch                   | Geplant       | 2 Wochen |
@@ -141,7 +141,7 @@
 
 **Erledigte Tasks:**
 
-- [x] Mobile Drag & Drop (mobile-drag-drop Polyfill)
+- [x] Mobile Drag & Drop (mobile-drag-drop Polyfill → in 3.7 durch @dnd-kit ersetzt)
 - [x] Visual Study Plan Board (Semester-Spalten mit DnD)
 - [x] Digitaler Studentenausweis (ID Card, Glassmorphism)
 - [x] Einstellungsbereich (3 Tabs: Persönlich, Konto, Erscheinungsbild)
@@ -150,9 +150,9 @@
 
 ---
 
-## Sprint 3.7 – Dashboard Rework, Auth & i18n 🟡
+## Sprint 3.7 – Dashboard Rework, Auth & i18n ✅
 
-**Ziel:** Professionalisierung: echte Daten, funktionierende Settings, vollständige Zweisprachigkeit.
+**Ziel:** Professionalisierung: echte Daten, funktionierende Settings, vollständige Zweisprachigkeit, native Touch-DnD, intelligente UI.
 
 **Erledigte Tasks (Phase 1+2):**
 
@@ -167,11 +167,11 @@
 - [x] Semester-Bug Fix (ModuleModal)
 - [x] Locale-aware Datumsformatierung
 
-**Offene Tasks (Phase 3–5):**
+**Erledigte Tasks (Phase 3–5):**
 
-- [ ] Mobile Kanban Rework (Tap-to-Move / @dnd-kit)
-- [ ] Studienplan Builder (dynamische Semester-Container)
-- [ ] Kontext-sensitiver Quick Add Button
+- [x] Mobile Kanban Rework (@dnd-kit/core + @dnd-kit/sortable)
+- [x] Studienplan Builder (dynamische Semester-Container mit + Neues Semester)
+- [x] Kontext-sensitiver Quick Add Button (ausgeblendet auf /settings, /profile, /setup)
 
 ---
 

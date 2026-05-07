@@ -22,8 +22,8 @@ My primary focus during this project was on:
 
 - ✅ **Mission Control Dashboard** — GPA tracker, ECTS progress, Smart Timeline, Exam Countdown
 - ✅ **Interactive Schedule Board** — 15-min CSS Grid engine with collision detection, ghosting mode, and semester binding
-- ✅ **Kanban Board** — Drag & Drop task management with columns: To Do, In Progress, Exam Ready, Done
-- ✅ **Visual Study Plan** — Interactive semester columns with Drag & Drop module assignment
+- ✅ **Kanban Board** — Touch-native task management (@dnd-kit) with columns: To Do, In Progress, Exam Ready, Done
+- ✅ **Visual Study Plan** — Dynamic semester buckets with touch DnD and "+ Add Semester" support
 - ✅ **Digital ID Card** — Premium glassmorphism student ID with real university data
 - ✅ **Settings & Profile** — Password change, personal data, language switcher
 - ✅ **Mobile-First Experience** — Agenda view, Quick Add FAB, responsive navigation

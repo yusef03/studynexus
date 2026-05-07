@@ -17,6 +17,7 @@ Wir brauchen ein Python-Backend das modern, schnell und gut für KI-Integration 
 FastAPI statt Django oder Flask.
 
 **Begründung:**
+
 - Automatische Swagger-Dokumentation
 - Async-fähig von Anfang an
 - Pydantic-Integration für Datenvalidierung
@@ -24,6 +25,7 @@ FastAPI statt Django oder Flask.
 - Schneller zu lernen als Django
 
 **Konsequenzen:**
+
 - Weniger eingebaute Features als Django (kein Admin-Panel)
 - Manuelle Strukturierung nötig
 
@@ -41,11 +43,13 @@ Passwörter müssen sicher gehasht werden. Ursprünglich passlib[bcrypt] geplant
 bcrypt 4.1.3 direkt verwenden, passlib komplett entfernen.
 
 **Begründung:**
+
 - passlib seit Jahren nicht mehr aktiv gepflegt
-- passlib inkompatibel mit bcrypt 5.x (AttributeError: module bcrypt has no attribute __about__)
+- passlib inkompatibel mit bcrypt 5.x (AttributeError: module bcrypt has no attribute **about**)
 - Direktes bcrypt ist einfacher, weniger Abhängigkeiten
 
 **Konsequenzen:**
+
 - Leicht mehr Code in security.py
 - Keine passlib-spezifischen Features verfügbar
 
@@ -63,12 +67,14 @@ JWT Token muss nach Login im Browser gespeichert werden.
 Token in httpOnly Cookie via Next.js API Proxy speichern.
 
 **Begründung:**
+
 - localStorage ist anfällig für XSS-Angriffe
 - httpOnly Cookie ist für JavaScript nicht lesbar
 - Server-Side Rendering funktioniert mit Cookies besser
 - DSGVO-konformer Ansatz
 
 **Konsequenzen:**
+
 - Next.js API Routes als Proxy nötig
 - Zwei API URLs erforderlich (NEXT_PUBLIC_API_URL + BACKEND_API_URL)
 - CSRF-Schutz muss später ergänzt werden
@@ -84,15 +90,18 @@ Token in httpOnly Cookie via Next.js API Proxy speichern.
 Frontend läuft in Docker und muss Backend erreichen. Browser und Docker-Container haben unterschiedliche Netzwerke.
 
 **Entscheidung:**
+
 - NEXT_PUBLIC_API_URL=http://localhost:8000 (Browser)
 - BACKEND_API_URL=http://backend:8000 (Docker-intern)
 
 **Begründung:**
+
 - Browser kann nicht auf Docker-interne Hostnamen zugreifen
 - Docker-Container kommunizieren über interne Netzwerknamen
 - Klare Trennung von Client-side und Server-side Anfragen
 
 **Konsequenzen:**
+
 - Zwei Umgebungsvariablen zu pflegen
 - In .env.example dokumentiert
 
@@ -110,10 +119,12 @@ Next.js 14.2.3 wurde mit TypeScript-Konfigurationsdatei initialisiert.
 next.config.ts zu next.config.js umbenennen und CommonJS-Syntax verwenden.
 
 **Begründung:**
+
 - Next.js 14.2.3 unterstützt .ts Konfiguration nicht
 - Fehler: Configuring Next.js via next.config.ts is not supported
 
 **Konsequenzen:**
+
 - Keine TypeScript-Typprüfung in der Konfigurationsdatei
 - Bei Next.js Upgrade auf 15+ kann .ts wieder aktiviert werden
 
@@ -131,12 +142,14 @@ Frontend und Backend könnten in separaten Repositories liegen.
 Alles in einem Repository (Monorepo).
 
 **Begründung:**
+
 - Einfachere Entwicklung als Einzelperson
 - Ein Git-History für das gesamte Projekt
 - Einfacheres Docker Compose Setup
-- CLAUDE.md als zentrales Projektgedächtnis
+- ANTIGRAVITY.md als zentrales Projektgedächtnis
 
 **Konsequenzen:**
+
 - Bei größerem Team könnten separate Repos sinnvoller sein
 - CI/CD muss Frontend und Backend separat testen
 
@@ -157,6 +170,7 @@ StudyNexus ist zunächst ausschließlich für Studierende der Hochschule Hannove
 Registrierung ist nur mit einer @stud.hs-hannover.de E-Mail-Adresse möglich.
 
 **Begründung:**
+
 - Fokus ermöglicht schnellere Markteinführung mit hoher Qualität für eine Zielgruppe
 - PO-Daten können sorgfältig gepflegt werden, bevor weitere Hochschulen ongeboardet werden
 - Vertrauensaufbau in einer bekannten Community (Word-of-Mouth in der HsH)
@@ -164,6 +178,7 @@ Registrierung ist nur mit einer @stud.hs-hannover.de E-Mail-Adresse möglich.
 - Einfachere DSGVO-Konformität mit überschaubarem Nutzerkreis
 
 **Konsequenzen:**
+
 - E-Mail-Domainvalidierung im Backend (register-Endpoint) und Frontend (Formularvalidierung)
 - Klare Kommunikation auf der Landing Page: „Für HsH-Studierende"
 - Erweiterung auf andere Hochschulen erst nach stabilem Admin-Panel (Sprint 5+)
@@ -184,11 +199,13 @@ auf `@stud.hs-hannover.de` enden. Das Frontend zeigt vorab eine entsprechende Fe
 Die Validierung wird in Sprint 3 implementiert.
 
 **Begründung:**
+
 - Server-seitige Validierung als primäre Sicherheitsebene (Frontend ist umgehbar)
 - Frontend-Validierung verbessert UX (sofortiges Feedback)
 - Einfache, wartbare Implementierung via Pydantic-Validator
 
 **Konsequenzen:**
+
 - Pydantic-Validator auf dem `email`-Feld in `RegisterRequest`
 - Fehlermeldung: HTTP 422 mit klarem Hinweis auf HsH-Domain
 - i18n-Keys für die Fehlermeldung in de.json / en.json
@@ -210,6 +227,7 @@ POs und Modulkataloge werden ausschließlich manuell durch den Admin (Yusef) üb
 Admin-Panel gepflegt. Kein Crowdsourcing, kein Scraping.
 
 **Begründung:**
+
 - Offizielle PO-Dokumente sind die einzig verlässliche Quelle; Fehler würden Studierende
   bei Studienplanentscheidungen irreführen
 - Scraping ist fragil und rechtlich unklar
@@ -218,6 +236,7 @@ Admin-Panel gepflegt. Kein Crowdsourcing, kein Scraping.
 - Qualität über Quantität: lieber ein akkurat gepflegter Studiengang als viele fehlerhafte
 
 **Konsequenzen:**
+
 - `is_admin` Flag auf dem User-Modell (Sprint 5)
 - Admin-Panel als separate Next.js-Route, nur für is_admin=True zugänglich
 - Admin-API-Endpunkte: CRUD für University, Faculty, Program, ExamRegulation, Module
@@ -235,6 +254,7 @@ Admin-Panel gepflegt. Kein Crowdsourcing, kein Scraping.
 Prerequisite rules across different POs vary significantly (e.g. particular modules needed vs. generic ECTS thresholds vs. Vorprüfung).
 
 **Entscheidung:**
+
 - Never hardcode semester prerequisite logic (e.g. if semester == 4...)
 - Create `module_prerequisites` table in Sprint 3A migration:
   - id (UUID)
@@ -244,6 +264,7 @@ Prerequisite rules across different POs vary significantly (e.g. particular modu
   - description (String) - human readable rule
 
 **Begründung:**
+
 - This supports all PO rules: specific module deps AND ECTS thresholds
 - Replaces has_prerequisites boolean (which is too simple)
 
@@ -258,11 +279,13 @@ Prerequisite rules across different POs vary significantly (e.g. particular modu
 Wir brauchen einen zuverlässigen E-Mail-Provider für Verifizierungscodes.
 
 **Entscheidung:**
+
 - Provider: Resend (resend.com)
 - Python SDK: resend (pip install resend)
 - Free tier: 3000 emails/month
 
 **Begründung:**
+
 - Use case: Email verification codes (6-digit, expires in 15 min)
 - Implement in Sprint 3A
 
@@ -278,17 +301,20 @@ Als SPA mit httpOnly Cookies ist das System anfällig für CSRF-Angriffe. Klassi
 erfordern serverseitige Session-State, was dem JWT-Ansatz widerspricht.
 
 **Entscheidung:**
+
 - Next.js Middleware validiert einen Custom Header `x-studynexus-client: true` auf allen
   mutierenden Requests (POST, PUT, DELETE, PATCH)
 - Zusätzlich: Origin/Host Header-Prüfung gegen Cross-Origin Requests
 - Erlaubte Origin wird über `NEXT_PUBLIC_APP_URL` Umgebungsvariable konfiguriert
 
 **Begründung:**
+
 - Custom Headers können von Cross-Origin Requests nicht ohne CORS-Preflight gesetzt werden
 - Einfacher als Token-basierter CSRF-Schutz, aber effektiv gegen die meisten Angriffsvektoren
 - Kombiniert mit httpOnly Cookies und SameSite=lax bietet dies ein solides Sicherheitsniveau
 
 **Konsequenzen:**
+
 - Alle Frontend fetch-Calls müssen `x-studynexus-client: true` Header mitsenden
 - API-Proxy-Routes leiten den Header nicht weiter (er wird nur von der Middleware geprüft)
 
@@ -304,6 +330,7 @@ Internationalisierung war ursprünglich für Sprint 6 geplant. Die Professionali
 Plattform in Sprint 3.7 erforderte jedoch eine sofortige Umsetzung.
 
 **Entscheidung:**
+
 - `next-intl` als i18n-Bibliothek (bereits im Projekt vorhanden, aber nur teilweise genutzt)
 - Alle UI-Strings in `messages/de.json` und `messages/en.json` ausgelagert
 - `useTranslations()` Hook in allen Komponenten, keine hardcodierten Strings
@@ -311,11 +338,13 @@ Plattform in Sprint 3.7 erforderte jedoch eine sofortige Umsetzung.
 - Datumsformatierung via `useLocale()` + `date-fns` Locale-Objekte
 
 **Begründung:**
+
 - next-intl integriert sich nahtlos mit dem Next.js App Router
 - URL-basiertes Routing ermöglicht SEO-freundliche mehrsprachige Seiten
 - Kein Build-Time i18n nötig – alles dynamisch zur Runtime
 
 **Konsequenzen:**
+
 - Jede neue Komponente muss Translation-Keys verwenden, nie hardcodierte Strings
 - Neue Sprachen (z.B. Türkisch) können durch einfaches Hinzufügen einer JSON-Datei ergänzt werden
 - Performance: Minimal – next-intl lädt nur die aktive Sprach-Datei
@@ -332,16 +361,53 @@ Die ursprüngliche Token-Lebensdauer von 30 Minuten führte zu häufigen "Not au
 Fehlern während normaler Nutzung. Studierende arbeiten oft in langen Sessions.
 
 **Entscheidung:**
+
 - `ACCESS_TOKEN_EXPIRE_MINUTES=10080` (7 Tage) in der `.env`-Datei
 - Cookie `maxAge` auf `60 * 60 * 24 * 7` (7 Tage) synchronisiert
 - Frontend: Bei 401-Antworten wird automatisch zum Login weitergeleitet
 
 **Begründung:**
+
 - 30 Minuten ist für eine Studien-App inakzeptabel kurz
 - Studierende loggen sich einmal ein und erwarten, dass die App "einfach funktioniert"
 - In Produktion kann der Wert angepasst werden, ohne Code-Änderungen
 
 **Konsequenzen:**
+
 - Kompromiss: Längere Token-Gültigkeit = größeres Fenster bei Token-Diebstahl
 - Mitigiert durch: httpOnly Cookie (nicht per JS auslesbar), SameSite=lax, CSRF-Schutz
 - Für Produktion: Wert sollte auf 1–3 Tage reduziert werden + Refresh Token Mechanismus
+
+---
+
+## ADR-015: @dnd-kit statt HTML5 Drag and Drop
+
+**Status:** Akzeptiert
+**Datum:** 2026-05-07
+
+**Kontext:**
+Die bisherige DnD-Implementierung (Kanban Board + Studienplan) basierte auf dem nativen HTML5
+Drag and Drop API mit dem `mobile-drag-drop` Polyfill (Release Candidate v3.0.0-rc.0).
+Auf mobilen Geräten war das Erlebnis unbrauchbar: kein visuelles Feedback, kein natives Scrollen
+möglich, und häufige Ghost-Effekte.
+
+**Entscheidung:**
+
+- `@dnd-kit/core`, `@dnd-kit/sortable` und `@dnd-kit/utilities` als einheitliche DnD-Lösung
+- `PointerSensor` mit `activationConstraint: { distance: 8 }` für Touch + Maus + Pen
+- `DragOverlay` für visuelles Feedback beim Ziehen
+- Komponenten-Extraktion: `KanbanCard`, `KanbanColumn`, `StudyPlanCard`, `StudyPlanColumn`
+
+**Begründung:**
+
+- @dnd-kit ist die Standard-Library für React DnD (16k+ GitHub Stars)
+- Einheitlicher Sensor für alle Input-Methoden (Touch, Maus, Pen, Keyboard)
+- Keine Polyfills nötig – native Performance
+- `activationConstraint` löst das Touch-Scroll-Problem elegant
+- `React.memo` + ausgelagerte Sub-Komponenten = performant bei vielen Items
+
+**Konsequenzen:**
+
+- Drei neue Dependencies: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
+- `mobile-drag-drop` Polyfill wurde entfernt
+- Alle Hooks müssen vor bedingten Returns stehen (React Hook-Regel strikt eingehalten)

@@ -4,9 +4,26 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Planned
-- **Sprint 3.7 Phase 3**: Mobile Kanban Rework (replace HTML5 DnD with Tap-to-Move or @dnd-kit)
-- **Sprint 3.7 Phase 4**: Dynamic Studienplan Builder (add/remove semester containers)
 - **Sprint 4**: Community & Collaboration (Study Spaces, Module Wikis, PDF sharing)
+
+## [v0.3.8] - 2026-05-07 (Sprint 3.7 - Phases 3, 4 & 5)
+### Changed
+- **Phase 3 – Mobile Kanban Rework**: Replaced `mobile-drag-drop` HTML5 polyfill with `@dnd-kit/core` + `@dnd-kit/sortable`
+- Kanban board now fully supports touch devices via `PointerSensor` with 8px activation distance
+- Extracted `KanbanCard` and `KanbanColumn` into standalone `React.memo` components
+- `DragOverlay` shows a floating preview card while dragging
+- Fixed React hook-order violation (`useCallback` before conditional returns)
+- **Phase 4 – Studienplan Builder**: Rewrote `StudyPlanBoard` with `@dnd-kit` for native touch DnD
+- Dynamic semesters: `+ Neues Semester` button allows creating Semester 7, 8, etc.
+- Extracted `StudyPlanCard` and `StudyPlanColumn` sub-components
+- Optimistic query updates via TanStack Query mutation
+- **Phase 5 – Smart FAB**: `MobileQuickAdd` now hides on `/settings`, `/profile`, `/setup` via `usePathname()`
+### Fixed
+- Missing `FOCUS` in `EventType` union (crashed MobileAgendaView)
+- `StudentModule` → `StudentModuleResponse` import error in StudyPlanBoard
+- `UserStats` → `StatsResponse` import error in useUserStats
+- Null-safety crash in EventModal when module name was null
+- `semester` number/string type mismatch in StudyPlanBoard
 
 ## [v0.3.7] - 2026-04-29 (Sprint 3.7 - Settings, Auth & i18n)
 ### Added

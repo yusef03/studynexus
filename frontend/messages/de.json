@@ -160,7 +160,18 @@
         "deleteBtn": "Löschen",
         "cancelBtn": "Abbrechen",
         "saveBtn": "Speichern",
-        "savingBtn": "Speichert..."
+        "savingBtn": "Speichert...",
+        "statusOptions": {
+          "todo": "To Do",
+          "inProgress": "In Bearbeitung",
+          "examReady": "Klausurbereit",
+          "done": "Erledigt"
+        },
+        "priorityOptions": {
+          "low": "Niedrig",
+          "medium": "Mittel",
+          "high": "Hoch"
+        }
       }
     },
     "schedule": {
@@ -223,7 +234,8 @@
         "unplanned": "Ungeplant",
         "semester": "Semester {n}",
         "dropHere": "Hier ablegen",
-        "custom": "Eigenes"
+        "custom": "Eigenes",
+        "addSemester": "+ Neues Semester"
       }
     },
     "addModule": {

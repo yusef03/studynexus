@@ -1,4 +1,4 @@
-export type EventType = "LECTURE" | "EXERCISE" | "TUTORIAL" | "SEMINAR" | "PRACTICUM" | "EXAM" | "CUSTOM_STUDY" | "WORK" | "LIFE";
+export type EventType = "LECTURE" | "EXERCISE" | "TUTORIAL" | "SEMINAR" | "PRACTICUM" | "EXAM" | "CUSTOM_STUDY" | "WORK" | "LIFE" | "FOCUS";
 
 export interface Event {
   id: string;

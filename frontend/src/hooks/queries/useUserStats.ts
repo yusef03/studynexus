@@ -1,10 +1,10 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { UserStats } from "@/types/study";
+import type { StatsResponse } from "@/types/study";
 
 export function useUserStats() {
-  return useQuery<UserStats, Error>({
+  return useQuery<StatsResponse, Error>({
     queryKey: ["userStats"],
     queryFn: async () => {
       const res = await fetch("/api/study/stats");

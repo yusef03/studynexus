@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { TaskModal } from "@/components/kanban/TaskModal";
 import { EventModal } from "@/components/schedule/EventModal";
 import { useTasks } from "@/hooks/queries/useTasks";
@@ -11,13 +12,18 @@ import { useTranslations } from "next-intl";
 
 export function MobileQuickAdd() {
   const t = useTranslations("dashboard.widgets.quickAdd");
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [modalType, setModalType] = useState<"NONE" | "TASK" | "SUBMISSION" | "EVENT">("NONE");
-  
   const { createTask } = useTasks();
   const { createEvent } = useEvents();
   const [isSaving, setIsSaving] = useState(false);
   const [collisionWarning, setCollisionWarning] = useState<string | null>(null);
+
+  // Phase 5: Only show FAB on pages where it makes sense
+  const hiddenPaths = ["/settings", "/profile", "/setup"];
+  const shouldHide = hiddenPaths.some(p => pathname.includes(p));
+  if (shouldHide) return null;
 
   const handleTaskSave = (id: string, payload: any) => {
     setIsSaving(true);
