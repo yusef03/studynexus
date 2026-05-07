@@ -154,11 +154,29 @@ def add_module(
         if existing:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Module already in your study plan")
 
+        # BIN PO: max 2 WAHLPFLICHT modules (12 ECTS total). Hard limit enforced here.
+        if module.modul_typ == ModulTyp.WAHLPFLICHT:
+            wahlpflicht_count = (
+                db.query(StudentModule)
+                .join(Module, StudentModule.module_id == Module.id)
+                .filter(
+                    StudentModule.user_id == current_user.id,
+                    Module.modul_typ == ModulTyp.WAHLPFLICHT,
+                )
+                .count()
+            )
+            if wahlpflicht_count >= 2:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Wahlpflicht limit reached. The PO allows exactly 2 Wahlpflicht modules (12 ECTS).",
+                )
+
     sm = StudentModule(
         user_id=current_user.id,
         module_id=payload.module_id,
         custom_name=payload.custom_name,
         custom_ects=payload.custom_ects,
+        custom_ist_benotet=payload.custom_ist_benotet,
         semester=payload.semester,
         status=StudiengangStatus.PLANNED,
         versuch_nummer=1,
@@ -230,6 +248,12 @@ def update_module(
         sm.pruefungs_datum = payload.pruefungs_datum
     if payload.semester is not None:
         sm.semester = payload.semester
+    # plan_semester: written only by StudyPlanBoard — decoupled from grade tracking.
+    # We accept any string (e.g. "3", "Ungeplant") or None (reset to auto-position).
+    if "plan_semester" in payload.model_fields_set:
+        sm.plan_semester = payload.plan_semester
+    if "custom_ist_benotet" in payload.model_fields_set:
+        sm.custom_ist_benotet = payload.custom_ist_benotet
 
     db.commit()
     db.refresh(sm)
@@ -303,6 +327,8 @@ def _build_sm_response(sm: StudentModule, module) -> StudentModuleResponse:
         anmelde_datum=sm.anmelde_datum,
         pruefungs_datum=sm.pruefungs_datum,
         semester=sm.semester,
+        plan_semester=sm.plan_semester,
+        custom_ist_benotet=sm.custom_ist_benotet,
         module=ModuleResponse.model_validate(module) if module else None,
     )
 

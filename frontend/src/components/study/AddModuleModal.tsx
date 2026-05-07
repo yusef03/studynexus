@@ -11,6 +11,7 @@ import { useAddModule } from "@/hooks/queries/useAddModule";
 
 interface Props {
   alreadyAddedModuleIds: Set<string>;
+  wahlpflichtCount?: number;
   onClose: () => void;
 }
 
@@ -21,7 +22,7 @@ const selectClass = cn(
   "disabled:cursor-not-allowed disabled:opacity-50",
 );
 
-export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
+export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, onClose }: Props) {
   const t = useTranslations("dashboard.addModule");
 
   const [mode, setMode] = useState<"wahlpflicht" | "custom">("wahlpflicht");
@@ -29,6 +30,7 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
   const [selectedModuleId, setSelectedModuleId] = useState("");
   const [customName, setCustomName] = useState("");
   const [customEcts, setCustomEcts] = useState("");
+  const [customIsGraded, setCustomIsGraded] = useState(true);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -66,7 +68,7 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
     const body =
       mode === "wahlpflicht"
         ? { module_id: selectedModuleId }
-        : { custom_name: customName.trim(), custom_ects: parseInt(customEcts, 10) };
+        : { custom_name: customName.trim(), custom_ects: parseInt(customEcts, 10), custom_ist_benotet: customIsGraded };
 
     addModule.mutate(body, {
       onSuccess: () => onClose(),
@@ -74,9 +76,11 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
     });
   };
 
+  const wahlpflichtFull = wahlpflichtCount >= 2;
+
   const canSave =
     mode === "wahlpflicht"
-      ? !!selectedModuleId
+      ? !!selectedModuleId && !wahlpflichtFull
       : customName.trim().length > 0 &&
         customEcts.trim().length > 0 &&
         Number.isInteger(Number(customEcts)) &&
@@ -138,7 +142,11 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
           {!loading && !loadError && mode === "wahlpflicht" && (
             <div className="space-y-1.5">
               <Label htmlFor="add-module-select">{t("modeWahlpflicht")}</Label>
-              {catalog.length === 0 ? (
+              {wahlpflichtFull ? (
+                <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+                  {t("wahlpflichtFull")}
+                </p>
+              ) : catalog.length === 0 ? (
                 <p className="text-sm text-muted-foreground">{t("noModules")}</p>
               ) : (
                 <select
@@ -160,6 +168,9 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
 
           {!loading && !loadError && mode === "custom" && (
             <>
+              <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
+                {t("ergaenzendHint")}
+              </p>
               <div className="space-y-1.5">
                 <Label htmlFor="add-custom-name">{t("customName")}</Label>
                 <Input
@@ -181,6 +192,15 @@ export function AddModuleModal({ alreadyAddedModuleIds, onClose }: Props) {
                   placeholder="z. B. 2"
                 />
               </div>
+              <label className="flex items-center gap-2 cursor-pointer text-sm">
+                <input
+                  type="checkbox"
+                  checked={customIsGraded}
+                  onChange={(e) => setCustomIsGraded(e.target.checked)}
+                  className="h-4 w-4 rounded border-input"
+                />
+                {t("isGraded")}
+              </label>
             </>
           )}
 

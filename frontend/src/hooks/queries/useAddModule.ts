@@ -7,6 +7,7 @@ interface AddPayload {
   module_id?: string;
   custom_name?: string;
   custom_ects?: number;
+  custom_ist_benotet?: boolean;
 }
 
 export function useAddModule() {

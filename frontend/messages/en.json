@@ -249,6 +249,9 @@
       "saving": "Adding…",
       "close": "Cancel",
       "noModules": "All elective modules already added",
+      "isGraded": "Graded",
+      "wahlpflichtFull": "Limit reached – the PO allows exactly 2 elective modules (12 ECTS)",
+      "ergaenzendHint": "BIN-209 Supplementary Subjects: Add 3 custom modules here (2 ECTS each) – at least 1 from the Business area",
       "loadError": "Error loading module catalogue",
       "saveError": "Error adding module"
     },

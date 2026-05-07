@@ -411,3 +411,70 @@ möglich, und häufige Ghost-Effekte.
 - Drei neue Dependencies: `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities`
 - `mobile-drag-drop` Polyfill wurde entfernt
 - Alle Hooks müssen vor bedingten Returns stehen (React Hook-Regel strikt eingehalten)
+
+---
+
+## ADR-017: `custom_ist_benotet` für custom ERGAENZEND-Module
+
+**Status:** Akzeptiert  
+**Datum:** 2026-05-07
+
+**Kontext:**
+Das Feld `ist_benotet` liegt auf der `Module`-Tabelle und gilt für Katalog-Module. Custom-Module (ERGAENZEND mit `custom_name`, kein `module_id`) haben keinen Katalogeintrag und damit kein vererbtes `ist_benotet`. Für BIN-209 müssen Studierende eigene Ergänzende Fächer anlegen — diese können benotet oder unbenotet sein.
+
+**Entscheidung:**
+Ein neues nullable Boolean-Feld `custom_ist_benotet` auf `student_modules`:
+- `NULL`: Katalog-Modul — `ist_benotet` wird von `module.ist_benotet` gelesen
+- `TRUE`: Custom-Modul ist benotet
+- `FALSE`: Custom-Modul ist unbenotet
+- Default beim Anlegen: `TRUE` (in `AddModuleModal` vorausgewählt)
+
+**Begründung:**
+- Minimale Datenbankänderung — ein Feld statt einer eigenen Tabelle
+- Klare Semantik: `NULL` heißt "schau ins Katalog-Modul"
+- `AddModuleModal` zeigt die Checkbox nur im custom-Modus (ERGAENZEND)
+- GPA-Berechnung muss custom-Module aktuell nicht berücksichtigen (keine `gewichtung`)
+
+**Konsequenzen:**
+- Migration 0011: `ALTER TABLE student_modules ADD COLUMN custom_ist_benotet BOOLEAN`
+- Alle Schemas (AddModuleRequest, UpdateModuleRequest, StudentModuleResponse) erweitert
+- Frontend: Checkbox "Benotet?" in `AddModuleModal` (custom-Modus, default: checked)
+- ModuleModal/ModuleList müssen `custom_ist_benotet` auslesen wenn `module === null` ← noch offen
+
+---
+
+## ADR-016: Getrenntes `plan_semester`-Feld für StudyPlanBoard
+
+**Status:** Akzeptiert
+**Datum:** 2026-05-07
+
+**Kontext:**
+`StudentModule.semester` wurde sowohl von der Notenübersicht (`/modules`) als auch vom
+StudyPlanBoard (`/study-plan`) genutzt. DnD-Verschiebungen im StudyPlanBoard änderten
+dadurch die Gruppierung in der Notenübersicht — ein kritischer UX-Bug.
+
+**Entscheidung:**
+
+Zwei getrennte Felder auf `StudentModule`:
+
+| Feld | Besitzer | Bedeutung |
+|---|---|---|
+| `semester` | Notenübersicht | Administratives/tatsächliches Semester; wird vom Noten-Flow gesetzt |
+| `plan_semester` | StudyPlanBoard | Persönliche Planung des Studierenden; wird nur durch DnD gesetzt |
+
+Display-Fallback im StudyPlanBoard: `plan_semester → semester_empfehlung → "Ungeplant"`
+
+**Begründung:**
+
+- Konzeptuelle Trennung: „Wann belege ich dieses Modul?" (administrativ) vs. „Wie plane ich mein Studium?" (strategisch)
+- Neue Studiengänge/Fakultäten funktionieren automatisch korrekt: PFLICHT-Module starten mit `plan_semester=null` und landen über `semester_empfehlung` automatisch in der richtigen Spalte
+- Neue Module (Wahlpflicht, Ergänzend) erscheinen automatisch in „Ungeplant" im StudyPlanBoard
+- Reihenfolge ist zukunftssicher: weitere Felder (z.B. `target_grade`) können analog getrennt werden
+
+**Konsequenzen:**
+
+- Migration 0010: `ALTER TABLE student_modules ADD COLUMN plan_semester VARCHAR`
+- `UpdateModuleRequest.plan_semester` schreibt nur `plan_semester`, nie `semester`
+- Backend verwendet `model_fields_set` um zwischen „nicht gesendet" und „explizit null" zu unterscheiden
+- StudyPlanBoard sendet ausschließlich `{ plan_semester: value }` im PUT-Body
+- `useUpdateModule` (Notenübersicht) sendet niemals `plan_semester` → sauber getrennt

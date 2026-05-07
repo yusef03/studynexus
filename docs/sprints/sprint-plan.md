@@ -12,6 +12,7 @@
 | Sprint 3.5| Mobile Ergonomics                          | ✅ Fertig     | 1 Woche  |
 | Sprint 3.6| UX Polish & Visual Features                | ✅ Fertig     | 1 Woche  |
 | Sprint 3.7| Dashboard Rework, Auth & i18n              | ✅ Fertig     | 3 Wochen |
+| Sprint 3.7.7 | BIN PO Data Fix + custom_ist_benotet   | ✅ Fertig     | 1 Tag    |
 | Sprint 4  | Community und Kollaboration                | Geplant       | 2 Wochen |
 | Sprint 5  | Gamification, KI und Admin-Panel           | Geplant       | 2 Wochen |
 | Sprint 6  | PWA, Branding und Launch                   | Geplant       | 2 Wochen |
@@ -172,6 +173,35 @@
 - [x] Mobile Kanban Rework (@dnd-kit/core + @dnd-kit/sortable)
 - [x] Studienplan Builder (dynamische Semester-Container mit + Neues Semester)
 - [x] Kontext-sensitiver Quick Add Button (ausgeblendet auf /settings, /profile, /setup)
+
+---
+
+## Sprint 3.7.7 – BIN PO Data Fix ✅
+
+**Ziel:** BIN PO 2019 korrekt und vollständig in der Datenbank abbilden.
+
+**Grundlage:** Vollständiges Lesen von Modulhandbuch BIN 19WS (76 Seiten), PO BIN 2019, ATPO-FIV 2025. Analyse-Dokument: `docs/sprints/po-architecture-analysis.md`. Status-Dokument: `docs/sprints/studiengang-implementation-status.md`.
+
+**Erledigte Tasks:**
+
+- [x] Migration 0011: alle 27 PFLICHT-Kürzel auf BIN-100..BIN-210 korrigiert
+- [x] Migration 0011: BIN-207 und BIN-209 ("Ergänzende Fächer") korrekt eingefügt
+- [x] Migration 0011: Alle 9 WAHLPFLICHT-Namen auf PO-korrekte Namen korrigiert + semester_empfehlung=5
+- [x] Migration 0011: has_prerequisites: FALSE für 1. Abschnitt (BIN-100..116), TRUE für 2. Abschnitt
+- [x] Migration 0011: Fake-Platzhaltermodule gelöscht
+- [x] Migration 0011: `custom_ist_benotet` Column auf student_modules
+- [x] Backend: `custom_ist_benotet` in Model, Schema, Router (add/update/build)
+- [x] Frontend: `custom_ist_benotet` in types/study.ts
+- [x] Frontend: "Benotet?"-Checkbox in AddModuleModal (custom ERGAENZEND-Modus)
+- [x] i18n: `addModule.isGraded` in de.json + en.json
+
+**Alle Tasks erledigt. Offene Punkte → nächste Session:**
+
+- [x] Fix: custom_ist_benotet in ModuleModal korrekt auslesen (sm.module !== null check)
+- [x] Fix: WAHLPFLICHT-Limit max. 2 (Backend 409 + Frontend amber Warning + canSave=false)
+- [x] Fix: BIN-209 ergaenzendHint in AddModuleModal custom-Modus
+- [ ] Fix: /api/me/profile Route im Next.js Proxy anlegen (P2, nächste Session)
+- [ ] Feature: Vorprüfungs-Milestone im Dashboard (P1, nächste Session)
 
 ---
 

@@ -1,6 +1,6 @@
 import uuid
 import enum
-from sqlalchemy import Column, String, Integer, Float, ForeignKey, DateTime, Enum
+from sqlalchemy import Column, String, Integer, Float, Boolean, ForeignKey, DateTime, Enum
 from sqlalchemy.dialects.postgresql import UUID
 from app.database import Base
 
@@ -26,3 +26,11 @@ class StudentModule(Base):
     anmelde_datum = Column(DateTime(timezone=True), nullable=True)
     pruefungs_datum = Column(DateTime(timezone=True), nullable=True)
     semester = Column(String, nullable=True)
+    # Used exclusively by the StudyPlanBoard (/study-plan).
+    # NULL means "auto-position via semester_empfehlung".
+    # Any string value means the user has explicitly placed this module.
+    # Never written by the ModuleList or grade-tracking flows.
+    plan_semester = Column(String, nullable=True)
+    # NULL for catalogue modules (ist_benotet comes from module.ist_benotet).
+    # Set explicitly for custom ERGAENZEND modules which have no catalogue entry.
+    custom_ist_benotet = Column(Boolean, nullable=True)

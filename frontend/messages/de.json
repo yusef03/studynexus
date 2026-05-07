@@ -249,6 +249,9 @@
       "saving": "Wird hinzugefügt…",
       "close": "Abbrechen",
       "noModules": "Alle Wahlpflichtmodule bereits hinzugefügt",
+      "isGraded": "Benotet",
+      "wahlpflichtFull": "Limit erreicht – laut PO sind genau 2 Wahlpflichtmodule (12 ECTS) vorgesehen",
+      "ergaenzendHint": "BIN-209 Ergänzende Fächer: Füge hier 3 eigene Module (je 2 ECTS) hinzu – mind. 1 aus dem BWL-Bereich",
       "loadError": "Fehler beim Laden des Modulkatalogs",
       "saveError": "Fehler beim Hinzufügen des Moduls"
     },

@@ -59,7 +59,12 @@ export interface StudentModuleResponse {
   versuch_nummer: number;
   anmelde_datum: string | null;
   pruefungs_datum: string | null;
+  /** Administrative semester — used by ModuleList (/modules). Never written by StudyPlanBoard. */
   semester: string | null;
+  /** StudyPlanBoard-only planning semester. null = auto-position via semester_empfehlung. */
+  plan_semester: string | null;
+  /** null for catalogue modules (use module.ist_benotet). Set for custom ERGAENZEND modules. */
+  custom_ist_benotet: boolean | null;
   module: ModuleResponse | null;
 }
 

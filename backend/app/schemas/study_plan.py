@@ -111,6 +111,10 @@ class StudentModuleResponse(BaseModel):
     anmelde_datum: Optional[datetime]
     pruefungs_datum: Optional[datetime]
     semester: Optional[str]
+    # StudyPlanBoard-exclusive field. NULL = auto-position via semester_empfehlung.
+    plan_semester: Optional[str]
+    # NULL for catalogue modules (use module.ist_benotet). Set for custom ERGAENZEND modules.
+    custom_ist_benotet: Optional[bool]
     module: Optional[ModuleResponse]
 
     model_config = {"from_attributes": True}
@@ -125,6 +129,7 @@ class AddModuleRequest(BaseModel):
     module_id: Optional[UUID] = None
     custom_name: Optional[str] = None
     custom_ects: Optional[int] = None
+    custom_ist_benotet: Optional[bool] = None
     semester: Optional[str] = None
 
     @model_validator(mode="after")
@@ -139,11 +144,16 @@ class AddModuleRequest(BaseModel):
 
 
 class UpdateModuleRequest(BaseModel):
+    # Grade/status fields — written by ModuleList (/modules page)
     status: Optional[StudiengangStatus] = None
     note: Optional[float] = None
     anmelde_datum: Optional[datetime] = None
     pruefungs_datum: Optional[datetime] = None
     semester: Optional[str] = None
+    # Planning field — written exclusively by StudyPlanBoard (/study-plan)
+    plan_semester: Optional[str] = None
+    # Grading flag for custom ERGAENZEND modules (no catalogue entry to inherit from)
+    custom_ist_benotet: Optional[bool] = None
 
 
 # ── Stats ─────────────────────────────────────────────────────────────────────

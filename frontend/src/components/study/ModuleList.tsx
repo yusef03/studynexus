@@ -28,12 +28,13 @@ export function ModuleList() {
   };
 
   const currentGroups = groups ?? [];
+  const allModules = currentGroups.flatMap((g) => g.modules);
   const addedModuleIds = new Set(
-    currentGroups
-      .flatMap((g) => g.modules)
-      .map((sm) => sm.module_id)
-      .filter((id): id is string => id !== null),
+    allModules.map((sm) => sm.module_id).filter((id): id is string => id !== null),
   );
+  const wahlpflichtCount = allModules.filter(
+    (sm) => sm.module?.modul_typ === "WAHLPFLICHT",
+  ).length;
 
   if (loading) {
     return (
@@ -138,6 +139,7 @@ export function ModuleList() {
       {showAddModal && (
         <AddModuleModal
           alreadyAddedModuleIds={addedModuleIds}
+          wahlpflichtCount={wahlpflichtCount}
           onClose={() => setShowAddModal(false)}
         />
       )}

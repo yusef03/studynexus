@@ -33,7 +33,9 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
   
   const updateModule = useUpdateModule();
 
-  const isBenotet = sm.module?.ist_benotet ?? false;
+  const isBenotet = sm.module !== null
+    ? sm.module.ist_benotet
+    : (sm.custom_ist_benotet ?? true);
   const displayName = sm.module?.name ?? sm.custom_name ?? "";
 
   if (!open) return null;

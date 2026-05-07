@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 3.7 Complete (all 5 Phases) — Sprint 4 (Community & Collaboration) next
+**Status:** ✅ Sprint 3.7.7 Complete — Sprint 4 (Community & Collaboration) next
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-05-07
 
@@ -81,6 +81,8 @@ Migration status:
 - 0007: semester_tag, event_date, lecturer fields on events ✅
 - 0008: focus type + is_submission on tasks ✅
 - 0009: profile fields (birth_date, hochschule) on users ✅
+- 0010: plan_semester field on student_modules (StudyPlanBoard-only) ✅
+- 0011: Fix all BIN module data (correct kuerzel BIN-100..BIN-210, ECTS, ist_benotet, has_prerequisites, gewichtung), delete fake placeholder modules, insert BIN-209 "Ergänzende Fächer", add custom_ist_benotet to student_modules ✅
 
 ---
 
@@ -189,34 +191,53 @@ Migration status:
 - Settings page (tabs: Personal, Security, Appearance)
 - Dashboard greeting with real user name
 
-### Sprint 3.7 – Rework (Phase 1+2 Complete) ✅
+### Sprint 3.7 – Rework (Phases 1–5 Complete) ✅
 - **Phase 1:** Registration fields (matrikelnummer, birth_date, hochschule) as required
 - **Phase 2:** Settings with real data, password change API (`PUT /me/password`), language switcher
-- **i18n Full Coverage:** Every UI string in all pages/modals/widgets translated via next-intl (de.json + en.json)
-- **Bugfixes:** Token lifetime 30min→7days, semester-field removal from ModuleModal, 401 auto-redirect
-- **Date formatting:** locale-aware via date-fns + toLocaleDateString
+- **Phase 3:** Mobile Kanban Rework — `@dnd-kit/core` + `@dnd-kit/sortable`, DragOverlay, KanbanCard/KanbanColumn
+- **Phase 4:** Studienplan Builder — `@dnd-kit`, dynamic `+ Neues Semester`, StudyPlanCard/StudyPlanColumn, optimistic mutations
+- **Phase 5:** Smart FAB — MobileQuickAdd hidden on /settings, /profile, /setup via `usePathname()`
+- **i18n Full Coverage:** all pages/modals/widgets via next-intl (de.json + en.json)
+- **Bugfixes:** Token lifetime 30min→7days, hook-order violations, semester field isolation, 401 auto-redirect
 
-### Sprint 3.7 – Phases 3–5 (Complete) ✅
-- **Phase 3 – Mobile Kanban Rework:** Replaced `mobile-drag-drop` polyfill with `@dnd-kit/core` + `@dnd-kit/sortable`. Native PointerSensor with 8px activation, DragOverlay, extracted KanbanCard/KanbanColumn components.
-- **Phase 4 – Studienplan Builder:** Rewrote StudyPlanBoard with `@dnd-kit`. Dynamic `+ Neues Semester` button. Extracted StudyPlanCard/StudyPlanColumn. Optimistic mutations.
-- **Phase 5 – Smart FAB:** MobileQuickAdd uses `usePathname()` to hide on /settings, /profile, /setup.
-- **Bugfixes:** React hook-order violations, missing FOCUS EventType, StudentModule/UserStats import errors, EventModal null-crash, semester type mismatch.
+### Sprint 3.7.7 – BIN PO Data Fix (Complete) ✅
+Vollständige Analyse und Umsetzung: `docs/sprints/studiengang-implementation-status.md`
+
+- **Migration 0011:** Alle 27 PFLICHT kuerzel (BIN-100..BIN-210) korrigiert. 9 WAHLPFLICHT-Namen auf echte PO-Namen. BIN-209 "Ergänzende Fächer" eingefügt + für bestehende User provisioniert. Fake-Platzhalter gelöscht. `custom_ist_benotet` Column auf student_modules.
+- **Backend:** `custom_ist_benotet` in Model, Schema, Router. WAHLPFLICHT-Limit (max 2) mit HTTP 409 durchgesetzt.
+- **Frontend:** `custom_ist_benotet` in types + useAddModule. `ModuleModal` Bug-Fix (custom Module zeigten immer "unbenotet"). `AddModuleModal` mit WAHLPFLICHT-Warning, BIN-209 Hinweis, Benotet-Checkbox. `ModuleList` berechnet wahlpflichtCount.
 
 ---
 
-## Next Steps – Sprint 4
+## Next Steps
 
-- [ ] Community & Collaboration (Study Spaces, Module Wikis, PDF sharing)
-- [ ] Gamification basics (XP, Streaks, Leaderboard)
-- [ ] Push notifications for deadlines
+### Sofort (vor Sprint 4)
+- [ ] Vorprüfungs-Milestone im Dashboard (BIN PO: Alle Sem-1-Prüfungen → Zugang zu Sem 4+, 134 CP → BA-Zulassung)
+- [ ] Semester-Tag im FAB dynamisch machen (aus `GET /me/program` start_semester)
+- [ ] `/api/me/profile` Route im Next.js Proxy anlegen (GET + PUT)
+
+### Sprint 4 — Community & Collaboration
+- [ ] Modul-Wiki (Beschreibungen, Prüfungsarten, Bewertungen)
+- [ ] Anonyme Modulevaluationen (DSGVO-konform)
+- [ ] Study Spaces (digitale Lerngruppen mit geteiltem Kanban)
+- [ ] PDF-Upload und -Sharing
+
+### Sprint 5 — Gamification & Admin
+- [ ] XP-System, Badges, Streaks, Leaderboard
+- [ ] Skill-Tree Visualisierung (Modul-Abhängigkeitsgraph)
+- [ ] Claude/OpenAI API Integration via LangChain
+- [ ] Admin-Panel (Yusef-only) für PO-Verwaltung
+- [ ] Weitere HsH-Studiengänge (MDI zuerst)
+- [ ] module_prerequisites Tabelle aufbauen + BIN-Daten eintragen
 
 ---
 
 ## Known Limitations
 
-- WAHLPFLICHT catalogue modules (BIN-211…BIN-219) have `semester_empfehlung = NULL` — they appear under "Ungeplant" when added.
-- Catalogue ERGAENZEND modules are not shown in the picker — students must enter them as custom modules.
+- Custom ERGAENZEND modules (Ergänzende Fächer für BIN-209) are entered by the student manually — not from a catalogue. The system explains this via the `ergaenzendHint` in AddModuleModal.
+- WAHLPFLICHT limit is hardcoded to 2 in the backend — this is correct for BIN but would need to be program-aware for other programs.
 - 404/500 prerender warnings during `next build` (Next.js + next-intl standalone mode issue — does not affect runtime).
+- `module_prerequisites` table (ADR-010) was never built — `has_prerequisites` is only a boolean flag, no detail about which specific modules are required.
 
 ---
 
@@ -234,6 +255,11 @@ Migration status:
 | CSRF Protection | Sprint 3B | Custom header `x-studynexus-client` + Origin check (ADR-012) |
 | i18n Full Integration | Sprint 3.7 | next-intl with DE/EN, originally planned for Sprint 6, pulled forward (ADR-013) |
 | Token Lifetime | Sprint 3.7 | 7 days in dev, was 30 min causing constant re-logins (ADR-014) |
+| @dnd-kit für alle DnD | Sprint 3.7 | Ersetzt HTML5 DnD + mobile-drag-drop Polyfill (ADR-015) |
+| plan_semester getrennt von semester | Sprint 3.7 | StudyPlanBoard schreibt nur plan_semester, Notenflow nur semester (ADR-016) |
+| BIN-209 als PFLICHT Container | Sprint 3.7.7 | Ergänzende Fächer als custom ERGAENZEND à 2 ECTS — Option A aus po-architecture-analysis.md |
+| custom_ist_benotet auf StudentModule | Sprint 3.7.7 | Custom-Module ohne Katalogeintrag brauchen eigenes ist_benotet (ADR-017) |
+| WAHLPFLICHT-Limit hardcoded = 2 | Sprint 3.7.7 | BIN PO erlaubt genau 2 WP-Module (12 ECTS) — Backend 409 + Frontend Warning |
 
 ---
 
@@ -254,6 +280,21 @@ Migration status:
 | Ghosting | Temporarily hiding schedule events without deleting them |
 
 ---
+
+### open points:
+  Vollständige Analyse und Priorisierung: docs/sprints/studiengang-implementation-status.md
+
+  Vollständige Analyse: docs/sprints/studiengang-implementation-status.md
+  
+  Noch offen (P1):
+  1. Vorprüfungs-Milestone im Dashboard (BIN: Sem 1 bestanden → Sem 4 freigegeben, 134 CP → BA)
+  2. Semester-Tag im FAB dynamisch (statt hardcoded "WiSe2425")
+  3. /api/me/profile Proxy-Route im Next.js anlegen
+
+  Noch offen (P2/Future):
+  4. module_prerequisites Tabelle (ADR-010) — erst sinnvoll mit Admin-Panel (Sprint 5)
+  5. MDI, Master, BWL Studiengänge (Sprint 5+)                                                                                                                                                                 
+
 
 ## Important Rules for AI Code Generation
 
