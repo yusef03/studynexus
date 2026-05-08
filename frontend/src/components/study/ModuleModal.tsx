@@ -4,11 +4,12 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import type { StudentModuleResponse, StudiengangStatus } from "@/types/study";
 import { useUpdateModule } from "@/hooks/queries/useUpdateModule";
+
+const NOTE_OPTIONS = [1.0, 1.3, 1.7, 2.0, 2.3, 2.7, 3.0, 3.3, 3.7, 4.0, 5.0];
 
 const STATUS_OPTIONS: StudiengangStatus[] = [
   "PLANNED",
@@ -38,6 +39,13 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
 
   const [status, setStatus] = useState<StudiengangStatus>(sm.status);
   const [note, setNote] = useState<string>(sm.note !== null ? sm.note.toFixed(1) : "");
+
+  const selectClass = cn(
+    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2",
+    "text-sm ring-offset-background",
+    "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+    "disabled:cursor-not-allowed disabled:opacity-50",
+  );
   const [error, setError] = useState<string | null>(null);
   
   const updateModule = useUpdateModule();
@@ -151,16 +159,19 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
           {isBenotet ? (
             <div className="space-y-1.5">
               <Label htmlFor="modal-note">{t("note")}</Label>
-              <Input
+              <select
                 id="modal-note"
-                type="number"
-                min="1.0"
-                max="5.0"
-                step="0.1"
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
-                placeholder="z. B. 2.3"
-              />
+                className={selectClass}
+              >
+                <option value="">{t("noteSelect")}</option>
+                {NOTE_OPTIONS.map((n) => (
+                  <option key={n} value={n.toFixed(1)}>
+                    {n.toFixed(1).replace(".", ",")}
+                  </option>
+                ))}
+              </select>
             </div>
           ) : (
             <p className="text-sm text-muted-foreground">{t("noteUngraded")}</p>

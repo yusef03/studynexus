@@ -15,6 +15,13 @@ All notable changes to this project will be documented in this file.
 - **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
 - **ADR-018**: Als abgeschlossen dokumentiert
 
+### Sprint 4 Phase 6 — Notenvalidierung & BIN-209 Gewichtungs-Fix (2026-05-09)
+#### Added
+- **Migration 0014**: `modules.gewichtung` für BIN-209 korrigiert: 1.0 → 1.5 (PO BIN 2019 Anlage B2, war Datenfehler aus Migration 0011)
+- **Backend `UpdateModuleRequest`**: `field_validator("note")` — nur 11 offizielle HsH-Noten zulässig (1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0), HTTP 422 bei Verstoß
+- **Frontend `ModuleModal`**: Noteneingabe von `<Input type="number">` auf `<select>`-Dropdown mit 11 Optionen umgestellt (keine Freitexteingabe mehr)
+- **i18n**: `dashboard.modal.noteSelect` (Dropdown-Placeholder) in de.json + en.json
+
 ### Sprint 4 Phase 5 — module_prerequisites + BIN-209 GPA-Fix (2026-05-09)
 #### Added
 - **Migration 0013**: `module_prerequisites` Tabelle (id, module_id, required_module_id, minimum_ects, required_semesters, prerequisite_type, description)
@@ -63,11 +70,7 @@ All notable changes to this project will be documented in this file.
 - **`docs/api/stats.md`**: alle neuen Felder dokumentiert
 
 ### Planned
-- **Sprint 4 Phase 3**: BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown)
-- **Sprint 4 Phase 3**: BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown)
-- **Sprint 4 Phase 4**: FAB Semester-Tag dynamisch + /api/me/profile Proxy
-- **Sprint 4 Phase 5**: module_prerequisites Tabelle (ADR-010) + BIN-Seed + BIN-209 GPA-Fix
-- **Sprint 4 Phase 6**: Notenvalidierung (nur 11 offizielle HsH-Noten)
+- **Sprint 4 Phase 7**: PO-Übersicht-Seite (`/dashboard/po-uebersicht`) — alle wichtigen PO-Regeln übersichtlich dargestellt (§6 Zulassungsregeln, Notenscala, Prüfungsarten, Wiederholungsregeln, BIN-209 Sonderregel, BA-Zulassung)
 - **Sprint 5**: Admin Panel (PO-Verwaltung ohne Alembic-Migrationen)
 - **Sprint 6**: PWA, Branding & Launch
 

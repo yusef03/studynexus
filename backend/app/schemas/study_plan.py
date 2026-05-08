@@ -1,9 +1,11 @@
 from uuid import UUID
 from datetime import date, datetime
 from typing import Optional, List
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, field_validator, model_validator
 from app.models.module import ModulTyp
 from app.models.student_module import StudiengangStatus
+
+_VALID_NOTES = {1.0, 1.3, 1.7, 2.0, 2.3, 2.7, 3.0, 3.3, 3.7, 4.0, 5.0}
 
 
 # ── University ────────────────────────────────────────────────────────────────
@@ -162,6 +164,15 @@ class UpdateModuleRequest(BaseModel):
     plan_semester: Optional[str] = None
     # Grading flag for custom ERGAENZEND modules (no catalogue entry to inherit from)
     custom_ist_benotet: Optional[bool] = None
+
+    @field_validator("note")
+    @classmethod
+    def note_must_be_official(cls, v: Optional[float]) -> Optional[float]:
+        if v is not None and round(v, 1) not in _VALID_NOTES:
+            raise ValueError(
+                f"Ungültige Note {v}. Zulässig: 1.0, 1.3, 1.7, 2.0, 2.3, 2.7, 3.0, 3.3, 3.7, 4.0, 5.0"
+            )
+        return v
 
 
 # ── Stats ─────────────────────────────────────────────────────────────────────

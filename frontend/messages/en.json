@@ -295,7 +295,8 @@
     "modal": {
       "title": "Edit module",
       "status": "Status",
-      "note": "Grade (1.0 – 4.0)",
+      "note": "Grade",
+      "noteSelect": "-- Select grade --",
       "noteUngraded": "This module is ungraded",
       "semester": "Semester (e.g. WS2024/25)",
       "save": "Save",

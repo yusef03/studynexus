@@ -295,7 +295,8 @@
     "modal": {
       "title": "Modul bearbeiten",
       "status": "Status",
-      "note": "Note (1,0 – 4,0)",
+      "note": "Note",
+      "noteSelect": "-- Note auswählen --",
       "noteUngraded": "Dieses Modul ist unbenotet",
       "semester": "Semester (z. B. WS2024/25)",
       "save": "Speichern",

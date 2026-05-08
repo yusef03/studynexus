@@ -431,13 +431,48 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 **Hintergrund:** ATPO-FIV 2025 §10 definiert exakt 11 gültige Noten: 1,0 — 1,3 — 1,7 — 2,0 — 2,3 — 2,7 — 3,0 — 3,3 — 3,7 — 4,0 — 5,0
 
 **Backend:**
-- [ ] Pydantic-Validator in `UpdateModuleRequest.note`: nur offizielle HsH-Noten zulässig
-- [ ] HTTP 422 mit klarer Fehlermeldung bei ungültiger Note
+- [x] Alembic Migration 0014 (Datenfehler-Fix): `modules.gewichtung` für BIN-209 korrigiert von 1.0 → 1.5 (PO BIN 2019 Anlage B2)
+- [x] Pydantic-Validator in `UpdateModuleRequest.note`: nur offizielle HsH-Noten zulässig (via `field_validator`)
+- [x] HTTP 422 mit klarer Fehlermeldung bei ungültiger Note
 
 **Frontend:**
-- [ ] Noteneingabe: Dropdown mit 11 Optionen statt Freitextfeld
-- [ ] Notenoptionen: 1,0 / 1,3 / 1,7 / 2,0 / 2,3 / 2,7 / 3,0 / 3,3 / 3,7 / 4,0 / 5,0
-- [ ] i18n: Noten-Labels
+- [x] `ModuleModal`: Noteneingabe → `<select>`-Dropdown mit 11 Optionen statt Freitextfeld (type="number")
+- [x] Notenoptionen: 1,0 / 1,3 / 1,7 / 2,0 / 2,3 / 2,7 / 3,0 / 3,3 / 3,7 / 4,0 / 5,0
+- [x] Leere Option (leer = keine Note) als erste Option
+- [x] i18n: `dashboard.modal.noteSelect` (Placeholder-Text)
+
+---
+
+#### Phase 7 — PO-Übersicht (Studienordnung auf einen Blick)
+
+**Hintergrund:** Studierende müssen ständig in PDFs nachschlagen — Zulassungsregeln, Notenscala, Wiederholungsfristen, BIN-209-Sonderregel. Diese Phase bringt alle wichtigen PO-Regeln in eine eigene, übersichtliche Seite in der App. Zukunftssicher: die Architektur ist program-aware, sodass in Sprint 7 weitere Studiengänge (MDI, MIN, …) ohne Code-Änderungen ergänzt werden können.
+
+**Architektur:**
+- Route: `/dashboard/po-uebersicht`
+- Sidebar-Eintrag: "Studienordnung" (neues Nav-Item, unter "Degree Plan")
+- Programm-Erkennung: `GET /api/study/program` → prüft `program.abschluss + kuerzel` → rendert BIN-spezifischen Content; für andere Programme: `"Für deinen Studiengang liegen noch keine PO-Regeln vor."`
+- Langfristig (Sprint 7): `GET /api/po-rules?program_id=...` liefert PO-Daten aus einer `program_rules` DB-Tabelle; Frontend bleibt unverändert
+
+**Backend:** keine Änderungen (nutzt bestehenden `GET /api/study/program`-Endpunkt)
+
+**Frontend — neue Seite `src/app/[locale]/dashboard/po-uebersicht/page.tsx`:**
+- Lädt UserProgramResponse via `useQuery(["userProgram"])`
+- Erkennt BIN via `program.name.includes("BIN")` oder Kürzel-Check
+- Rendert 6 Sektionen als Cards/Accordions:
+
+  | Sektion | Inhalt |
+  |---|---|
+  | Zulassungsregeln | §6-Tabelle: Sem 4 → Sem 1 bestanden; Sem 5 → Sem 1+2; Sem 6/BIN-206/208 → Vorprüfung; BIN-210 → VP + 134 ECTS; BIN-209 → keine Voraussetzung |
+  | Notenscala | 11 offizielle Noten mit Bedeutung (sehr gut / gut / befriedigend / ausreichend / nicht ausreichend) + Bestehensgrenze ≤ 4,0 |
+  | Prüfungsarten | PX (Klausur/mdl. Prüfung), EA (Experimentelle Arbeit), R (Referat/Präsentation), BAA+Ko (Bachelorarbeit + Kolloquium) |
+  | Wiederholungsregeln | §11: max. 2 Wiederholungen, Frist 13 Monate; max. 3 mündl. Ergänzungsprüfungen im Studium; Notenverbesserung 1× möglich (bis 7. Fachsem) |
+  | Sondermodule | BIN-209: 6 ECTS (3 × 2 ECTS Sub-Module), gewichtung 1.5, mind. 1 BWL-Fach; WP-Limit: max. 2 Wahlpflichtmodule (12 ECTS) |
+  | Bachelor-Zulassung | Vorprüfung bestanden + mind. 134 ECTS → BA-Zulassung möglich |
+
+- `MilestoneWidget` integriert (oder verlinkt) für Live-Status der Vorprüfung
+- Kein neuer Backend-Endpunkt nötig
+
+**i18n:** `dashboard.poUebersicht.{title, subtitle, binOnly, sections.{zulassung, noten, pruefungsarten, wiederholung, sondermodule, ba}}` in de.json + en.json
 
 ---
 
