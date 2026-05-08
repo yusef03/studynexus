@@ -1,64 +1,84 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+/**
+ * StudyPlanBoard — personal study planning view.
+ *
+ * Data model:
+ *   plan_semester (StudentModule) — written ONLY here. null = auto-position.
+ *   semester      (StudentModule) — written ONLY by the grade-tracking flow.
+ *
+ * Display logic (per module):
+ *   if plan_semester is set          → place in that column
+ *   else if semester_empfehlung set  → place in the recommended column
+ *   else                             → "Ungeplant"
+ *
+ * This means:
+ * - PFLICHT modules auto-populate into their recommended semesters on first load.
+ * - WAHLPFLICHT/ERGAENZEND modules with no recommendation land in "Ungeplant".
+ * - The user can drag any module anywhere; only plan_semester is persisted.
+ * - The Modules page (/modules) is completely unaffected.
+ * - New modules added anywhere appear here automatically on next data sync.
+ */
+
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import {
   DndContext,
   DragOverlay,
-  closestCorners,
+  rectIntersection,
   PointerSensor,
   KeyboardSensor,
   useSensor,
   useSensors,
+  useDraggable,
   useDroppable,
   type DragStartEvent,
   type DragEndEvent,
   type DragOverEvent,
 } from "@dnd-kit/core";
-import { useSortable, SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { useUserModules } from "@/hooks/queries/useUserModules";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { StudentModuleResponse } from "@/types/study";
 import { Loader2, Plus, GripVertical } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-// ─── Module Card ────────────────────────────────────────────
+// ─── Helper ──────────────────────────────────────────────────
+/**
+ * Determines which column a module belongs to in the StudyPlanBoard.
+ * Reads plan_semester first, falls back to semester_empfehlung, then "Ungeplant".
+ */
+function getDisplaySemester(mod: StudentModuleResponse): string {
+  if (mod.plan_semester) return mod.plan_semester;
+  if (mod.module?.semester_empfehlung) return mod.module.semester_empfehlung.toString();
+  return "Ungeplant";
+}
+
+// ─── LocalModule — plan_semester overlaid as `semester` for column filtering ─
+// We keep a local flat list where `semester` holds the current display position.
+// This avoids passing a separate field through every sub-component.
+type LocalModule = StudentModuleResponse & { semester: string };
+
+// ─── Module Card ─────────────────────────────────────────────
 interface CardProps {
-  mod: StudentModuleResponse;
+  mod: LocalModule;
   isOverlay?: boolean;
 }
 
 const StudyPlanCard = React.memo(function StudyPlanCard({ mod, isOverlay }: CardProps) {
   const t = useTranslations("dashboard.studyPlan.board");
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
     id: mod.id,
     data: { type: "module", module: mod },
   });
 
-  const style: React.CSSProperties = {
-    transform: CSS.Translate.toString(transform),
-    transition,
-    opacity: isDragging ? 0.3 : 1,
-    touchAction: "none",
-  };
-
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={{ opacity: isDragging ? 0 : 1, touchAction: "none" }}
       className={`bg-card p-3 rounded-lg shadow-sm border relative group transition-all ${
         isOverlay ? "shadow-xl scale-[1.03] rotate-[1.5deg] border-primary/50" : ""
       } hover:border-primary/50`}
     >
-      {/* Drag Handle */}
       <button
         {...attributes}
         {...listeners}
@@ -83,23 +103,28 @@ const StudyPlanCard = React.memo(function StudyPlanCard({ mod, isOverlay }: Card
   );
 });
 
-// ─── Semester Column ────────────────────────────────────────
+// ─── Semester Column ─────────────────────────────────────────
 interface ColumnProps {
   id: string;
   title: string;
-  modules: StudentModuleResponse[];
+  modules: LocalModule[];
   totalEcts: number;
+  isOver: boolean;
 }
 
-const StudyPlanColumn = React.memo(function StudyPlanColumn({ id, title, modules, totalEcts }: ColumnProps) {
+const StudyPlanColumn = React.memo(function StudyPlanColumn({
+  id,
+  title,
+  modules,
+  totalEcts,
+  isOver,
+}: ColumnProps) {
   const t = useTranslations("dashboard.studyPlan.board");
 
-  const { setNodeRef, isOver } = useDroppable({
-    id: id,
+  const { setNodeRef } = useDroppable({
+    id,
     data: { type: "column", semester: id },
   });
-
-  const moduleIds = modules.map(m => m.id);
 
   return (
     <div
@@ -115,11 +140,9 @@ const StudyPlanColumn = React.memo(function StudyPlanColumn({ id, title, modules
         </span>
       </div>
       <div className="flex-1 p-3 overflow-y-auto space-y-3 min-h-[150px]">
-        <SortableContext items={moduleIds} strategy={verticalListSortingStrategy}>
-          {modules.map(mod => (
-            <StudyPlanCard key={mod.id} mod={mod} />
-          ))}
-        </SortableContext>
+        {modules.map((mod) => (
+          <StudyPlanCard key={mod.id} mod={mod} />
+        ))}
         {modules.length === 0 && (
           <div className="h-20 border-2 border-dashed border-muted-foreground/20 rounded-lg flex items-center justify-center text-muted-foreground/50 text-sm">
             {t("dropHere")}
@@ -130,175 +153,172 @@ const StudyPlanColumn = React.memo(function StudyPlanColumn({ id, title, modules
   );
 });
 
-// ─── Main Board ─────────────────────────────────────────────
+// ─── Main Board ──────────────────────────────────────────────
 export function StudyPlanBoard() {
   const t = useTranslations("dashboard.studyPlan.board");
   const { data: groupedModules, isLoading } = useUserModules();
   const queryClient = useQueryClient();
-  const [extraSemesters, setExtraSemesters] = useState(0);
-  const [activeModule, setActiveModule] = useState<StudentModuleResponse | null>(null);
 
-  // Sensors: PointerSensor with 8px activation distance prevents accidental drags while scrolling
+  const [extraSemesters, setExtraSemesters] = useState(0);
+  const [activeModule, setActiveModule] = useState<LocalModule | null>(null);
+  const [overColumnId, setOverColumnId] = useState<string | null>(null);
+  const [localModules, setLocalModules] = useState<LocalModule[]>([]);
+
+  // Flatten server data into a local list.
+  // `semester` on each LocalModule reflects the StudyPlanBoard display position
+  // (plan_semester → semester_empfehlung → "Ungeplant"), NOT the grade-tracking semester.
+  useEffect(() => {
+    if (!groupedModules) return;
+    const flat: LocalModule[] = groupedModules.flatMap((g) =>
+      g.modules.map((m) => ({
+        ...m,
+        semester: getDisplaySemester(m),
+      }))
+    );
+    setLocalModules(flat);
+  }, [groupedModules]);
+
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: { distance: 8 },
-    }),
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor)
   );
 
-  const updateSemesterMutation = useMutation({
-    mutationFn: async ({ smId, semester }: { smId: string; semester: string }) => {
+  // Persists plan_semester to backend. Uses model_fields_set on the backend
+  // so we can explicitly set plan_semester = null (reset to auto-position).
+  const savePlanSemester = useMutation({
+    mutationFn: async ({ smId, planSemester }: { smId: string; planSemester: string | null }) => {
       const res = await fetch(`/api/study/modules/${smId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ semester }),
+        headers: {
+          "Content-Type": "application/json",
+          "x-studynexus-client": "true",
+        },
+        body: JSON.stringify({ plan_semester: planSemester }),
       });
-      if (!res.ok) throw new Error("Failed to update semester");
+      if (!res.ok) throw new Error("Failed to save plan semester");
       return res.json();
     },
-    onMutate: async ({ smId, semester }) => {
-      await queryClient.cancelQueries({ queryKey: ["userModules"] });
-      const previous = queryClient.getQueryData(["userModules"]);
-
-      queryClient.setQueryData(["userModules"], (old: any) => {
-        if (!old) return old;
-        const newGroups = JSON.parse(JSON.stringify(old));
-        
-        let targetModule = null;
-        for (const group of newGroups) {
-          const idx = group.modules.findIndex((m: any) => m.id === smId);
-          if (idx !== -1) {
-            targetModule = group.modules[idx];
-            group.modules.splice(idx, 1);
-            break;
-          }
-        }
-        
-        if (targetModule) {
-          targetModule.semester = semester;
-          let targetGroup = newGroups.find((g: any) => g.semester?.toString() === semester);
-          if (!targetGroup) {
-            targetGroup = { semester: parseInt(semester) || semester, modules: [] };
-            newGroups.push(targetGroup);
-          }
-          targetGroup.modules.push(targetModule);
-        }
-        return newGroups;
-      });
-
-      return { previous };
-    },
-    onError: (err, variables, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(["userModules"], context.previous);
-      }
+    onError: () => {
+      // On failure, re-sync from server (rollback the optimistic update)
+      queryClient.invalidateQueries({ queryKey: ["userModules"] });
     },
     onSettled: () => {
+      // Always re-sync after mutation to get the canonical server state
       queryClient.invalidateQueries({ queryKey: ["userModules"] });
     },
   });
 
+  // Build columns from localModules.
+  // Columns 1–(6+extras) are always shown; extra semesters from data are added dynamically.
   const columns = useMemo(() => {
-    if (!groupedModules) return [];
-    
     const sems = new Set<string>();
-    // Default columns: 1–6 plus any extras the user has added
-    const maxSem = 6 + extraSemesters;
-    for (let i = 1; i <= maxSem; i++) {
-      sems.add(i.toString());
-    }
+    for (let i = 1; i <= 6 + extraSemesters; i++) sems.add(i.toString());
     sems.add("Ungeplant");
-    
-    // Also include any semesters that exist in the data (e.g. from previous sessions)
-    groupedModules.forEach(g => {
-      if (g.semester) {
-        sems.add(g.semester.toString());
-        // If data has semester 7+ but user hasn't clicked "add", still show it
-      }
-    });
-    
-    const sorted = Array.from(sems).sort((a, b) => {
-      if (a === "Ungeplant") return 1;
-      if (b === "Ungeplant") return -1;
-      const numA = parseInt(a);
-      const numB = parseInt(b);
-      if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-      return a.localeCompare(b);
+
+    // Include any semesters already present in the data (e.g. from previous sessions
+    // or semesters > 6 that the user created before)
+    localModules.forEach((m) => {
+      if (m.semester && m.semester !== "Ungeplant") sems.add(m.semester);
     });
 
-    return sorted.map(sem => {
-      const group = groupedModules.find(g => g.semester?.toString() === sem);
-      return {
+    return Array.from(sems)
+      .sort((a, b) => {
+        if (a === "Ungeplant") return 1;
+        if (b === "Ungeplant") return -1;
+        const na = parseInt(a, 10);
+        const nb = parseInt(b, 10);
+        if (!isNaN(na) && !isNaN(nb)) return na - nb;
+        return a.localeCompare(b);
+      })
+      .map((sem) => ({
         id: sem,
         title: sem === "Ungeplant" ? t("unplanned") : t("semester", { n: sem }),
-        modules: group ? group.modules : [],
-      };
-    });
-  }, [groupedModules, extraSemesters, t]);
+        modules: localModules.filter((m) => m.semester === sem),
+      }));
+  }, [localModules, extraSemesters, t]);
 
-  // Determine next semester number for the "add" button
-  const maxExistingSem = useMemo(() => {
-    let max = 6 + extraSemesters;
-    if (groupedModules) {
-      groupedModules.forEach(g => {
-        const n = Number(g.semester);
-        if (!isNaN(n) && n > max) max = n;
-      });
-    }
-    return max;
-  }, [groupedModules, extraSemesters]);
-
-  // ─── DnD Handlers ───
+  // ─── DnD handlers ────────────────────────────────────────
   const handleDragStart = useCallback((event: DragStartEvent) => {
-    const mod = event.active.data.current?.module as StudentModuleResponse | undefined;
+    const mod = event.active.data.current?.module as LocalModule | undefined;
     if (mod) setActiveModule(mod);
   }, []);
 
+  // Only update visual column highlight — NEVER setState on localModules here.
+  // Changing localModules during a drag triggers @dnd-kit measureRect which
+  // fires another DragOver → setState → measureRect → infinite loop.
   const handleDragOver = useCallback((event: DragOverEvent) => {
-    // We handle column changes on drag end, so no optimistic column change here
+    const { over } = event;
+    if (!over) {
+      setOverColumnId(null);
+      return;
+    }
+    if (over.data.current?.type === "column") {
+      setOverColumnId(over.id as string);
+    } else if (over.data.current?.type === "module") {
+      setOverColumnId(over.data.current.module?.semester ?? null);
+    }
   }, []);
 
-  const handleDragEnd = useCallback((event: DragEndEvent) => {
-    setActiveModule(null);
-    const { active, over } = event;
-    if (!over) return;
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      setActiveModule(null);
+      setOverColumnId(null);
 
-    const moduleId = active.id as string;
-    const overId = over.id as string;
+      if (!over) return;
 
-    // Determine target semester
-    let targetSemester: string;
-    if (over.data.current?.type === "column") {
-      targetSemester = overId;
-    } else {
-      // Dropped over another module – find which column it belongs to
-      const col = columns.find(c => c.modules.some(m => m.id === overId));
-      if (!col) return;
-      targetSemester = col.id;
-    }
+      const activeId = active.id as string;
+      const dragged = localModules.find((m) => m.id === activeId);
+      if (!dragged) return;
 
-    // Check if already in target semester
-    const currentCol = columns.find(c => c.modules.some(m => m.id === moduleId));
-    if (currentCol?.id === targetSemester) return;
+      // Resolve drop target column
+      let targetSemester: string;
+      if (over.data.current?.type === "column") {
+        targetSemester = over.id as string;
+      } else if (over.data.current?.type === "module") {
+        targetSemester = over.data.current.module?.semester ?? "Ungeplant";
+      } else {
+        return;
+      }
 
-    updateSemesterMutation.mutate({ smId: moduleId, semester: targetSemester });
-  }, [columns, updateSemesterMutation]);
+      if (dragged.semester === targetSemester) return;
+
+      // Optimistic local update — safe here because drag is finished
+      setLocalModules((prev) =>
+        prev.map((m) => (m.id === activeId ? { ...m, semester: targetSemester } : m))
+      );
+
+      // Determine what to store as plan_semester:
+      // "Ungeplant" → explicit unplan (stored as "Ungeplant" string, not null,
+      //   so the auto-fallback to semester_empfehlung doesn't kick back in)
+      // any number string → store it
+      savePlanSemester.mutate({ smId: activeId, planSemester: targetSemester });
+    },
+    [localModules, savePlanSemester]
+  );
 
   if (isLoading) {
-    return <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-primary w-8 h-8" /></div>;
+    return (
+      <div className="h-full flex items-center justify-center">
+        <Loader2 className="animate-spin text-primary w-8 h-8" />
+      </div>
+    );
   }
 
   return (
     <div className="h-full w-full overflow-x-auto flex gap-6 p-6">
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={rectIntersection}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         {columns.map((col) => {
-          const totalEcts = col.modules.reduce((sum, m) => sum + (m.module?.ects || m.custom_ects || 0), 0);
+          const totalEcts = col.modules.reduce(
+            (sum, m) => sum + (m.module?.ects || m.custom_ects || 0),
+            0
+          );
           return (
             <StudyPlanColumn
               key={col.id}
@@ -306,21 +326,19 @@ export function StudyPlanBoard() {
               title={col.title}
               modules={col.modules}
               totalEcts={totalEcts}
+              isOver={overColumnId === col.id}
             />
           );
         })}
 
         <DragOverlay dropAnimation={null}>
-          {activeModule && (
-            <StudyPlanCard mod={activeModule} isOverlay />
-          )}
+          {activeModule && <StudyPlanCard mod={activeModule} isOverlay />}
         </DragOverlay>
       </DndContext>
 
-      {/* + Neues Semester Button */}
       <div className="flex-shrink-0 w-80 flex flex-col items-center justify-center">
         <button
-          onClick={() => setExtraSemesters(prev => prev + 1)}
+          onClick={() => setExtraSemesters((prev) => prev + 1)}
           className="w-full h-20 border-2 border-dashed border-muted-foreground/30 rounded-xl flex items-center justify-center gap-2 text-muted-foreground hover:text-primary hover:border-primary/50 transition-colors"
         >
           <Plus className="w-5 h-5" />
