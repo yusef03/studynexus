@@ -4,7 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Planned
-- **Sprint 4**: Community & Collaboration (Study Spaces, Module Wikis, PDF sharing)
+- **Sprint 4**: BIN Studiengang Vollintegration (pruefungsart, Vorprüfungs-Milestone, BIN-209 Katalog, module_prerequisites, Notenvalidierung)
+- **Sprint 5**: Admin Panel (PO-Verwaltung ohne Alembic-Migrationen)
+- **Sprint 6**: PWA, Branding & Launch
+
+## [v0.3.7.7] - 2026-05-07 (Sprint 3.7.7 - BIN PO Datenkorrektur)
+### Fixed
+- **Migration 0011**: Alle 27 PFLICHT-Kürzel auf offizielles Schema BIN-100..BIN-210 korrigiert
+- **Migration 0011**: BIN-207 (Computergrafik 2) und BIN-209 (Ergänzende Fächer) fehlten — eingefügt
+- **Migration 0011**: Alle 9 WAHLPFLICHT-Namen auf offizielle PO-Namen korrigiert (statt erfundener Namen)
+- **Migration 0011**: `ist_benotet` korrigiert — BIN-114, BIN-204, BIN-206, BIN-208 sind unbenotet
+- **Migration 0011**: `has_prerequisites` — 1. Abschnitt (BIN-100..116) auf false gesetzt (keine PO-Voraussetzungen)
+- **Migration 0011**: Fake-Platzhaltermodule gelöscht (BIN-501, BIN-601 etc.)
+- **ModuleModal**: Custom-Module zeigten immer "unbenotet" — behoben mit `custom_ist_benotet` Logik
+### Added
+- **Migration 0011**: `custom_ist_benotet BOOLEAN NULLABLE` auf student_modules
+- **Backend**: `custom_ist_benotet` in Model, Schemas (Add/Update/Response), Router
+- **Backend**: WAHLPFLICHT-Limit = 2, erzwingt HTTP 409 bei Überschreitung
+- **Frontend AddModuleModal**: "Benotet?"-Checkbox für custom ERGAENZEND-Module
+- **Frontend AddModuleModal**: WAHLPFLICHT-Warning (amber) wenn Limit (2) erreicht
+- **Frontend AddModuleModal**: BIN-209 Ergänzende Fächer Hinweistext
+- **Frontend ModuleList**: berechnet `wahlpflichtCount`, übergibt an AddModuleModal
+- **i18n**: `addModule.isGraded`, `addModule.wahlpflichtFull`, `addModule.ergaenzendHint` in de.json + en.json
 
 ## [v0.3.8] - 2026-05-07 (Sprint 3.7 - Phases 3, 4 & 5)
 ### Changed

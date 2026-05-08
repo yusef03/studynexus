@@ -9,9 +9,9 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 3.7.7 Complete — Sprint 4 (Community & Collaboration) next
+**Status:** ✅ Sprint 3.7.7 Complete — Sprint 4 (BIN Studiengang Vollintegration) next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-05-07
+**Last Updated:** 2026-05-08
 
 ---
 
@@ -211,33 +211,69 @@ Vollständige Analyse und Umsetzung: `docs/sprints/studiengang-implementation-st
 
 ## Next Steps
 
-### Sofort (vor Sprint 4)
-- [ ] Vorprüfungs-Milestone im Dashboard (BIN PO: Alle Sem-1-Prüfungen → Zugang zu Sem 4+, 134 CP → BA-Zulassung)
-- [ ] Semester-Tag im FAB dynamisch machen (aus `GET /me/program` start_semester)
+### Sprint 4 — BIN Studiengang Vollintegration (NÄCHSTER SPRINT)
+
+**Ziel:** BIN vollständig und intelligent in StudyNexus integrieren — alle PO-Regeln automatisch abgebildet.
+
+**Phase 1 — Prüfungsarten & Modul-Metadaten (Migration 0012):**
+- [ ] `pruefungsart VARCHAR NULLABLE` + `sws SMALLINT NULLABLE` auf modules
+- [ ] BIN-Seed: PX (Standard), EA (BIN-114/206/208), R (BIN-204), BAA+Ko (BIN-210)
+- [ ] Backend Schema + Frontend types + ModuleModal Prüfungsart-Badge
+
+**Phase 2 — Vorprüfungs-Milestone Dashboard:**
+- [ ] `GET /me/stats` erweitern: sem1_complete, vorpruefung_bestanden, sem4/5/6_zugaenglich, ba_zulassung_eligible, ects_fuer_ba
+- [ ] Dashboard: MilestoneWidget (neu) mit Vorprüfungs-Status und BA-Fortschritt
+
+**Phase 3 — BIN-209 Sub-Modul-Katalog:**
+- [ ] AddModuleModal: Dropdown mit 7 offiziellen Namen (BIN-209-01..07: Erg. Fach A-D + BWL-Fach A-C)
+- [ ] Validierung: mind. 1 BWL-Fach bei BIN-209
+
+**Phase 4 — Technische Schulden:**
+- [ ] Semester-Tag im FAB dynamisch (aus `GET /me/program` start_semester)
 - [ ] `/api/me/profile` Route im Next.js Proxy anlegen (GET + PUT)
 
-### Sprint 4 — Community & Collaboration
+**Phase 5 — module_prerequisites Tabelle (ADR-010):**
+- [ ] Migration 0013: module_prerequisites Tabelle
+- [ ] BIN-Seed: alle Zulassungsregeln nach §6 PO BIN 2019
+
+**Phase 6 — Notenvalidierung:**
+- [ ] Backend: nur offizielle HsH-Noten (1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0)
+- [ ] Frontend: Dropdown mit 11 Optionen statt Freitextfeld
+
+### Sprint 5 — Admin Panel
+- [ ] is_admin Flag + Admin Auth Guard
+- [ ] CRUD für University/Faculty/Program/ExamRegulation/Module über Admin-UI
+- [ ] CRUD für module_prerequisites
+- [ ] Ersetzt manuelle Alembic-Migrationen für neue Studiengänge
+
+### Sprint 6 — PWA, Branding & Launch
+- [ ] Service Worker + Offline-Cache
+- [ ] GitHub Actions CI/CD
+- [ ] Cloud Deployment (Railway oder Render)
+- [ ] Security Audit (OWASP Top 10)
+- [ ] Landing Page
+
+### Sprint 7 — Multi-Program-Architektur
+- [ ] MDI Studiengang (Medieninformatik) hinzufügen
+- [ ] MIN/MMI Master (optional)
+
+### Sprint 8 — Community & Kollaboration (fern geplant)
 - [ ] Modul-Wiki (Beschreibungen, Prüfungsarten, Bewertungen)
 - [ ] Anonyme Modulevaluationen (DSGVO-konform)
 - [ ] Study Spaces (digitale Lerngruppen mit geteiltem Kanban)
 - [ ] PDF-Upload und -Sharing
 
-### Sprint 5 — Gamification & Admin
-- [ ] XP-System, Badges, Streaks, Leaderboard
-- [ ] Skill-Tree Visualisierung (Modul-Abhängigkeitsgraph)
-- [ ] Claude/OpenAI API Integration via LangChain
-- [ ] Admin-Panel (Yusef-only) für PO-Verwaltung
-- [ ] Weitere HsH-Studiengänge (MDI zuerst)
-- [ ] module_prerequisites Tabelle aufbauen + BIN-Daten eintragen
-
 ---
 
 ## Known Limitations
 
-- Custom ERGAENZEND modules (Ergänzende Fächer für BIN-209) are entered by the student manually — not from a catalogue. The system explains this via the `ergaenzendHint` in AddModuleModal.
-- WAHLPFLICHT limit is hardcoded to 2 in the backend — this is correct for BIN but would need to be program-aware for other programs.
+- Custom ERGAENZEND modules (BIN-209 Ergänzende Fächer) are entered manually. The 7 official sub-module names from PO Anlage B2 (BIN-209-01..07) are not yet offered as a dropdown — Sprint 4 Phase 3.
+- WAHLPFLICHT limit is hardcoded to 2 in the backend — correct for BIN, but must become program-aware before adding other programs (Sprint 7).
+- `pruefungsart` (PX/EA/R/BAA+Ko) is not yet stored per module — Sprint 4 Phase 1.
+- BIN-209 GPA contribution: sub-modules (custom ERGAENZEND) are currently excluded from GPA. Correct behavior per PO: they should flow into BIN-209 module note (gewichtung=1.5). Sprint 4+.
+- Note validation: backend accepts arbitrary decimals. Only 11 official HsH grades should be allowed (1.0/1.3/…/5.0 per ATPO-FIV 2025 §10) — Sprint 4 Phase 6.
 - 404/500 prerender warnings during `next build` (Next.js + next-intl standalone mode issue — does not affect runtime).
-- `module_prerequisites` table (ADR-010) was never built — `has_prerequisites` is only a boolean flag, no detail about which specific modules are required.
+- `module_prerequisites` table (ADR-010) was never built — `has_prerequisites` is only a boolean flag. Full prerequisite logic comes in Sprint 4 Phase 5.
 
 ---
 
@@ -281,19 +317,28 @@ Vollständige Analyse und Umsetzung: `docs/sprints/studiengang-implementation-st
 
 ---
 
-### open points:
-  Vollständige Analyse und Priorisierung: docs/sprints/studiengang-implementation-status.md
-
-  Vollständige Analyse: docs/sprints/studiengang-implementation-status.md
+### Open Points (Stand 2026-05-08)
+  Vollständige Analyse und Status: docs/sprints/studiengang-implementation-status.md
+  Vollständige Erkenntnisse aus PDF-Analyse: docs/sprints/studiengang-implementation-status.md (Abschnitt "Neue Erkenntnisse")
   
-  Noch offen (P1):
-  1. Vorprüfungs-Milestone im Dashboard (BIN: Sem 1 bestanden → Sem 4 freigegeben, 134 CP → BA)
-  2. Semester-Tag im FAB dynamisch (statt hardcoded "WiSe2425")
-  3. /api/me/profile Proxy-Route im Next.js anlegen
-
-  Noch offen (P2/Future):
-  4. module_prerequisites Tabelle (ADR-010) — erst sinnvoll mit Admin-Panel (Sprint 5)
-  5. MDI, Master, BWL Studiengänge (Sprint 5+)                                                                                                                                                                 
+  Sprint 4 Phase 1 (Migration 0012):
+  - [ ] pruefungsart + sws Felder auf modules → BIN-Seed + Backend + Frontend
+  
+  Sprint 4 Phase 2:
+  - [ ] Vorprüfungs-Milestone im Dashboard (BIN §6: Sem 1 → Sem 4, Sem 1+2 → Sem 5, Vorprüfung → Sem 6, 134 CP → BA)
+  
+  Sprint 4 Phase 3:
+  - [ ] BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown in AddModuleModal)
+  
+  Sprint 4 Phase 4 (Tech Debt):
+  - [ ] Semester-Tag im FAB dynamisch (statt hardcoded "WiSe2425")
+  - [ ] /api/me/profile Proxy-Route im Next.js anlegen (GET + PUT)
+  
+  Sprint 4 Phase 5:
+  - [ ] module_prerequisites Tabelle (ADR-010) + BIN-Seed + Backend-Logik
+  
+  Sprint 4 Phase 6:
+  - [ ] HsH-Notenvalidierung: nur 1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0 (ATPO-FIV §10)
 
 
 ## Important Rules for AI Code Generation

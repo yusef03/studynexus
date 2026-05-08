@@ -213,9 +213,83 @@ Das Modulhandbuch enthält Prüfungsarten (Klausur, mündliche Prüfung, experim
 
 ## Neue Ideen (gesammelt, noch nicht priorisiert)
 
-- **Vorprüfungs-Dashboard-Widget** → P1, kommt als nächstes
+- **Vorprüfungs-Dashboard-Widget** → P1, kommt in Sprint 4 Phase 2
 - **GPA-Prognose:** Wenn Student alle offenen Module mit einer bestimmten Note besteht, was wäre der End-GPA? ("Was-wäre-wenn"-Rechner)
 - **Semester-Planung Export:** StudyPlanBoard als PDF/ICS exportieren
 - **Notifikation bei Klausur-Nähe:** 7 Tage vorher Push-Notification via Service Worker
 - **Auto-Suggest für Ergänzende Fächer:** Basierend auf WAHLPFLICHT-Auswahl passende Ergänzende Fächer vorschlagen (KI, Sprint 5)
 - **Stundenplan-Import:** ICS/Excel-Import für HsH-Stundenplan statt manueller Eingabe
+
+---
+
+## Neue Erkenntnisse aus erneuter PDF-Analyse (2026-05-08)
+
+Vollständige Neulektüre aller drei PDFs (105 Seiten gesamt). Erkenntnisse für Sprint 4:
+
+### 1. Prüfungsarten (pruefungsart) — FEHLT in DB
+
+Die ATPO-FIV 2025 §7 und PO BIN 2019 Anlage B1/B2 definieren Prüfungsarten pro Modul:
+
+| Code | Bezeichnung | BIN-Module |
+|---|---|---|
+| PX | Prüfung (Klausur oder mündl., 90 Min.) | Alle Standard-Module |
+| EA | Experimentelle Arbeit | BIN-114, BIN-206, BIN-208 |
+| R | Referat | BIN-204 |
+| BAA+Ko | Bachelorarbeit mit Kolloquium | BIN-210 |
+
+**Aktion Sprint 4 Phase 1:** Migration 0012 + `pruefungsart` Feld auf `modules`
+
+### 2. Zulassungsregeln (PO BIN 2019 §6) — genauer als bisher dokumentiert
+
+```
+§6 Abs. 1:
+  - Allgemeine Voraussetzung: BIN-116 (Englisch) muss bestanden sein
+  - Sem 4: alle Prüfungsleistungen des 1. Semesters bestanden
+  - Sem 5: alle Prüfungsleistungen des 1. UND 2. Semesters bestanden
+  - Sem 6: Bachelor-Vorprüfung bestanden (= alle Sem 1-3)
+  - BIN-206 (Praxisprojekt 1): Bachelor-Vorprüfung
+  - BIN-209 (Ergänzende Fächer): KEINE Voraussetzung, jederzeit!
+
+§6 Abs. 2:
+  - Bachelor-Arbeit (BIN-210): Vorprüfung + mind. 134 Credits bestanden
+```
+
+**Aktion Sprint 4 Phase 2:** Stats-Endpunkt + Dashboard-Widget
+
+### 3. BIN-209 Sub-Module — offizielle Namen laut PO
+
+PO BIN 2019 Anlage B2 zeigt 7 offizielle Teilmodule (WP innerhalb BIN-209, Student wählt 3):
+
+| TM-Kürzel | Name | Typ | Sem | ECTS |
+|---|---|---|---|---|
+| BIN-209-01 | Ergänzendes Fach A | WP | 4-6 | 2 |
+| BIN-209-02 | Ergänzendes Fach B | WP | 4-6 | 2 |
+| BIN-209-03 | Ergänzendes Fach C | WP | 4-6 | 2 |
+| BIN-209-04 | Ergänzendes Fach D | WP | 4-6 | 2 |
+| BIN-209-05 | Ergänzendes BWL-Fach A | WP | 4-6 | 2 |
+| BIN-209-06 | Ergänzendes BWL-Fach B | WP | 4-6 | 2 |
+| BIN-209-07 | Ergänzendes BWL-Fach C | WP | 4-6 | 2 |
+
+**Aktion Sprint 4 Phase 3:** AddModuleModal mit Dropdown-Auswahl dieser 7 Namen
+
+### 4. Notenystem (ATPO-FIV 2025 §10) — Validierung fehlt
+
+Erlaubte Noten: 1,0 | 1,3 | 1,7 | 2,0 | 2,3 | 2,7 | 3,0 | 3,3 | 3,7 | 4,0 | 5,0
+
+Aktuell: Backend akzeptiert beliebige Dezimalzahlen als Note. Student könnte 1.5 eingeben.
+
+**Aktion Sprint 4 Phase 6:** Pydantic-Validator + Frontend-Dropdown mit 11 Optionen
+
+### 5. BIN-209 GPA-Beitrag — aktuell falsch
+
+BIN-209 hat `gewichtung = 1.5` in der DB. Die Custom-ERGAENZEND-Sub-Module werden aber aktuell von der GPA-Berechnung ausgeschlossen (`module_id=null` → kein GPA-Beitrag).
+
+**Korrekt laut PO:** Benotete Ergänzende Fächer fließen in BIN-209-Modulnote ein (Durchschnitt der 3 gewählten Fächer), dann BIN-209-Note × gewichtung=1.5 in Gesamt-GPA.
+
+**Aktion Sprint 4 Phase 5+:** GPA-Logik für ERGAENZEND-Module korrigieren (verknüpft mit module_prerequisites-Tabelle)
+
+### 6. SWS (Semesterwochenstunden) — fehlt in DB
+
+Modulhandbuch BIN 19WS enthält SWS pro Modul (meist 4 SWS = "Vorlesung mit Übung / 4 SWS").
+
+**Aktion Sprint 4 Phase 1:** `sws SMALLINT NULLABLE` auf `modules` (Migration 0012)

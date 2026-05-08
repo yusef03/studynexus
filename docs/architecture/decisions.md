@@ -436,10 +436,40 @@ Ein neues nullable Boolean-Feld `custom_ist_benotet` auf `student_modules`:
 - GPA-Berechnung muss custom-Module aktuell nicht berücksichtigen (keine `gewichtung`)
 
 **Konsequenzen:**
-- Migration 0011: `ALTER TABLE student_modules ADD COLUMN custom_ist_benotet BOOLEAN`
-- Alle Schemas (AddModuleRequest, UpdateModuleRequest, StudentModuleResponse) erweitert
-- Frontend: Checkbox "Benotet?" in `AddModuleModal` (custom-Modus, default: checked)
-- ModuleModal/ModuleList müssen `custom_ist_benotet` auslesen wenn `module === null` ← noch offen
+- Migration 0011: `ALTER TABLE student_modules ADD COLUMN custom_ist_benotet BOOLEAN` ✅
+- Alle Schemas (AddModuleRequest, UpdateModuleRequest, StudentModuleResponse) erweitert ✅
+- Frontend: Checkbox "Benotet?" in `AddModuleModal` (custom-Modus, default: checked) ✅
+- ModuleModal liest `custom_ist_benotet` korrekt aus wenn `module === null` ✅ (Sprint 3.7.7)
+
+---
+
+---
+
+## ADR-018: `pruefungsart` und `sws` auf der `modules`-Tabelle
+
+**Status:** Akzeptiert (geplant für Sprint 4)
+**Datum:** 2026-05-08
+
+**Kontext:**
+Die ATPO-FIV 2025 §7 und PO BIN 2019 Anlage B1/B2 definieren für jedes Modul eine Prüfungsart (z.B. PX = Prüfung mündl. oder Klausur, EA = Experimentelle Arbeit, R = Referat, BAA+Ko = Bachelorarbeit mit Kolloquium). Außerdem ist die SWS-Zahl (Semesterwochenstunden) pro Modul dokumentiert. Diese Informationen sind aktuell nicht in der Datenbank gespeichert.
+
+**Entscheidung:**
+Zwei neue nullable Felder auf der `modules`-Tabelle (Migration 0012):
+- `pruefungsart VARCHAR(20) NULLABLE` — kodierter Wert (PX, EA, R, BAA_KO, etc.)
+- `sws SMALLINT NULLABLE` — Semesterwochenstunden (z.B. 4 für "Vorlesung mit Übung / 4 SWS")
+
+**Begründung:**
+- Studierende müssen wissen, was für eine Prüfungsart sie erwartet (Klausur vs. Projekt vs. Referat)
+- `pruefungsart` ist relevant für das geplante Modul-Wiki (Sprint 8) und die aktuelle Moduldetail-Ansicht
+- Nullable = kein Breaking Change für bestehende Daten
+- Ein `VARCHAR` statt ENUM: einfacher zu erweitern bei neuen Prüfungsarten
+
+**Konsequenzen:**
+- Migration 0012: 2 neue nullable Spalten auf `modules`
+- BIN-Seed in Migration 0012: pruefungsart + sws für alle 37 BIN-Module eintragen
+- Backend: `ModuleResponse` und `StudentModuleResponse` Schemas erweitern
+- Frontend: ModuleModal zeigt Prüfungsart-Badge, types/study.ts erweitern
+- Admin-Panel (Sprint 5): Prüfungsart als Dropdown-Feld im Modul-Formular
 
 ---
 
