@@ -22,6 +22,8 @@ const BIN_209_SUGGESTIONS = [
 interface Props {
   alreadyAddedModuleIds: Set<string>;
   wahlpflichtCount?: number;
+  /** null = non-BIN or loading; true = Sem 1+2 complete; false = prerequisites not met */
+  wpPrerequisitesMet?: boolean | null;
   onClose: () => void;
 }
 
@@ -32,7 +34,7 @@ const selectClass = cn(
   "disabled:cursor-not-allowed disabled:opacity-50",
 );
 
-export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, onClose }: Props) {
+export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, wpPrerequisitesMet = null, onClose }: Props) {
   const t = useTranslations("dashboard.addModule");
 
   const [mode, setMode] = useState<"wahlpflicht" | "custom">("wahlpflicht");
@@ -98,10 +100,11 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, on
   };
 
   const wahlpflichtFull = wahlpflichtCount >= 2;
+  const wpLocked = wpPrerequisitesMet === false;
 
   const canSave =
     mode === "wahlpflicht"
-      ? !!selectedModuleId && !wahlpflichtFull
+      ? !!selectedModuleId && !wahlpflichtFull && !wpLocked
       : customName.trim().length > 0 &&
         customEcts.trim().length > 0 &&
         Number.isInteger(Number(customEcts)) &&
@@ -151,6 +154,13 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, on
               {t("modeCustom")}
             </label>
           </div>
+
+          {/* WP prerequisites not met */}
+          {mode === "wahlpflicht" && wpLocked && (
+            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+              {t("wpPrerequisitesLocked")}
+            </p>
+          )}
 
           {loading && (
             <p className="text-sm text-muted-foreground">{t("loadError")}</p>

@@ -69,6 +69,10 @@ export interface StudentModuleResponse {
   plan_semester: string | null;
   /** null for catalogue modules (use module.ist_benotet). Set for custom ERGAENZEND modules. */
   custom_ist_benotet: boolean | null;
+  /** Sprint 4 Phase 5: parent PFLICHT module for custom BIN-209 sub-modules. Used for GPA. */
+  parent_module_id: string | null;
+  /** Sprint 4 Phase 5: null on mutations, computed on GET /me/modules. */
+  prerequisites_met: boolean | null;
   module: ModuleResponse | null;
 }
 

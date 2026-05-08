@@ -15,6 +15,24 @@ All notable changes to this project will be documented in this file.
 - **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
 - **ADR-018**: Als abgeschlossen dokumentiert
 
+### Sprint 4 Phase 5 — module_prerequisites + BIN-209 GPA-Fix (2026-05-09)
+#### Added
+- **Migration 0013**: `module_prerequisites` Tabelle (id, module_id, required_module_id, minimum_ects, required_semesters, prerequisite_type, description)
+- **Migration 0013**: `parent_module_id UUID NULLABLE FK → modules` auf `student_modules`
+- **Migration 0013**: BIN PO §6 Seed — alle Voraussetzungsregeln für BIN-200..210 + WP (BIN-211..219)
+- **Migration 0013**: Backfill `parent_module_id` für bestehende custom ERGAENZEND StudentModules → BIN-209
+- **Backend Model**: `ModulePrerequisite` + `PrerequisiteType` Enum (`MODULE`, `ECTS_THRESHOLD`, `SEMESTER_COMPLETE`)
+- **Backend `StudentModule`**: `parent_module_id` Spalte
+- **Backend `StatsResponse`**: `parent_module_id` + `prerequisites_met` Felder
+- **Backend `add_module()`**: Auto-setzt `parent_module_id = BIN-209` für neue custom ERGAENZEND Sub-Module
+- **Backend `GET /me/modules`**: Berechnet `prerequisites_met: bool` pro Modul via `_eval_prerequisites()` + `_get_semester_flags()`
+- **Backend `gpa_service.py`**: BIN-209 GPA-Fix — ERGAENZEND Sub-Module werden per `parent_module_id` gruppiert, `avg(note)` wird als BIN-209-Note verwendet (`× 6 ECTS × gewichtung`)
+- **Frontend `types/study.ts`**: `parent_module_id: string | null`, `prerequisites_met: boolean | null` auf `StudentModuleResponse`
+- **Frontend `ModuleModal`**: Lock-Icon + amber Hinweis wenn `prerequisites_met === false`
+- **Frontend `ModuleList`**: Lädt `useUserStats`, übergibt `wpPrerequisitesMet = stats?.sem2_complete` an AddModuleModal
+- **Frontend `AddModuleModal`**: `wpPrerequisitesMet` Prop — amber Banner + Save-Button deaktiviert wenn WP-Voraussetzungen fehlen
+- **i18n**: `modal.prerequisitesHint`, `addModule.wpPrerequisitesLocked` in de.json + en.json
+
 ### Sprint 4 Phase 4 — Dynamisches FAB + Proxy-Route Fix (2026-05-08)
 #### Added
 - **Frontend `src/app/api/me/profile/route.ts`**: Neue Next.js Proxy-Route — `GET` → `/me` (UserResponse), `PUT` → `/me/profile` (Profil aktualisieren)

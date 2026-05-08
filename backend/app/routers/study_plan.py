@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -8,6 +8,7 @@ from app.core.dependencies import get_current_user
 from app.database import get_db
 from app.models.exam_regulation import ExamRegulation
 from app.models.module import Module, ModulTyp
+from app.models.module_prerequisite import ModulePrerequisite, PrerequisiteType
 from app.models.program import Program
 from app.models.student_module import StudentModule, StudiengangStatus
 from app.models.user import User
@@ -110,16 +111,38 @@ def get_my_modules(
 
     modules_by_id = _load_modules_by_id(db, student_modules)
 
+    # Compute semester completion flags + reached ECTS for prerequisites_met
+    sem_flags = _get_semester_flags(db, current_user.id, student_modules)
+    reached_ects = sum(
+        modules_by_id[sm.module_id].ects if sm.module_id and sm.module_id in modules_by_id
+        else (sm.custom_ects or 0)
+        for sm in student_modules if sm.status == StudiengangStatus.PASSED
+    )
+
+    # Load all prerequisites for catalogue modules in the plan
+    catalogue_ids = [sm.module_id for sm in student_modules if sm.module_id]
+    prereqs_by_module: dict = {}
+    if catalogue_ids:
+        for prereq in db.query(ModulePrerequisite).filter(
+            ModulePrerequisite.module_id.in_(catalogue_ids)
+        ).all():
+            prereqs_by_module.setdefault(prereq.module_id, []).append(prereq)
+
     from collections import defaultdict
     grouped: dict = defaultdict(list)
     for sm in student_modules:
         module = modules_by_id.get(sm.module_id) if sm.module_id else None
         semester_key = sm.semester
         if semester_key is None:
-            # Fallback to recommended semester
             semester_key = str(module.semester_empfehlung) if module and module.semester_empfehlung else "Ungeplant"
-            
-        grouped[semester_key].append(_build_sm_response(sm, module))
+
+        prereqs_met = _eval_prerequisites(
+            sm.module_id,
+            prereqs_by_module,
+            sem_flags,
+            reached_ects,
+        )
+        grouped[semester_key].append(_build_sm_response(sm, module, prerequisites_met=prereqs_met))
 
     return [
         StudentModulesBySemester(semester=sem, modules=mods)
@@ -171,6 +194,18 @@ def add_module(
                     detail="Wahlpflicht limit reached. The PO allows exactly 2 Wahlpflicht modules (12 ECTS).",
                 )
 
+    # Sprint 4 Phase 5: auto-link custom ERGAENZEND sub-modules to their parent (BIN-209)
+    parent_module_id = None
+    if payload.custom_name:
+        user_prog = db.query(UserProgram).filter(UserProgram.user_id == current_user.id).first()
+        if user_prog:
+            parent = db.query(Module).filter(
+                Module.kuerzel == "BIN-209",
+                Module.exam_regulation_id == user_prog.exam_regulation_id,
+            ).first()
+            if parent:
+                parent_module_id = parent.id
+
     sm = StudentModule(
         user_id=current_user.id,
         module_id=payload.module_id,
@@ -178,6 +213,7 @@ def add_module(
         custom_ects=payload.custom_ects,
         custom_ist_benotet=payload.custom_ist_benotet,
         semester=payload.semester,
+        parent_module_id=parent_module_id,
         status=StudiengangStatus.PLANNED,
         versuch_nummer=1,
     )
@@ -314,7 +350,11 @@ def _load_modules_by_id(db: Session, student_modules) -> dict:
     return {m.id: m for m in db.query(Module).filter(Module.id.in_(ids)).all()}
 
 
-def _build_sm_response(sm: StudentModule, module) -> StudentModuleResponse:
+def _build_sm_response(
+    sm: StudentModule,
+    module,
+    prerequisites_met: Optional[bool] = None,
+) -> StudentModuleResponse:
     return StudentModuleResponse(
         id=sm.id,
         user_id=sm.user_id,
@@ -329,8 +369,55 @@ def _build_sm_response(sm: StudentModule, module) -> StudentModuleResponse:
         semester=sm.semester,
         plan_semester=sm.plan_semester,
         custom_ist_benotet=sm.custom_ist_benotet,
+        parent_module_id=sm.parent_module_id,
+        prerequisites_met=prerequisites_met,
         module=ModuleResponse.model_validate(module) if module else None,
     )
+
+
+def _get_semester_flags(db: Session, user_id, student_modules: list) -> dict:
+    """Returns {1: bool, 2: bool, 3: bool} — whether each semester's PFLICHT modules are all PASSED."""
+    user_program = db.query(UserProgram).filter(UserProgram.user_id == user_id).first()
+    if not user_program:
+        return {}
+    exam_reg = db.get(ExamRegulation, user_program.exam_regulation_id)
+    if not exam_reg:
+        return {}
+    reg_pflicht = db.query(Module).filter(
+        Module.exam_regulation_id == exam_reg.id,
+        Module.modul_typ == ModulTyp.PFLICHT,
+        Module.semester_empfehlung.in_([1, 2, 3]),
+    ).all()
+    passed_ids = {
+        sm.module_id for sm in student_modules
+        if sm.status == StudiengangStatus.PASSED and sm.module_id
+    }
+    result = {}
+    for sem in [1, 2, 3]:
+        sem_ids = {m.id for m in reg_pflicht if m.semester_empfehlung == sem}
+        result[sem] = bool(sem_ids) and sem_ids.issubset(passed_ids)
+    return result
+
+
+def _eval_prerequisites(module_id, prereqs_by_module: dict, sem_flags: dict, reached_ects: int) -> bool:
+    """Returns True if all prerequisites for a module are satisfied. Custom modules always return True."""
+    if module_id is None:
+        return True
+    prereqs = prereqs_by_module.get(module_id, [])
+    if not prereqs:
+        return True
+    for prereq in prereqs:
+        if prereq.prerequisite_type == PrerequisiteType.SEMESTER_COMPLETE:
+            for s in prereq.required_semesters.split(","):
+                if not sem_flags.get(int(s), False):
+                    return False
+        elif prereq.prerequisite_type == PrerequisiteType.ECTS_THRESHOLD:
+            if reached_ects < prereq.minimum_ects:
+                return False
+        elif prereq.prerequisite_type == PrerequisiteType.MODULE:
+            # Not used in BIN seed — reserved for future use
+            pass
+    return True
 
 
 def _build_user_program_response(user_program, exam_reg, program) -> UserProgramResponse:

@@ -390,12 +390,12 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-#### Phase 5 — module_prerequisites Grundgerüst (ADR-010)
+#### Phase 5 — module_prerequisites Grundgerüst (ADR-010) ✅
 
 **Basis:** ADR-010 (beschlossen Sprint 3A, nie implementiert)
 
 **Backend:**
-- [ ] Alembic Migration 0013: `module_prerequisites` Tabelle
+- [x] Alembic Migration 0013: `module_prerequisites` Tabelle
   ```sql
   id UUID PRIMARY KEY
   module_id UUID FK → modules (das abhängige Modul)
@@ -404,23 +404,25 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
   prerequisite_type ENUM('MODULE', 'ECTS_THRESHOLD', 'SEMESTER_COMPLETE')
   description VARCHAR (menschenlesbar, z.B. "Alle Prüfungen Sem 1 bestanden")
   ```
-- [ ] Seed: BIN-Voraussetzungsregeln eintragen:
-  - BIN-200..BIN-204 → prerequisite_type=SEMESTER_COMPLETE, description="Alle Sem 1 Prüfungen"
-  - BIN-205, BIN-207 → "Alle Sem 1+2 Prüfungen"
-  - BIN-206 → prerequisite_type=MODULE, "Bachelor-Vorprüfung"
-  - BIN-208 → "Alle Sem 1-3 Prüfungen"
-  - BIN-210 → ECTS_THRESHOLD=134 + Vorprüfung
-  - BIN-209-XX → keine Voraussetzungen
-- [ ] `GET /me/modules` gibt `prerequisites_met: bool` pro Modul zurück (neu)
-- [ ] Backend-Check in `add_module()`: WP-Module nur hinzufügbar wenn prerequisites_met
-- [ ] **BIN-209 GPA-Fix:** Benotete ERGAENZEND-Sub-Module sollen in die BIN-209-Note einfließen.
-  Logik: `avg(noten aller benoteten sub-module)` → BIN-209 Modulnote, dann × `gewichtung=1.5` in GPA.
-  Aktuell: Custom-ERGAENZEND (`module_id=null`) wird **komplett aus GPA ausgeschlossen** — das ist falsch!
-  Umsetzung erfordert Verknüpfung: custom ERGAENZEND → parent BIN-209 StudentModule.
+- [x] Seed: BIN-Voraussetzungsregeln:
+  - BIN-200..204 → SEMESTER_COMPLETE required_semesters="1"
+  - BIN-205, BIN-207 → SEMESTER_COMPLETE required_semesters="1,2"
+  - BIN-206 → SEMESTER_COMPLETE required_semesters="1,2,3" (Vorprüfung)
+  - BIN-208 → SEMESTER_COMPLETE required_semesters="1,2,3"
+  - BIN-210 → SEMESTER_COMPLETE "1,2,3" + ECTS_THRESHOLD 134
+  - BIN-211..219 (WP) → SEMESTER_COMPLETE required_semesters="1,2"
+  - BIN-209 Sub-Module → keine Voraussetzungen
+- [x] `parent_module_id UUID NULLABLE` auf student_modules — auto-gesetzt in `add_module()`
+- [x] Backfill: bestehende custom ERGAENZEND → BIN-209 parent_module_id
+- [x] `GET /me/modules` berechnet `prerequisites_met: bool` via `_eval_prerequisites()` + `_get_semester_flags()`
+- [x] `add_module()`: setzt `parent_module_id = BIN-209` für neue custom ERGAENZEND Sub-Module
+- [x] **BIN-209 GPA-Fix** (`gpa_service.py`): ERGAENZEND Sub-Module per `parent_module_id` gruppiert → `avg(note)` × BIN-209 ects × gewichtung; Parent-Modul selbst aus qualifying ausgeschlossen
 
 **Frontend:**
-- [ ] `ModuleModal`: Lock-Icon + Hinweistext wenn prerequisites nicht erfüllt
-- [ ] `AddModuleModal`: WP-Module gesperrt wenn prerequisites nicht erfüllt
+- [x] `types/study.ts`: `parent_module_id`, `prerequisites_met` auf StudentModuleResponse
+- [x] `ModuleModal`: Lock-Icon + amber Hinweis wenn `prerequisites_met === false`
+- [x] `ModuleList`: `useUserStats` → `wpPrerequisitesMet = stats?.sem2_complete` an AddModuleModal
+- [x] `AddModuleModal`: `wpPrerequisitesMet` Prop — amber Banner + Save deaktiviert wenn WP gesperrt
 
 ---
 

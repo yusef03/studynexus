@@ -288,6 +288,7 @@
         "bin20907": "Supplementary Business Subject C",
         "bwlHint": "At least 1 of your 3 subjects must be a Business subject (per PO)"
       },
+      "wpPrerequisitesLocked": "Elective modules become accessible once Sem 1+2 are complete (PO §6)",
       "loadError": "Error loading module catalogue",
       "saveError": "Error adding module"
     },
@@ -300,7 +301,8 @@
       "save": "Save",
       "saving": "Saving…",
       "close": "Close",
-      "saveError": "Error saving changes"
+      "saveError": "Error saving changes",
+      "prerequisitesHint": "The prerequisites for this module have not been met yet (per PO §6)."
     },
     "setup": {
       "title": "Select your degree programme",

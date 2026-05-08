@@ -119,6 +119,10 @@ class StudentModuleResponse(BaseModel):
     plan_semester: Optional[str]
     # NULL for catalogue modules (use module.ist_benotet). Set for custom ERGAENZEND modules.
     custom_ist_benotet: Optional[bool]
+    # Sprint 4 Phase 5: parent PFLICHT module for custom ERGAENZEND sub-modules (BIN-209 GPA fix).
+    parent_module_id: Optional[UUID] = None
+    # Sprint 4 Phase 5: True if all prerequisites for this module are met. None on mutations.
+    prerequisites_met: Optional[bool] = None
     module: Optional[ModuleResponse]
 
     model_config = {"from_attributes": True}

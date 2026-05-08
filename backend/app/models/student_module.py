@@ -34,3 +34,7 @@ class StudentModule(Base):
     # NULL for catalogue modules (ist_benotet comes from module.ist_benotet).
     # Set explicitly for custom ERGAENZEND modules which have no catalogue entry.
     custom_ist_benotet = Column(Boolean, nullable=True)
+    # Sprint 4 Phase 5: Links custom ERGAENZEND sub-modules to their parent PFLICHT module.
+    # Set automatically on add_module() for custom BIN-209 sub-modules.
+    # Used by gpa_service to compute BIN-209 GPA contribution via avg of sub-module notes.
+    parent_module_id = Column(UUID(as_uuid=True), ForeignKey("modules.id", ondelete="SET NULL"), nullable=True)

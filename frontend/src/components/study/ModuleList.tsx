@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useUserModules } from "@/hooks/queries/useUserModules";
+import { useUserStats } from "@/hooks/queries/useUserStats";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { ModuleModal } from "@/components/study/ModuleModal";
@@ -28,6 +29,7 @@ export function ModuleList() {
   const tPa = useTranslations("dashboard.modules.pruefungsart");
 
   const { data: groups, isLoading: loading, isError } = useUserModules();
+  const { data: stats } = useUserStats();
   const [selected, setSelected] = useState<StudentModuleResponse | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
 
@@ -161,6 +163,7 @@ export function ModuleList() {
         <AddModuleModal
           alreadyAddedModuleIds={addedModuleIds}
           wahlpflichtCount={wahlpflichtCount}
+          wpPrerequisitesMet={stats?.sem2_complete ?? null}
           onClose={() => setShowAddModal(false)}
         />
       )}

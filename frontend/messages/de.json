@@ -288,6 +288,7 @@
         "bin20907": "Ergänzendes BWL-Fach C",
         "bwlHint": "Mind. 1 deiner 3 Fächer muss ein BWL-Fach sein (laut PO)"
       },
+      "wpPrerequisitesLocked": "Wahlpflichtmodule zugänglich, sobald Sem 1+2 abgeschlossen sind (PO §6)",
       "loadError": "Fehler beim Laden des Modulkatalogs",
       "saveError": "Fehler beim Hinzufügen des Moduls"
     },
@@ -300,7 +301,8 @@
       "save": "Speichern",
       "saving": "Wird gespeichert…",
       "close": "Schließen",
-      "saveError": "Fehler beim Speichern"
+      "saveError": "Fehler beim Speichern",
+      "prerequisitesHint": "Laut PO §6 sind die Voraussetzungen für dieses Modul noch nicht erfüllt."
     },
     "setup": {
       "title": "Studiengang auswählen",
