@@ -218,8 +218,8 @@
 **Ziel:** Vollständige und korrekte Abbildung der BIN PO 2019 in der Datenbank.
 
 **Grundlage:** Vollständige Analyse von Modulhandbuch BIN 19WS (76 S.), PO BIN 2019, ATPO-FIV 2025.
-Analyse-Dokument: [po-architecture-analysis.md](po-architecture-analysis.md)
-Status-Dokument: [studiengang-implementation-status.md](studiengang-implementation-status.md)
+Quell-PDFs: `docs/pos_test/` (ATPO-FIV 2025, PO BIN 2019, Modulhandbuch BIN 19WS).
+Detailliertes Review: [sprint-3.7.7-review.md](sprint-3.7.7-review.md)
 
 **Erledigte Tasks:**
 - [x] Alembic Migration 0011: Alle 27 PFLICHT-Kürzel auf BIN-100..BIN-210 korrigiert
@@ -313,24 +313,30 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 #### Phase 2 — Vorprüfungs-Milestone & Semester-Progression
 
 **Basis:** BIN PO 2019 §6 — Zulassungsvoraussetzungen:
-- Sem 4-Prüfungen: alle Sem 1-Module (BIN-100..BIN-116) bestanden
-- Sem 5-Prüfungen: alle Sem 1+2-Module (BIN-100..BIN-109) bestanden
-- BIN-206 (Praxisprojekt 1): Bachelor-Vorprüfung bestanden
-- Sem 6-Prüfungen: Bachelor-Vorprüfung (= alle Sem 1-3 bestanden)
-- Bachelor-Arbeit (BIN-210): Vorprüfung + mind. 134 ECTS
-- BIN-209 (Ergänzende Fächer): jederzeit, keine Voraussetzung
+- Sem 4-Prüfungen: alle Sem-1-Prüfungen bestanden (inkl. BIN-116 Englisch!)
+- Sem 5-Prüfungen: alle Sem-1 + Sem-2-Prüfungen bestanden
+- BIN-206 (Praxisprojekt 1): Bachelor-Vorprüfung bestanden (Sonderregel!)
+- Sem 6-Prüfungen: Bachelor-Vorprüfung bestanden (= alle Sem 1–3)
+- Bachelor-Arbeit (BIN-210): Vorprüfung + mind. 134 ECTS bestanden
+- BIN-209 (Ergänzende Fächer): KEINE Voraussetzung — jederzeit zugänglich!
+
+**Genaue Modul-Listen BIN (semester_empfehlung-basiert, aus PO §6):**
+- **Sem 1** (6 Module): BIN-100, BIN-101, BIN-102, BIN-103, BIN-104, BIN-116
+- **Sem 2** (5 Module): BIN-105, BIN-106, BIN-107, BIN-108, BIN-109
+- **Sem 3** (6 Module): BIN-110, BIN-111, BIN-112, BIN-113, BIN-114, BIN-115
+- **Vorprüfung** = alle 17 Module Sem 1–3 bestanden (BIN-100..BIN-116)
 
 **Backend:**
 - [ ] `GET /me/stats` erweitern:
-  - `sem1_complete: bool` — alle BIN-100..BIN-116 PASSED
-  - `sem2_complete: bool` — alle BIN-105..BIN-109 PASSED
-  - `vorpruefung_bestanden: bool` — alle Sem 1-3 PASSED (Bachelor-Vorprüfung nach §6)
-  - `sem4_zugaenglich: bool` — sem1_complete
+  - `sem1_complete: bool` — alle BIN-100, BIN-101, BIN-102, BIN-103, BIN-104, BIN-116 PASSED
+  - `sem2_complete: bool` — alle BIN-105, BIN-106, BIN-107, BIN-108, BIN-109 PASSED
+  - `vorpruefung_bestanden: bool` — alle 17 BIN-100..BIN-116 PASSED (Bachelor-Vorprüfung §6)
+  - `sem4_zugaenglich: bool` — sem1_complete (BIN-116 muss dabei sein!)
   - `sem5_zugaenglich: bool` — sem1_complete AND sem2_complete
   - `sem6_zugaenglich: bool` — vorpruefung_bestanden
   - `ba_zulassung_eligible: bool` — vorpruefung_bestanden AND ects_bestanden >= 134
   - `ects_fuer_ba: int` — aktuelle bestandene ECTS (für BA-Fortschrittsanzeige)
-- [ ] Backend-Logik: Nur für BIN-Programme berechnet (program-aware, über `exam_regulation.program_id`)
+- [ ] Backend-Logik: program-aware über `exam_regulation.program_id` — nicht hardcoded für BIN
 - [ ] Schema: `StatsResponse` um obige Felder erweitern
 - [ ] Docs: `docs/api/stats.md` aktualisieren
 
@@ -404,6 +410,10 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
   - BIN-209-XX → keine Voraussetzungen
 - [ ] `GET /me/modules` gibt `prerequisites_met: bool` pro Modul zurück (neu)
 - [ ] Backend-Check in `add_module()`: WP-Module nur hinzufügbar wenn prerequisites_met
+- [ ] **BIN-209 GPA-Fix:** Benotete ERGAENZEND-Sub-Module sollen in die BIN-209-Note einfließen.
+  Logik: `avg(noten aller benoteten sub-module)` → BIN-209 Modulnote, dann × `gewichtung=1.5` in GPA.
+  Aktuell: Custom-ERGAENZEND (`module_id=null`) wird **komplett aus GPA ausgeschlossen** — das ist falsch!
+  Umsetzung erfordert Verknüpfung: custom ERGAENZEND → parent BIN-209 StudentModule.
 
 **Frontend:**
 - [ ] `ModuleModal`: Lock-Icon + Hinweistext wenn prerequisites nicht erfüllt
@@ -496,9 +506,11 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 **Ziel:** Weitere HsH-Studiengänge aus Fakultät IV hinzufügen — MDI zuerst, dann Master-Programme.
 
 **Hintergrund:**
-Das DB-Schema ist bereits multi-program-fähig (ADR-009). Neue Programme benötigen nur neue Seed-Daten (keine Code-Änderungen). Das Admin-Panel aus Sprint 5 wird für die Datenpflege genutzt.
+Das DB-Schema ist bereits vollständig multi-program-fähig (`University → Faculty → Program → ExamRegulation → Module`). Neue Studiengänge benötigen **NUR neue Seed-Daten (Alembic-Migration) — keinerlei Code-Änderungen**. Das Admin-Panel aus Sprint 5 wird langfristig für die Datenpflege genutzt.
 
-**Studiengänge laut ATPO-FIV 2025:**
+**Wichtige Architektur-Invariante:** `StudentModule` hat bewusst **keine FK auf `UserProgram`**. Wenn ein User das Programm wechselt (`PUT /me/program`), bleiben seine alten `StudentModules` erhalten (Bestandsschutz für bereits eingetragene Noten). Diese Entscheidung ist dauerhaft.
+
+**Studiengänge laut ATPO-FIV 2025 Fakultät IV:**
 - MDI – Medieninformatik und Interaktives Entertainment (Bachelor)
 - BWL – Betriebswirtschaftslehre (Bachelor) — in Kooperation mit Fak. IV
 - MIN – Informatik (Master)
@@ -546,4 +558,5 @@ Das DB-Schema ist bereits multi-program-fähig (ADR-009). Neue Programme benöti
 | KI-Planung | Karteikarten-Generator aus Modulbeschreibungen (LangChain + Claude/OpenAI) | Sprint 8+ |
 | Skill-Tree Visualisierung | Interaktiver Modul-Abhängigkeitsgraph (Voraussetzungen visualisiert) | Sprint 8+ |
 | Notenverbesserungs-Tracking | §11 Abs. 4 ATPO: bestandene Prüfungen können einmal zur Notenverbesserung wiederholt werden | Sprint 5+ |
+| Auto-Suggest Ergänzende Fächer | KI-basierter Vorschlag passender BIN-209-Sub-Module basierend auf WAHLPFLICHT-Auswahl | Sprint 8+ |
 | Weitere Hochschulen | Erweiterung über HsH hinaus (erst nach stabilem Admin-Panel) | Sprint 9+ |

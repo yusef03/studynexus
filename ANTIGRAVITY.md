@@ -201,7 +201,7 @@ Migration status:
 - **Bugfixes:** Token lifetime 30min→7days, hook-order violations, semester field isolation, 401 auto-redirect
 
 ### Sprint 3.7.7 – BIN PO Data Fix (Complete) ✅
-Vollständige Analyse und Umsetzung: `docs/sprints/studiengang-implementation-status.md`
+Review: `docs/sprints/sprint-3.7.7-review.md`
 
 - **Migration 0011:** Alle 27 PFLICHT kuerzel (BIN-100..BIN-210) korrigiert. 9 WAHLPFLICHT-Namen auf echte PO-Namen. BIN-209 "Ergänzende Fächer" eingefügt + für bestehende User provisioniert. Fake-Platzhalter gelöscht. `custom_ist_benotet` Column auf student_modules.
 - **Backend:** `custom_ist_benotet` in Model, Schema, Router. WAHLPFLICHT-Limit (max 2) mit HTTP 409 durchgesetzt.
@@ -265,6 +265,56 @@ Vollständige Analyse und Umsetzung: `docs/sprints/studiengang-implementation-st
 
 ---
 
+## BIN Studiengang — PO-Regeln & Architektur (Referenz)
+
+### GPA-Gewichtungen (modules.gewichtung)
+| Modul | Gewichtung | Grund |
+|---|---|---|
+| BIN-114 Programmierprojekt | 0.0 | EA (Experimentelle Arbeit), fließt nicht in GPA |
+| BIN-116 Englisch | 0.0 | Unbewertet für GPA, trotzdem Pflicht für Vorprüfung |
+| BIN-204 Seminar | 0.0 | Referat (R), unbenotet |
+| BIN-206 Praxisprojekt 1 | 0.0 | EA, unbenotet |
+| BIN-208 Praxisprojekt 2 | 0.0 | EA, unbenotet |
+| BIN-209 Ergänzende Fächer | 1.5 | PFLICHT, sub-Module sollten in BIN-209-Note fließen (Bug — Sprint 4 Phase 5) |
+| BIN-210 Bachelorarbeit + Kolloquium | 4.0 | Höchste Gewichtung im Studium |
+
+### §6 PO BIN 2019 — Zulassungsvoraussetzungen (exakt)
+
+**Semester-Definitionen (BIN, semester_empfehlung-basiert):**
+- Sem 1 (6 Module): BIN-100, BIN-101, BIN-102, BIN-103, BIN-104, BIN-116
+- Sem 2 (5 Module): BIN-105, BIN-106, BIN-107, BIN-108, BIN-109
+- Sem 3 (6 Module): BIN-110, BIN-111, BIN-112, BIN-113, BIN-114, BIN-115
+- Vorprüfung = alle 17 Module Sem 1–3 (BIN-100..BIN-116) bestanden
+
+**Zulassungsregeln:**
+- Sem 4: alle Sem-1-Prüfungen bestanden — **BIN-116 Englisch muss dabei sein!**
+- Sem 5: alle Sem-1 + Sem-2-Prüfungen bestanden
+- Sem 6 + BIN-206: Bachelor-Vorprüfung bestanden (alle Sem 1–3)
+- BIN-210 Bachelorarbeit: Vorprüfung + mind. 134 ECTS bestanden
+- BIN-209 Ergänzende Fächer: **KEINE Voraussetzung** — jederzeit zugänglich!
+
+### Prüfungsarten BIN (ATPO-FIV 2025 §7 + PO Anlage B1/B2)
+| Code | Bezeichnung | BIN-Module |
+|---|---|---|
+| PX | Klausur oder mündliche Prüfung (90 Min.) | Alle Standard-PFLICHT + WP |
+| EA | Experimentelle Arbeit | BIN-114, BIN-206, BIN-208 |
+| R | Referat | BIN-204 |
+| BAA+Ko | Bachelorarbeit mit Kolloquium | BIN-210 |
+
+### Multi-Program-Architektur (bereits fertig, kein Code-Change nötig)
+Das DB-Schema `University → Faculty → Program → ExamRegulation → Module → StudentModule` ist vollständig multi-program-fähig. **Neue Studiengänge benötigen NUR eine neue Alembic-Migration mit Seed-Daten** — keine Code-Änderungen.
+
+**Studiengänge Fakultät IV (laut ATPO-FIV 2025):**
+- MDI — Medieninformatik und Interaktives Entertainment (Bachelor) → Sprint 7 zuerst
+- MIN — Informatik (Master)
+- MMI — Medieninformatik (Master)
+
+**Wichtige Invariante:** `StudentModule` hat **keine FK auf `UserProgram`** (bewusst). Bei Programmwechsel bleiben bestehende StudentModules erhalten — Bestandsschutz für bereits eingetragene Noten. Nur wenn explizit gewünscht → `user_program_id` FK nachrüsten.
+
+**WAHLPFLICHT-Limit (2 Module):** Aktuell hardcoded für BIN im Backend. Muss program-aware werden vor Sprint 7 (jedes Programm hat sein eigenes Limit laut PO).
+
+---
+
 ## Known Limitations
 
 - Custom ERGAENZEND modules (BIN-209 Ergänzende Fächer) are entered manually. The 7 official sub-module names from PO Anlage B2 (BIN-209-01..07) are not yet offered as a dropdown — Sprint 4 Phase 3.
@@ -317,28 +367,35 @@ Vollständige Analyse und Umsetzung: `docs/sprints/studiengang-implementation-st
 
 ---
 
-### Open Points (Stand 2026-05-08)
-  Vollständige Analyse und Status: docs/sprints/studiengang-implementation-status.md
-  Vollständige Erkenntnisse aus PDF-Analyse: docs/sprints/studiengang-implementation-status.md (Abschnitt "Neue Erkenntnisse")
-  
-  Sprint 4 Phase 1 (Migration 0012):
-  - [ ] pruefungsart + sws Felder auf modules → BIN-Seed + Backend + Frontend
-  
-  Sprint 4 Phase 2:
-  - [ ] Vorprüfungs-Milestone im Dashboard (BIN §6: Sem 1 → Sem 4, Sem 1+2 → Sem 5, Vorprüfung → Sem 6, 134 CP → BA)
-  
-  Sprint 4 Phase 3:
-  - [ ] BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown in AddModuleModal)
-  
-  Sprint 4 Phase 4 (Tech Debt):
-  - [ ] Semester-Tag im FAB dynamisch (statt hardcoded "WiSe2425")
-  - [ ] /api/me/profile Proxy-Route im Next.js anlegen (GET + PUT)
-  
-  Sprint 4 Phase 5:
-  - [ ] module_prerequisites Tabelle (ADR-010) + BIN-Seed + Backend-Logik
-  
-  Sprint 4 Phase 6:
-  - [ ] HsH-Notenvalidierung: nur 1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0 (ATPO-FIV §10)
+### Open Points — Sprint 4 (Stand 2026-05-08)
+
+Vollständige Task-Listen mit Details: `docs/sprints/sprint-plan.md` → Sprint 4 Phasen 1–6.
+
+**Phase 1 — Migration 0012** (pruefungsart + sws auf modules):
+- [ ] `pruefungsart VARCHAR(20) NULLABLE` + `sws SMALLINT NULLABLE` auf `modules`
+- [ ] BIN-Seed: PX (Standard), EA (BIN-114/206/208), R (BIN-204), BAA+Ko (BIN-210)
+- [ ] Backend + Frontend: ModuleModal zeigt Prüfungsart-Badge; i18n-Keys
+
+**Phase 2 — Vorprüfungs-Milestone Dashboard:**
+- [ ] `GET /me/stats` erweitern: `sem1_complete`, `sem2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`
+- [ ] Dashboard: neues `MilestoneWidget` (Vorprüfungs-Status + BA-ECTS-Balken + Sem-Freischaltung)
+- [ ] Modullisten für Berechnung: Sem 1 = BIN-100..104 + BIN-116; Sem 2 = BIN-105..109; Sem 3 = BIN-110..115
+
+**Phase 3 — BIN-209 Sub-Modul-Katalog:**
+- [ ] AddModuleModal: Dropdown mit 7 offiziellen Namen (BIN-209-01 Erg. Fach A–D + BIN-209-05..07 BWL-Fach A–C)
+- [ ] Validierung: mind. 1 BWL-Fach (BIN-209-05..07) bei BIN-209-Belegung
+
+**Phase 4 — Tech Debt:**
+- [ ] FAB `MobileQuickAdd.tsx`: semester_tag dynamisch aus `GET /me/program` (statt hardcoded "WiSe2425")
+- [ ] `frontend/src/app/api/me/profile/route.ts` anlegen (GET + PUT, analog zu anderen Proxy-Routes)
+
+**Phase 5 — module_prerequisites (ADR-010) + BIN-209 GPA-Fix:**
+- [ ] Migration 0013: `module_prerequisites` Tabelle + BIN-Seed (alle §6-Regeln)
+- [ ] BIN-209 GPA-Fix: sub-Module (ERGAENZEND) sollen avg → BIN-209-Note → × 1.5 in GPA fließen
+
+**Phase 6 — Notenvalidierung:**
+- [ ] Backend Pydantic-Validator: nur 1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0 (ATPO-FIV §10)
+- [ ] Frontend: Dropdown mit 11 Optionen statt Freitextfeld
 
 
 ## Important Rules for AI Code Generation
