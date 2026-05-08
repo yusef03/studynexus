@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
+import { useQuery } from "@tanstack/react-query";
 import { TaskModal } from "@/components/kanban/TaskModal";
 import { EventModal } from "@/components/schedule/EventModal";
 import { useTasks } from "@/hooks/queries/useTasks";
 import { useEvents } from "@/hooks/queries/useEvents";
 import { Task } from "@/types/task";
+import type { UserProgramResponse } from "@/types/study";
 import { Plus, BookOpen, Calendar, Clock, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -19,6 +21,19 @@ export function MobileQuickAdd() {
   const { createEvent } = useEvents();
   const [isSaving, setIsSaving] = useState(false);
   const [collisionWarning, setCollisionWarning] = useState<string | null>(null);
+
+  const { data: programData } = useQuery<UserProgramResponse, Error>({
+    queryKey: ["userProgram"],
+    queryFn: async () => {
+      const res = await fetch("/api/study/program");
+      if (!res.ok) throw new Error("No program");
+      return res.json();
+    },
+    staleTime: 10 * 60 * 1000,
+    retry: false,
+  });
+
+  const semesterTag = programData?.start_semester ?? "";
 
   // Phase 5: Only show FAB on pages where it makes sense
   const hiddenPaths = ["/settings", "/profile", "/setup"];
@@ -144,7 +159,7 @@ export function MobileQuickAdd() {
           onSave={handleEventSave} 
           onDelete={() => {}} 
           isSaving={isSaving} 
-          semesterTag="WiSe2425" 
+          semesterTag={semesterTag}
           collisionWarning={collisionWarning} 
         />
       )}

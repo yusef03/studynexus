@@ -378,14 +378,15 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-#### Phase 4 — Dynamisches FAB + Proxy-Route Fix
+#### Phase 4 — Dynamisches FAB + Proxy-Route Fix ✅
 
 **Backend:** keine Änderungen
 
 **Frontend:**
-- [ ] `frontend/src/app/api/me/profile/route.ts` anlegen (GET + PUT, analog zu bestehenden Proxy-Routes)
-- [ ] `MobileQuickAdd.tsx`: Semester-Tag dynamisch aus `GET /me/program` → `start_semester` laden statt hardcoded "WiSe2425"
-- [ ] Fallback: wenn kein Programm vorhanden, leeres Dropdown
+- [x] `frontend/src/app/api/me/profile/route.ts` — `GET` → `BACKEND/me`, `PUT` → `BACKEND/me/profile`
+- [x] `MobileQuickAdd.tsx`: `useQuery(["userProgram"])` fetcht `UserProgramResponse.start_semester`
+- [x] `semesterTag={semesterTag}` an EventModal — kein Hardcode mehr
+- [x] Fallback `""` wenn kein Programm vorhanden (`retry: false`, silent error)
 
 ---
 

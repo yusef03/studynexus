@@ -15,6 +15,12 @@ All notable changes to this project will be documented in this file.
 - **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
 - **ADR-018**: Als abgeschlossen dokumentiert
 
+### Sprint 4 Phase 4 — Dynamisches FAB + Proxy-Route Fix (2026-05-08)
+#### Added
+- **Frontend `src/app/api/me/profile/route.ts`**: Neue Next.js Proxy-Route — `GET` → `/me` (UserResponse), `PUT` → `/me/profile` (Profil aktualisieren)
+- **Frontend `MobileQuickAdd`**: `useQuery(["userProgram"])` — lädt `start_semester` aus `GET /api/study/program` dynamisch
+- `semesterTag` für EventModal wird aus `UserProgramResponse.start_semester` gesetzt (Fallback: `""` wenn kein Programm)
+
 ### Sprint 4 Phase 3 — BIN-209 Sub-Modul-Katalog (2026-05-08)
 #### Added
 - **Frontend `AddModuleModal`**: Suggestion-Dropdown im Custom-Modus mit 7 offiziellen BIN-209-Namen (laut PO Anlage B2): Ergänzendes Fach A–D + Ergänzendes BWL-Fach A–C
