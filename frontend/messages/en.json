@@ -128,6 +128,14 @@
         "REGISTERED": "Registered",
         "PASSED": "Passed",
         "FAILED": "Failed"
+      },
+      "pruefungsart": {
+        "label": "Exam type",
+        "PX": "Written / oral exam",
+        "EA": "Experimental work",
+        "R": "Presentation",
+        "BAA+Ko": "Bachelor thesis + colloquium",
+        "sws": "{n} SWS"
       }
     },
     "kanban": {

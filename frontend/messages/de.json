@@ -128,6 +128,14 @@
         "REGISTERED": "Angemeldet",
         "PASSED": "Bestanden",
         "FAILED": "Nicht bestanden"
+      },
+      "pruefungsart": {
+        "label": "Prüfungsart",
+        "PX": "Klausur / mdl. Prüfung",
+        "EA": "Experimentelle Arbeit",
+        "R": "Referat",
+        "BAA+Ko": "Bachelorarbeit + Kolloquium",
+        "sws": "{n} SWS"
       }
     },
     "kanban": {

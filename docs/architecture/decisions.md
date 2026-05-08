@@ -447,7 +447,7 @@ Ein neues nullable Boolean-Feld `custom_ist_benotet` auf `student_modules`:
 
 ## ADR-018: `pruefungsart` und `sws` auf der `modules`-Tabelle
 
-**Status:** Akzeptiert (geplant für Sprint 4)
+**Status:** Akzeptiert ✅ (Sprint 4 Phase 1 abgeschlossen)
 **Datum:** 2026-05-08
 
 **Kontext:**
@@ -465,11 +465,15 @@ Zwei neue nullable Felder auf der `modules`-Tabelle (Migration 0012):
 - Ein `VARCHAR` statt ENUM: einfacher zu erweitern bei neuen Prüfungsarten
 
 **Konsequenzen:**
-- Migration 0012: 2 neue nullable Spalten auf `modules`
-- BIN-Seed in Migration 0012: pruefungsart + sws für alle 37 BIN-Module eintragen
-- Backend: `ModuleResponse` und `StudentModuleResponse` Schemas erweitern
-- Frontend: ModuleModal zeigt Prüfungsart-Badge, types/study.ts erweitern
-- Admin-Panel (Sprint 5): Prüfungsart als Dropdown-Feld im Modul-Formular
+- Migration 0012: 2 neue nullable Spalten auf `modules` ✅
+- BIN-Seed in Migration 0012: pruefungsart + sws für alle 37 BIN-Module eingetragen ✅
+- Backend: `ModuleResponse` Schema um `pruefungsart` + `sws` erweitert ✅
+- Backend: `module.py` SQLAlchemy-Model um beide Felder erweitert ✅
+- Frontend: `types/study.ts` um `pruefungsart` + `sws` erweitert ✅
+- Frontend: `ModuleModal` zeigt farbige Prüfungsart-Badge + SWS-Chip ✅
+- Frontend: `ModuleList` zeigt Prüfungsart-Chip pro Modulzeile ✅
+- i18n: `dashboard.modules.pruefungsart.*` in de.json + en.json ✅
+- Admin-Panel (Sprint 5): Prüfungsart als Dropdown-Feld im Modul-Formular (offen)
 
 ---
 

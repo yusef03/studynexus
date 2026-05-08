@@ -288,25 +288,25 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 #### Phase 1 — Prüfungsart & Modul-Metadaten (Backend + DB)
 
 **Technische Tasks:**
-- [ ] Alembic Migration 0012: `pruefungsart VARCHAR(20) NULLABLE` auf `modules`
-- [ ] Migration 0012: `sws SMALLINT NULLABLE` auf `modules`
-- [ ] Migration 0012: BIN-Seed-Update — alle pruefungsart-Werte aus Anlage B1/B2 der PO BIN 2019:
-  - Alle PX-Module (Standard, Klausur oder mündliche Prüfung)
-  - BIN-114: EA (Experimentelle Arbeit), Gew=0
-  - BIN-204: R (Referat), Gew=0
-  - BIN-206: EA (Experimentelle Arbeit), Gew=0
-  - BIN-208: EA (Experimentelle Arbeit), Gew=0
-  - BIN-210: BAA+Ko (Bachelorarbeit mit Kolloquium), Gew=4
-- [ ] Backend: `ModuleResponse` + `StudentModuleResponse` Schemas um `pruefungsart`, `sws` erweitern
-- [ ] Backend: `GET /exam-regulations/{id}/modules` liefert `pruefungsart` + `sws`
-- [ ] Backend: `GET /me/modules` liefert `pruefungsart` + `sws` pro Modul
-- [ ] ADR-018 dokumentieren: pruefungsart auf Module
+- [x] Alembic Migration 0012: `pruefungsart VARCHAR(20) NULLABLE` auf `modules`
+- [x] Migration 0012: `sws SMALLINT NULLABLE` auf `modules`
+- [x] Migration 0012: BIN-Seed — alle 37 Module mit pruefungsart + sws aus ATPO-FIV 2025 + Modulhandbuch:
+  - PX: alle Standard-PFLICHT + 9 WAHLPFLICHT (BIN-211..219)
+  - EA: BIN-114 (Programmierprojekt), BIN-206 (Praxisprojekt 1), BIN-208 (Praxisprojekt 2)
+  - R: BIN-204 (Seminar)
+  - BAA+Ko: BIN-210 (Bachelorarbeit mit Kolloquium)
+  - sws=NULL: BIN-206, BIN-208, BIN-209, BIN-210 (keine festen SWS)
+- [x] Backend: `module.py` SQLAlchemy-Model um `pruefungsart` + `sws` erweitert
+- [x] Backend: `ModuleResponse` Schema um `pruefungsart: Optional[str]` + `sws: Optional[int]` erweitert
+- [x] Backend: automatisch verfügbar in `GET /me/modules` + `GET /exam-regulations/{id}/modules`
+- [x] ADR-018 als abgeschlossen dokumentiert
 
 **Frontend:**
-- [ ] `types/study.ts`: `pruefungsart?: string | null`, `sws?: number | null` auf `ModuleResponse`
-- [ ] `ModuleModal`: Prüfungsart-Badge anzeigen (z.B. "Klausur/mdl." / "Experimentelle Arbeit")
-- [ ] `ModuleList`: Prüfungsart-Icon oder Label pro Modul-Zeile
-- [ ] i18n: `modules.pruefungsart.*` Keys in de.json + en.json
+- [x] `types/study.ts`: `pruefungsart: string | null`, `sws: number | null` auf `ModuleResponse`
+- [x] `ModuleModal`: farbiger Prüfungsart-Badge + SWS-Chip unter dem Modulnamen
+  - PX → blau, EA → amber, R → lila, BAA+Ko → emerald
+- [x] `ModuleList`: Prüfungsart-Chip pro Modulzeile (klein, unter dem Kürzel)
+- [x] i18n: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,sws,label}` in de.json + en.json
 
 ---
 

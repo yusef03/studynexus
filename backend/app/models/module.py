@@ -25,3 +25,7 @@ class Module(Base):
     max_versuche = Column(Integer, nullable=False, default=3)
     gewichtung = Column(Float, nullable=False, default=1.0)
     has_prerequisites = Column(Boolean, nullable=False, default=True)
+    # Sprint 4 Phase 1 (ADR-018): PX / EA / R / BAA+Ko per ATPO-FIV 2025 §7
+    pruefungsart = Column(String, nullable=True)
+    # Sprint 4 Phase 1: Semesterwochenstunden from Modulhandbuch BIN 19WS
+    sws = Column(Integer, nullable=True)

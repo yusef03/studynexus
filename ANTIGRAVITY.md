@@ -83,6 +83,7 @@ Migration status:
 - 0009: profile fields (birth_date, hochschule) on users ✅
 - 0010: plan_semester field on student_modules (StudyPlanBoard-only) ✅
 - 0011: Fix all BIN module data (correct kuerzel BIN-100..BIN-210, ECTS, ist_benotet, has_prerequisites, gewichtung), delete fake placeholder modules, insert BIN-209 "Ergänzende Fächer", add custom_ist_benotet to student_modules ✅
+- 0012: Add pruefungsart VARCHAR(20) + sws SMALLINT (both nullable) to modules; seed all 37 BIN modules with values from ATPO-FIV 2025 §7 + Modulhandbuch BIN 19WS ✅
 
 ---
 
@@ -371,10 +372,12 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module 
 
 Vollständige Task-Listen mit Details: `docs/sprints/sprint-plan.md` → Sprint 4 Phasen 1–6.
 
-**Phase 1 — Migration 0012** (pruefungsart + sws auf modules):
-- [ ] `pruefungsart VARCHAR(20) NULLABLE` + `sws SMALLINT NULLABLE` auf `modules`
-- [ ] BIN-Seed: PX (Standard), EA (BIN-114/206/208), R (BIN-204), BAA+Ko (BIN-210)
-- [ ] Backend + Frontend: ModuleModal zeigt Prüfungsart-Badge; i18n-Keys
+**Phase 1 — Migration 0012** ✅ abgeschlossen:
+- [x] `pruefungsart VARCHAR(20) NULLABLE` + `sws SMALLINT NULLABLE` auf `modules`
+- [x] BIN-Seed: PX (Standard), EA (BIN-114/206/208), R (BIN-204), BAA+Ko (BIN-210)
+- [x] Backend `ModuleResponse` + `module.py` erweitert; i18n-Keys in de.json + en.json
+- [x] ModuleModal: farbige Prüfungsart-Badge (PX=blau, EA=amber, R=lila, BAA+Ko=emerald) + SWS-Chip
+- [x] ModuleList: Prüfungsart-Chip in jeder Modulzeile
 
 **Phase 2 — Vorprüfungs-Milestone Dashboard:**
 - [ ] `GET /me/stats` erweitern: `sem1_complete`, `sem2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`

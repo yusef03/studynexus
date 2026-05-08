@@ -8,6 +8,13 @@ import { ModuleModal } from "@/components/study/ModuleModal";
 import { AddModuleModal } from "@/components/study/AddModuleModal";
 import type { StudentModuleResponse, StudentModulesBySemester, StudiengangStatus } from "@/types/study";
 
+const PRUEFUNGSART_COLOR: Record<string, string> = {
+  PX: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  EA: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  R: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  "BAA+Ko": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+};
+
 const STATUS_BADGE: Record<StudiengangStatus, string> = {
   PLANNED: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
   REGISTERED: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300",
@@ -18,6 +25,7 @@ const STATUS_BADGE: Record<StudiengangStatus, string> = {
 export function ModuleList() {
   const t = useTranslations("dashboard.modules");
   const tStatus = useTranslations("dashboard.modules.status");
+  const tPa = useTranslations("dashboard.modules.pruefungsart");
 
   const { data: groups, isLoading: loading, isError } = useUserModules();
   const [selected, setSelected] = useState<StudentModuleResponse | null>(null);
@@ -87,11 +95,24 @@ export function ModuleList() {
                   >
                     <div className="flex flex-col gap-0.5 min-w-0">
                       <span className="text-sm font-medium truncate">{name}</span>
-                      {kuerzel && (
-                        <span className="text-xs text-muted-foreground">
-                          {kuerzel}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {kuerzel && (
+                          <span className="text-xs text-muted-foreground">
+                            {kuerzel}
+                          </span>
+                        )}
+                        {sm.module?.pruefungsart && (
+                          <span
+                            className={cn(
+                              "inline-flex items-center rounded-full px-1.5 py-0 text-[10px] font-medium leading-4",
+                              PRUEFUNGSART_COLOR[sm.module.pruefungsart] ??
+                                "bg-muted text-muted-foreground",
+                            )}
+                          >
+                            {tPa(sm.module.pruefungsart as "PX" | "EA" | "R" | "BAA+Ko")}
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <div className="flex items-center gap-3 shrink-0 ml-4">

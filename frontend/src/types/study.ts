@@ -46,6 +46,10 @@ export interface ModuleResponse {
   max_versuche: number;
   gewichtung: number;
   has_prerequisites: boolean;
+  /** PX | EA | R | BAA+Ko — null for non-BIN or unset modules (ADR-018) */
+  pruefungsart: string | null;
+  /** Semesterwochenstunden — null for project/thesis modules */
+  sws: number | null;
 }
 
 export interface StudentModuleResponse {

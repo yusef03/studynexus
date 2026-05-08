@@ -23,9 +23,17 @@ interface Props {
   onSave: (updated: StudentModuleResponse) => void;
 }
 
+const PRUEFUNGSART_COLOR: Record<string, string> = {
+  PX: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
+  EA: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
+  R: "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  "BAA+Ko": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
+};
+
 export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props) {
   const t = useTranslations("dashboard.modal");
   const tStatus = useTranslations("dashboard.modules.status");
+  const tPa = useTranslations("dashboard.modules.pruefungsart");
 
   const [status, setStatus] = useState<StudiengangStatus>(sm.status);
   const [note, setNote] = useState<string>(sm.note !== null ? sm.note.toFixed(1) : "");
@@ -81,8 +89,30 @@ export function ModuleModal({ studentModule: sm, open, onClose, onSave }: Props)
         </div>
 
         <div className="px-6 py-4 space-y-4">
-          {/* Module name */}
-          <p className="text-sm font-medium">{displayName}</p>
+          {/* Module name + metadata */}
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium">{displayName}</p>
+            {sm.module && (sm.module.pruefungsart || sm.module.sws) && (
+              <div className="flex flex-wrap items-center gap-1.5">
+                {sm.module.pruefungsart && (
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium",
+                      PRUEFUNGSART_COLOR[sm.module.pruefungsart] ??
+                        "bg-muted text-muted-foreground",
+                    )}
+                  >
+                    {tPa(sm.module.pruefungsart as "PX" | "EA" | "R" | "BAA+Ko")}
+                  </span>
+                )}
+                {sm.module.sws && (
+                  <span className="inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium bg-muted text-muted-foreground">
+                    {tPa("sws", { n: sm.module.sws })}
+                  </span>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Status */}
           <div className="space-y-1.5">

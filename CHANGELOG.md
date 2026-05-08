@@ -3,8 +3,24 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+### Sprint 4 Phase 1 — Prüfungsart & Modul-Metadaten (2026-05-08)
+#### Added
+- **Migration 0012**: `pruefungsart VARCHAR(20) NULLABLE` + `sws SMALLINT NULLABLE` auf `modules`
+- **Migration 0012**: BIN-Seed — alle 37 BIN-Module mit Prüfungsart (PX/EA/R/BAA+Ko) + SWS aus ATPO-FIV 2025 + Modulhandbuch BIN 19WS
+- **Backend**: `ModuleResponse` Schema + `module.py` Model um `pruefungsart` + `sws` erweitert
+- **Frontend**: `types/study.ts` — `pruefungsart: string | null`, `sws: number | null` auf `ModuleResponse`
+- **Frontend `ModuleModal`**: Farbige Prüfungsart-Badge + SWS-Chip (PX=blau, EA=amber, R=lila, BAA+Ko=emerald)
+- **Frontend `ModuleList`**: Prüfungsart-Chip pro Modulzeile (unter dem Kürzel)
+- **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
+- **ADR-018**: Als abgeschlossen dokumentiert
+
 ### Planned
-- **Sprint 4**: BIN Studiengang Vollintegration (pruefungsart, Vorprüfungs-Milestone, BIN-209 Katalog, module_prerequisites, Notenvalidierung)
+- **Sprint 4 Phase 2**: Vorprüfungs-Milestone Dashboard-Widget (BIN PO §6 Regeln)
+- **Sprint 4 Phase 3**: BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown)
+- **Sprint 4 Phase 4**: FAB Semester-Tag dynamisch + /api/me/profile Proxy
+- **Sprint 4 Phase 5**: module_prerequisites Tabelle (ADR-010) + BIN-Seed + BIN-209 GPA-Fix
+- **Sprint 4 Phase 6**: Notenvalidierung (nur 11 offizielle HsH-Noten)
 - **Sprint 5**: Admin Panel (PO-Verwaltung ohne Alembic-Migrationen)
 - **Sprint 6**: PWA, Branding & Launch
 

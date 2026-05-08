@@ -69,6 +69,10 @@ class ModuleResponse(BaseModel):
     max_versuche: int
     gewichtung: float
     has_prerequisites: bool
+    # Sprint 4 Phase 1 (ADR-018): PX / EA / R / BAA+Ko — NULL for non-BIN or unset
+    pruefungsart: Optional[str] = None
+    # Sprint 4 Phase 1: Semesterwochenstunden — NULL for project/thesis modules
+    sws: Optional[int] = None
 
     model_config = {"from_attributes": True}
 
