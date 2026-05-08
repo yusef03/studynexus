@@ -15,8 +15,23 @@ All notable changes to this project will be documented in this file.
 - **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
 - **ADR-018**: Als abgeschlossen dokumentiert
 
+### Sprint 4 Phase 2 — Vorprüfungs-Milestone Dashboard (2026-05-08)
+#### Added
+- **Backend `GET /me/stats`**: 8 neue Felder — `sem1_complete`, `sem2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`
+- **Backend**: `_compute_milestone_stats()` Helper — program-aware via `semester_empfehlung` (kein BIN-Hardcode)
+- **Backend**: `StatsResponse` Pydantic-Schema um 8 optionale Felder erweitert (`None` für nicht-BIN Programme)
+- **Frontend `MilestoneWidget`**: Neue Dashboard-Sidebar-Komponente (`components/dashboard/`)
+  - Rendert nur für BIN-Studierende (wenn `vorpruefung_bestanden !== null`)
+  - Vorprüfungs-Status: Icon + grüner/grauer Badge
+  - Semester 4/5/6 Freischaltung: Lock/Unlock-Icons
+  - BA-Fortschrittsbalken (X/134 ECTS), wird grün bei Zulassung
+- **Frontend `types/study.ts`**: `StatsResponse` um 8 neue `boolean | null` Felder
+- **Dashboard `page.tsx`**: `MilestoneWidget` in Sidebar eingebunden (über ExamCountdownWidget)
+- **i18n**: `dashboard.milestone.*` (14 Keys) in de.json + en.json
+- **`docs/api/stats.md`**: alle neuen Felder dokumentiert
+
 ### Planned
-- **Sprint 4 Phase 2**: Vorprüfungs-Milestone Dashboard-Widget (BIN PO §6 Regeln)
+- **Sprint 4 Phase 3**: BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown)
 - **Sprint 4 Phase 3**: BIN-209 Sub-Modul-Katalog (7 offizielle Namen als Dropdown)
 - **Sprint 4 Phase 4**: FAB Semester-Tag dynamisch + /api/me/profile Proxy
 - **Sprint 4 Phase 5**: module_prerequisites Tabelle (ADR-010) + BIN-Seed + BIN-209 GPA-Fix

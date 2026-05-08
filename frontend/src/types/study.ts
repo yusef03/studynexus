@@ -85,6 +85,15 @@ export interface StatsResponse {
   bestandene_module: number;
   nicht_bestandene_module: number;
   offene_module: number;
+  // Sprint 4 Phase 2 — BIN PO §6 milestone stats (null = not applicable / no BIN program)
+  sem1_complete: boolean | null;
+  sem2_complete: boolean | null;
+  vorpruefung_bestanden: boolean | null;
+  sem4_zugaenglich: boolean | null;
+  sem5_zugaenglich: boolean | null;
+  sem6_zugaenglich: boolean | null;
+  ba_zulassung_eligible: boolean | null;
+  ects_fuer_ba: number | null;
 }
 
 export interface UserProgramResponse {

@@ -379,10 +379,11 @@ Vollständige Task-Listen mit Details: `docs/sprints/sprint-plan.md` → Sprint 
 - [x] ModuleModal: farbige Prüfungsart-Badge (PX=blau, EA=amber, R=lila, BAA+Ko=emerald) + SWS-Chip
 - [x] ModuleList: Prüfungsart-Chip in jeder Modulzeile
 
-**Phase 2 — Vorprüfungs-Milestone Dashboard:**
-- [ ] `GET /me/stats` erweitern: `sem1_complete`, `sem2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`
-- [ ] Dashboard: neues `MilestoneWidget` (Vorprüfungs-Status + BA-ECTS-Balken + Sem-Freischaltung)
-- [ ] Modullisten für Berechnung: Sem 1 = BIN-100..104 + BIN-116; Sem 2 = BIN-105..109; Sem 3 = BIN-110..115
+**Phase 2 — Vorprüfungs-Milestone Dashboard** ✅ abgeschlossen:
+- [x] `GET /me/stats` — 8 neue Felder: `sem1/2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`
+- [x] Berechnung program-aware via `semester_empfehlung` (nicht BIN-hardcoded)
+- [x] `MilestoneWidget` — Sidebar des Dashboards: Vorprüfungs-Badge + Sem-Locks + BA-Fortschrittsbalken
+- [x] `StatsResponse` schema + `types/study.ts` erweitert; i18n-Keys in de+en
 
 **Phase 3 — BIN-209 Sub-Modul-Katalog:**
 - [ ] AddModuleModal: Dropdown mit 7 offiziellen Namen (BIN-209-01 Erg. Fach A–D + BIN-209-05..07 BWL-Fach A–C)

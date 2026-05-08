@@ -246,6 +246,22 @@
         "addSemester": "+ Add Semester"
       }
     },
+    "milestone": {
+      "title": "Degree Progress",
+      "subtitle": "Admission requirements per BIN PO §6",
+      "vorpruefung": "Preliminary Exam (1st section)",
+      "passed": "Passed",
+      "open": "Not yet complete",
+      "sem4": "Semester 4 accessible",
+      "sem5": "Semester 5 accessible",
+      "sem6": "Semester 6 accessible",
+      "unlocked": "Unlocked",
+      "locked": "Locked",
+      "ba": "Bachelor thesis",
+      "baEcts": "{current} / {required} ECTS",
+      "baEligible": "✓ Bachelor thesis admission possible",
+      "baLocked": "Vorprüfung + {required} ECTS required"
+    },
     "addModule": {
       "title": "Add module",
       "modeWahlpflicht": "Elective from catalogue",

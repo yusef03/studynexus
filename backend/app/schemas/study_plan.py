@@ -170,3 +170,13 @@ class StatsResponse(BaseModel):
     bestandene_module: int
     nicht_bestandene_module: int
     offene_module: int
+    # Sprint 4 Phase 2 — BIN PO §6 milestone stats.
+    # All fields are None for programs without semester_empfehlung-based PFLICHT structure.
+    sem1_complete: Optional[bool] = None
+    sem2_complete: Optional[bool] = None
+    vorpruefung_bestanden: Optional[bool] = None
+    sem4_zugaenglich: Optional[bool] = None
+    sem5_zugaenglich: Optional[bool] = None
+    sem6_zugaenglich: Optional[bool] = None
+    ba_zulassung_eligible: Optional[bool] = None
+    ects_fuer_ba: Optional[int] = None

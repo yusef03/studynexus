@@ -3,6 +3,7 @@ import { StatsCard } from "@/components/study/StatsCard";
 import { SmartTimeline } from "@/components/dashboard/SmartTimeline";
 import { DailyFocus } from "@/components/dashboard/DailyFocus";
 import { ExamCountdownWidget } from "@/components/dashboard/ExamCountdownWidget";
+import { MilestoneWidget } from "@/components/dashboard/MilestoneWidget";
 
 import { cookies } from "next/headers";
 import { BACKEND, bearerHeaders } from "@/lib/backend";
@@ -46,6 +47,7 @@ export default async function DashboardOverviewPage() {
           <SmartTimeline />
         </div>
         <div className="space-y-6">
+          <MilestoneWidget />
           <ExamCountdownWidget />
           <DailyFocus />
         </div>

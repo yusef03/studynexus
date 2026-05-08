@@ -246,6 +246,22 @@
         "addSemester": "+ Neues Semester"
       }
     },
+    "milestone": {
+      "title": "Studienfortschritt",
+      "subtitle": "Zulassungen nach BIN PO §6",
+      "vorpruefung": "Vorprüfung (1. Abschnitt)",
+      "passed": "Bestanden",
+      "open": "Noch offen",
+      "sem4": "Semester 4 zugänglich",
+      "sem5": "Semester 5 zugänglich",
+      "sem6": "Semester 6 zugänglich",
+      "unlocked": "Freigegeben",
+      "locked": "Gesperrt",
+      "ba": "Bachelorarbeit",
+      "baEcts": "{current} / {required} ECTS",
+      "baEligible": "✓ Zulassung zur BA möglich",
+      "baLocked": "Vorprüfung + {required} ECTS erforderlich"
+    },
     "addModule": {
       "title": "Modul hinzufügen",
       "modeWahlpflicht": "Wahlpflichtmodul aus Katalog",

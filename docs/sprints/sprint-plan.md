@@ -327,26 +327,27 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - **Vorprüfung** = alle 17 Module Sem 1–3 bestanden (BIN-100..BIN-116)
 
 **Backend:**
-- [ ] `GET /me/stats` erweitern:
-  - `sem1_complete: bool` — alle BIN-100, BIN-101, BIN-102, BIN-103, BIN-104, BIN-116 PASSED
-  - `sem2_complete: bool` — alle BIN-105, BIN-106, BIN-107, BIN-108, BIN-109 PASSED
-  - `vorpruefung_bestanden: bool` — alle 17 BIN-100..BIN-116 PASSED (Bachelor-Vorprüfung §6)
-  - `sem4_zugaenglich: bool` — sem1_complete (BIN-116 muss dabei sein!)
-  - `sem5_zugaenglich: bool` — sem1_complete AND sem2_complete
-  - `sem6_zugaenglich: bool` — vorpruefung_bestanden
-  - `ba_zulassung_eligible: bool` — vorpruefung_bestanden AND ects_bestanden >= 134
-  - `ects_fuer_ba: int` — aktuelle bestandene ECTS (für BA-Fortschrittsanzeige)
-- [ ] Backend-Logik: program-aware über `exam_regulation.program_id` — nicht hardcoded für BIN
-- [ ] Schema: `StatsResponse` um obige Felder erweitern
-- [ ] Docs: `docs/api/stats.md` aktualisieren
+- [x] `GET /me/stats` erweitert:
+  - `sem1_complete`, `sem2_complete`, `vorpruefung_bestanden` — via semester_empfehlung-basierter PFLICHT-Gruppen
+  - `sem4_zugaenglich`, `sem5_zugaenglich`, `sem6_zugaenglich` — abgeleitet aus sem_complete Flags
+  - `ba_zulassung_eligible` — vorpruefung_bestanden AND ects >= 134
+  - `ects_fuer_ba` — aktuelle bestandene ECTS
+  - Alle Felder `Optional[bool] = None` — None für Programme ohne Abschnitt-1/2/3-Struktur
+- [x] Backend-Logik: program-aware via `semester_empfehlung` — kein BIN-Hardcode, generisch
+- [x] `_compute_milestone_stats()` Helper in `stats.py` extrahiert
+- [x] `StatsResponse` Schema um 8 neue optionale Felder erweitert
+- [x] `docs/api/stats.md` aktualisiert
 
 **Frontend:**
-- [ ] `useUserStats` Hook: neue Felder typisieren
-- [ ] Dashboard: `MilestoneWidget` (neue Komponente unter `components/dashboard/`)
-  - Vorprüfungs-Status: Progressbar + Grün/Rot Badge
-  - BA-Zulassung: ECTS-Balken (X/134 CP)
-  - Semester-Freischaltung: visuelle Icons (Sem 4/5/6 locked/unlocked)
-- [ ] i18n: `dashboard.milestone.*` Keys in de.json + en.json
+- [x] `types/study.ts` — 8 neue Felder auf `StatsResponse` (alle `boolean | null`)
+- [x] `useUserStats` Hook — keine Änderung nötig (fetcht alle Felder automatisch)
+- [x] `MilestoneWidget` (`components/dashboard/MilestoneWidget.tsx`) — neue Komponente:
+  - Rendert sich nur wenn `vorpruefung_bestanden !== null` (BIN-Programm vorhanden)
+  - Vorprüfungs-Status: CheckCircle/Circle Icon + grüner/grauer Badge
+  - Sem 4/5/6 Zeilen: Lock/Unlock Icons + "Freigegeben"/"Gesperrt"
+  - BA-Fortschrittsbalken (X/134 ECTS) — wird grün wenn Zulassung möglich
+- [x] Dashboard `page.tsx` — MilestoneWidget in Sidebar (über ExamCountdownWidget)
+- [x] i18n: `dashboard.milestone.{title,subtitle,vorpruefung,passed,open,sem4,sem5,sem6,unlocked,locked,ba,baEcts,baEligible,baLocked}` in de.json + en.json
 
 ---
 
