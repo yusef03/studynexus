@@ -351,7 +351,7 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-#### Phase 3 — BIN-209 Sub-Modul-Katalog
+#### Phase 3 — BIN-209 Sub-Modul-Katalog ✅
 
 **Basis:** PO BIN 2019 Anlage B2 — BIN-209 hat 7 offizielle Teilmodule (Student wählt 3):
 
@@ -366,14 +366,15 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 | BIN-209-07 | Ergänzendes BWL-Fach C | WP |
 
 **Backend:**
-- [ ] Neue `ergaenzend_suggestions` Tabelle ODER: hardcoded Liste im Router für BIN
-- [ ] Endpoint: `GET /programs/{id}/ergaenzend-suggestions` → gibt die 7 Namen zurück
-- [ ] Alternativ: die 7 Sub-Module als ERGAENZEND-Einträge in `modules` Tabelle (eigene Kürzel BIN-209-01..07, program-spezifisch)
+- [x] Keine Änderungen nötig — 7 Namen als Frontend-Konstante `BIN_209_SUGGESTIONS` (PO-fix, kein DB-Eintrag nötig)
+- [ ] Phase 5: BIN-209-01..07 als ERGAENZEND-Einträge in `modules` Tabelle (für GPA-Fix, ADR-010)
 
 **Frontend:**
-- [ ] `AddModuleModal` — Custom-ERGAENZEND-Modus: Dropdown mit den 7 offiziellen Namen (+ "Eigener Name" Option)
-- [ ] Muss mind. 1 BWL-Fach gewählt sein: UI-Hinweis wenn kein BWL-Fach dabei
-- [ ] i18n: `addModule.ergaenzendSuggestions.*`
+- [x] `AddModuleModal` — `BIN_209_SUGGESTIONS` Konstante (7 Einträge mit `key` + `isBwl`)
+- [x] Custom-ERGAENZEND-Modus: Suggestion-Dropdown (`ergaenzendSuggestions.label`)
+- [x] Auswahl → `customName` auto-fill + `customEcts = "2"`
+- [x] Amber-Hinweis bei non-BWL-Auswahl (`ergaenzendSuggestions.bwlHint`)
+- [x] i18n: `addModule.ergaenzendSuggestions.{label,selectHint,bin20901..07,bwlHint}` in de.json + en.json
 
 ---
 

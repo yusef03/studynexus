@@ -15,6 +15,14 @@ All notable changes to this project will be documented in this file.
 - **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
 - **ADR-018**: Als abgeschlossen dokumentiert
 
+### Sprint 4 Phase 3 — BIN-209 Sub-Modul-Katalog (2026-05-08)
+#### Added
+- **Frontend `AddModuleModal`**: Suggestion-Dropdown im Custom-Modus mit 7 offiziellen BIN-209-Namen (laut PO Anlage B2): Ergänzendes Fach A–D + Ergänzendes BWL-Fach A–C
+- **Frontend `AddModuleModal`**: Auswahl aus Dropdown füllt automatisch Modulname + ECTS=2
+- **Frontend `AddModuleModal`**: Amber-Hinweis wenn non-BWL-Fach gewählt — erinnert an PO-Pflicht (mind. 1 BWL-Fach)
+- **i18n**: `addModule.ergaenzendSuggestions.{label,selectHint,bin20901..07,bwlHint}` in de.json + en.json
+- **i18n**: `addModule.ergaenzendHint` aktualisiert (Hinweis auf Katalog-Dropdown ergänzt)
+
 ### Sprint 4 Phase 2 — Vorprüfungs-Milestone Dashboard (2026-05-08)
 #### Added
 - **Backend `GET /me/stats`**: 8 neue Felder — `sem1_complete`, `sem2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`

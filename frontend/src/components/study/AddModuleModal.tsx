@@ -9,6 +9,16 @@ import { cn } from "@/lib/utils";
 import type { ModuleResponse, UserProgramResponse } from "@/types/study";
 import { useAddModule } from "@/hooks/queries/useAddModule";
 
+const BIN_209_SUGGESTIONS = [
+  { key: "bin20901", isBwl: false },
+  { key: "bin20902", isBwl: false },
+  { key: "bin20903", isBwl: false },
+  { key: "bin20904", isBwl: false },
+  { key: "bin20905", isBwl: true },
+  { key: "bin20906", isBwl: true },
+  { key: "bin20907", isBwl: true },
+] as const;
+
 interface Props {
   alreadyAddedModuleIds: Set<string>;
   wahlpflichtCount?: number;
@@ -31,11 +41,22 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, on
   const [customName, setCustomName] = useState("");
   const [customEcts, setCustomEcts] = useState("");
   const [customIsGraded, setCustomIsGraded] = useState(true);
+  const [selectedSuggestionKey, setSelectedSuggestionKey] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const addModule = useAddModule();
+
+  const handleSuggestionChange = (key: string) => {
+    setSelectedSuggestionKey(key);
+    if (!key) return;
+    const label = t(`ergaenzendSuggestions.${key}` as Parameters<typeof t>[0]);
+    setCustomName(label);
+    setCustomEcts("2");
+  };
+
+  const selectedSuggestion = BIN_209_SUGGESTIONS.find((s) => s.key === selectedSuggestionKey) ?? null;
 
   useEffect(() => {
     fetch("/api/study/program")
@@ -171,6 +192,28 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, on
               <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
                 {t("ergaenzendHint")}
               </p>
+              {/* BIN-209 catalogue dropdown */}
+              <div className="space-y-1.5">
+                <Label htmlFor="add-suggestion-select">{t("ergaenzendSuggestions.label")}</Label>
+                <select
+                  id="add-suggestion-select"
+                  className={selectClass}
+                  value={selectedSuggestionKey}
+                  onChange={(e) => handleSuggestionChange(e.target.value)}
+                >
+                  <option value="">{t("ergaenzendSuggestions.selectHint")}</option>
+                  {BIN_209_SUGGESTIONS.map((s) => (
+                    <option key={s.key} value={s.key}>
+                      {t(`ergaenzendSuggestions.${s.key}` as Parameters<typeof t>[0])}
+                    </option>
+                  ))}
+                </select>
+                {selectedSuggestion && !selectedSuggestion.isBwl && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+                    {t("ergaenzendSuggestions.bwlHint")}
+                  </p>
+                )}
+              </div>
               <div className="space-y-1.5">
                 <Label htmlFor="add-custom-name">{t("customName")}</Label>
                 <Input

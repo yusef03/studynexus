@@ -275,7 +275,19 @@
       "noModules": "Alle Wahlpflichtmodule bereits hinzugefügt",
       "isGraded": "Benotet",
       "wahlpflichtFull": "Limit erreicht – laut PO sind genau 2 Wahlpflichtmodule (12 ECTS) vorgesehen",
-      "ergaenzendHint": "BIN-209 Ergänzende Fächer: Füge hier 3 eigene Module (je 2 ECTS) hinzu – mind. 1 aus dem BWL-Bereich",
+      "ergaenzendHint": "BIN-209 Ergänzende Fächer: Füge 3 Module (je 2 ECTS) hinzu – mind. 1 aus dem BWL-Bereich. Wähle offizielle Namen aus dem Katalog.",
+      "ergaenzendSuggestions": {
+        "label": "Aus BIN-209-Katalog wählen",
+        "selectHint": "-- Offiziellen Namen wählen (optional) --",
+        "bin20901": "Ergänzendes Fach A",
+        "bin20902": "Ergänzendes Fach B",
+        "bin20903": "Ergänzendes Fach C",
+        "bin20904": "Ergänzendes Fach D",
+        "bin20905": "Ergänzendes BWL-Fach A",
+        "bin20906": "Ergänzendes BWL-Fach B",
+        "bin20907": "Ergänzendes BWL-Fach C",
+        "bwlHint": "Mind. 1 deiner 3 Fächer muss ein BWL-Fach sein (laut PO)"
+      },
       "loadError": "Fehler beim Laden des Modulkatalogs",
       "saveError": "Fehler beim Hinzufügen des Moduls"
     },
