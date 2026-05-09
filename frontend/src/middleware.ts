@@ -8,6 +8,19 @@ const intlMiddleware = createMiddleware({
   defaultLocale: "de",
 });
 
+// Edge-runtime safe JWT payload decode (no signature verification — middleware only)
+function parseJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const b64 = token.split(".")[1];
+    if (!b64) return null;
+    const padded = b64.replace(/-/g, "+").replace(/_/g, "/");
+    const pad = (4 - (padded.length % 4)) % 4;
+    return JSON.parse(atob(padded + "=".repeat(pad)));
+  } catch {
+    return null;
+  }
+}
+
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -39,11 +52,27 @@ export default function middleware(request: NextRequest) {
 
   // Strip the locale segment to get the bare path
   const bare = pathname.replace(/^\/(de|en)/, "") || "/";
+  const locale = pathname.startsWith("/en") ? "en" : "de";
 
+  // Admin route guard — requires JWT + is_admin=true
+  if (bare.startsWith("/admin")) {
+    const token = request.cookies.get("access_token")?.value;
+    if (!token) {
+      const loginUrl = new URL(`/${locale}/login`, request.url);
+      loginUrl.searchParams.set("from", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    const payload = parseJwtPayload(token);
+    if (!payload?.is_admin) {
+      return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url));
+    }
+    return intlMiddleware(request);
+  }
+
+  // Regular protected routes
   if (!PUBLIC_PATHS.has(bare)) {
     const token = request.cookies.get("access_token")?.value;
     if (!token) {
-      const locale = pathname.startsWith("/en") ? "en" : "de";
       const loginUrl = new URL(`/${locale}/login`, request.url);
       loginUrl.searchParams.set("from", pathname);
       return NextResponse.redirect(loginUrl);

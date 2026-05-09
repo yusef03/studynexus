@@ -706,15 +706,15 @@ Import-Flow:
 - [x] `app/routers/admin/system.py` – `GET /system` (DB-Version, -Größe, Counts) + `GET /system/health` (DB + Redis Ping)
 - [x] Tests: 12 neue Tests — KPI-Shape, Growth-Period-Validation, Module-Stats, User-Segmentation, System-Health, 111/111 grün
 
-### Phase 5 – Frontend Fundament (1–2 Tage)
-- [ ] `app/[locale]/admin/layout.tsx` – AdminLayout (separate Sidebar, kein Dashboard-Frame)
-- [ ] `components/admin/AdminSidebar.tsx` – Navigation, Admin-Badge, Session-Status
-- [ ] `components/admin/AdminHeader.tsx` – Breadcrumb, Session-Timer
-- [ ] `components/admin/AdminSessionBanner.tsx` – Session-Ablauf-Warning
-- [ ] `app/[locale]/admin/login/page.tsx` – Passwort-Bestätigungs-Seite
-- [ ] Middleware: `/admin/*` Guard (is_admin im JWT → 403 wenn false)
-- [ ] Admin-Session-Hook: `useAdminSession()` – Auto-Refresh, Expiry-Warning
-- [ ] Next.js API-Proxy: `app/api/admin/` → alle Admin-Endpunkte
+### Phase 5 – Frontend Fundament ✅ (2026-05-09)
+- [x] `middleware.ts` – `/admin/*` Guard: kein Token → /login, is_admin=false → /dashboard; Edge-safe JWT-Decode via atob()
+- [x] `app/api/admin/[...path]/route.ts` – Catch-all Proxy: leitet alle Methoden an Backend weiter, forwarded X-Admin-Token Header
+- [x] `hooks/useAdminSession.ts` – sessionStorage-basierter Admin-Session-Hook: TTL-Countdown, Expiry-Warning < 2 Min, saveSession/clearSession
+- [x] `components/admin/AdminSidebar.tsx` – dunkle Sidebar (zinc-950), roter ADMIN-Badge, 9 Nav-Links, Session-Timer-Chip, Live-Countdown
+- [x] `components/admin/AdminSessionBanner.tsx` – Banner wenn Session < 2 Min oder nicht aktiv, "Verlängern"-Link
+- [x] `app/[locale]/admin/layout.tsx` – AdminLayout: fetchAdminName() via GET /admin/me, AdminSidebar + AdminSessionBanner, kein Dashboard-Frame
+- [x] `app/[locale]/admin/page.tsx` – Dashboard-Placeholder mit 4 Quick-Nav-Cards
+- [x] `app/[locale]/admin/login/page.tsx` – Admin-Re-Auth: POST /api/admin/auth/session → saveSession() → redirect /admin; dunkles Design
 
 ### Phase 6 – Dashboard + Analytics Frontend (1 Tag)
 - [ ] `components/admin/KPICard.tsx`
