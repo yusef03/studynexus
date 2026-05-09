@@ -20,15 +20,28 @@ My primary focus during this project was on:
 
 ## Core Features
 
+### Study Management
 - ✅ **Mission Control Dashboard** — GPA tracker, ECTS progress, Smart Timeline, Exam Countdown
-- ✅ **Interactive Schedule Board** — 15-min CSS Grid engine with collision detection, ghosting mode, and semester binding
+- ✅ **Visual Study Plan** — Dynamic semester buckets with touch DnD, Wahlpflicht catalog, Ergänzend sub-modules
+- ✅ **BIN PO Integration** — Full Prüfungsordnung import for B.Sc. Informatik (Hannover): module catalog, ECTS validation, Vorprüfungs-Milestone, prerequisites, `custom_ist_benotet` flag
+- ✅ **PO-Übersicht** — Live progress table across all PO modules with note validation and pruefungsart badges
+- ✅ **Note & Grade Logic** — Strict validation per pruefungsart, weighted GPA calculation, min-pass enforcement
+
+### Scheduling & Tasks
+- ✅ **Interactive Schedule Board** — 15-min CSS Grid engine with collision detection, ghosting mode, semester binding
 - ✅ **Kanban Board** — Touch-native task management (@dnd-kit) with columns: To Do, In Progress, Exam Ready, Done
-- ✅ **Visual Study Plan** — Dynamic semester buckets with touch DnD and "+ Add Semester" support
-- ✅ **Digital ID Card** — Premium glassmorphism student ID with real university data
-- ✅ **Settings & Profile** — Password change, personal data, language switcher
-- ✅ **Mobile-First Experience** — Agenda view, Quick Add FAB, responsive navigation
+- ✅ **Mobile Quick Add FAB** — Floating action button for rapid task/event creation on mobile
+
+### User Experience
+- ✅ **Digital ID Card** — Premium glassmorphism student ID with real university data and current semester display
+- ✅ **Current Semester Tracking** — Auto-calculated from registration start semester, shown across sidebar and profile
+- ✅ **Settings & Profile** — Password change, personal data, university program, language switcher
+- ✅ **Mobile-First Experience** — Agenda view, responsive navigation, touch-optimized interactions
 - ✅ **Bilingual (DE/EN)** — Full i18n with next-intl, zero hardcoded strings
-- 🤝 **Study Spaces** — Digital study groups with shared Kanban boards *(planned)*
+
+### Planned
+- 🛡️ **Admin Panel** — University/PO management, user administration, audit log *(Sprint 5 — in planning)*
+- 🤝 **Study Spaces** — Digital study groups with shared Kanban boards *(Sprint 8)*
 - 📚 **Module Wiki** — Community knowledge base with anonymous module reviews *(planned)*
 - 🤖 **AI Planning** — Smart recommendations and auto-scheduling *(planned)*
 - 🏆 **Gamification** — XP, Badges, Streaks *(planned)*
@@ -45,6 +58,19 @@ My primary focus during this project was on:
 | AI       | OpenAI API / Claude API via LangChain           |
 | DevOps   | Docker, GitHub Actions                          |
 
+## Sprint Status
+
+| Sprint | Focus | Status |
+|--------|-------|--------|
+| 1 | Auth, setup, base infra | ✅ Complete |
+| 2 | Dashboard, schedule, kanban | ✅ Complete |
+| 3 | Study plan, DnD, Quick Add FAB | ✅ Complete |
+| 3.7 | BIN PO full integration | ✅ Complete |
+| 4 | PO-Übersicht, note validation, Vorprüfungs-Milestone | ✅ Complete |
+| 5 | Admin Panel (university/PO/user management) | 🔧 In Planning |
+| 6–7 | AI features, extended analytics | Backlog |
+| 8 | Community (Study Spaces, Module Wiki) | Backlog |
+
 ## Authentication & Security
 
 StudyNexus incorporates strict security mechanisms:
@@ -52,6 +78,8 @@ StudyNexus incorporates strict security mechanisms:
 - **Email Verification:** Accounts require a 6-digit confirmation code generated and sent via Resend API.
 - **Stateless Session Control:** Next.js proxies manage `httpOnly` secure cookies (7-day lifetime).
 - **CSRF Protection:** Custom header validation (`x-studynexus-client`) + Origin/Host matching on all mutating requests.
+- **Admin-Session:** Short-lived Redis tokens (15 min) for destructive admin operations, separate from regular session.
+- **Audit Log:** Every admin mutation logged with before/after state, reason, and IP.
 
 ## Project Structure
 

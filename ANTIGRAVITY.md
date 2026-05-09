@@ -8,10 +8,10 @@
 ## Project Overview
 
 **Name:** StudyNexus
-**Type:** B2C SaaS - Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 3.7.7 Complete — Sprint 4 (BIN Studiengang Vollintegration) next
+**Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
+**Status:** ✅ Sprint 4 Complete — Sprint 5 (Admin Panel) next
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-05-08
+**Last Updated:** 2026-05-09
 
 ---
 
@@ -19,407 +19,352 @@
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui, Framer Motion |
+| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS, shadcn/ui |
 | i18n | next-intl (DE + EN), date-fns locale-aware formatting |
-| Backend | FastAPI (Python), SQLAlchemy, Alembic, Pydantic |
+| State | TanStack Query (React Query) — ALL data fetching via custom hooks |
+| Backend | FastAPI (Python), SQLAlchemy, Alembic, Pydantic v2 |
 | Database | PostgreSQL (primary), Redis (cache/sessions) |
 | Auth | JWT (python-jose), bcrypt 4.1.3 (direct, no passlib), httpOnly cookies |
-| AI | OpenAI API / Claude API via LangChain |
-| DevOps | Docker Compose (local), GitHub Actions (CI/CD) |
-| Testing | pytest (backend), Jest (frontend) |
+| DevOps | Docker Compose (local), GitHub Actions (CI/CD planned Sprint 6) |
+| Testing | pytest (backend, 66 tests), Jest (frontend) |
 
 ---
 
-## Architecture Decisions
+## Architecture Decisions (All ADRs)
 
-- Monorepo: frontend/ and backend/ in one repo
-- API-first: FastAPI REST API, Next.js consumes it
-- Mobile-First PWA: responsive, offline-capable
-- i18n from day 1: German + English (next-intl), default locale: de
-- DSGVO compliant: strict permission model, httpOnly cookies
-- Freemium-ready: is_premium field on User model
-- Shell: fish shell - never use heredoc EOF syntax
-- Config: next.config.js not .ts (Next.js 14.2.3 limitation)
-- Password hashing: bcrypt 4.1.3 direct, never passlib
-- Auth: httpOnly cookie via Next.js API proxy, never localStorage
-- Two API URLs: NEXT_PUBLIC_API_URL (browser) + BACKEND_API_URL (Docker-internal)
-- **HsH-only platform:** registration restricted to @stud.hs-hannover.de email addresses
-- **Admin-managed POs:** exam regulations and module data entered manually by admin (Yusef), not crowdsourced
-- **postgresql.ENUM in migrations:** always use `postgresql.ENUM` from `sqlalchemy.dialects.postgresql`, never `sa.Enum`, to avoid duplicate CREATE TYPE errors
-- **CSRF Protection:** Next.js middleware validates `x-studynexus-client: true` header on all mutating requests (POST, PUT, DELETE, PATCH) + Origin/Host check
-- **Token Lifetime:** JWT access tokens expire after 7 days (10080 minutes) in development. Cookie maxAge matches.
-- **i18n Full Coverage:** All UI strings use `useTranslations()` from next-intl. Zero hardcoded German/English strings. Date formatting is locale-aware (`date-fns`, `toLocaleDateString`).
+| ADR | Decision | Sprint |
+|---|---|---|
+| ADR-002 | bcrypt 4.1.3 direct — never passlib | 1 |
+| ADR-003 | httpOnly cookie via Next.js API proxy — never localStorage | 1 |
+| ADR-004 | Two API URLs: NEXT_PUBLIC_API_URL (browser) + BACKEND_API_URL (Docker-internal) | 1 |
+| ADR-005 | next.config.js not .ts (Next.js 14.2.3 limitation) | 1 |
+| ADR-007 | HsH-only: registration requires @stud.hs-hannover.de | 3A |
+| ADR-009 | Admin-managed POs: exam regulations entered by admin, not crowdsourced | 3A |
+| ADR-010 | module_prerequisites table for PO prerequisite rules | 3A → 4 |
+| ADR-011 | Resend API for transactional email | 3A |
+| ADR-012 | CSRF: x-studynexus-client header + Origin/Host check | 3A |
+| ADR-013 | next-intl for i18n (DE + EN), pulled forward from Sprint 6 | 3.7 |
+| ADR-014 | JWT lifetime 7 days in dev (was 30 min) | 3.7 |
+| ADR-015 | @dnd-kit for all drag-and-drop (replaces HTML5 polyfill) | 3.7 |
+| ADR-016 | plan_semester decoupled from semester (StudyPlanBoard only writes plan_semester) | 3.7 |
+| ADR-017 | custom_ist_benotet on StudentModule for custom ERGAENZEND modules | 3.7.7 |
+| ADR-018 | pruefungsart (PX/EA/R/BAA+Ko) + sws stored per module in DB | 4 |
+| ADR-019 | Admin-Session via Redis (15 min TTL, X-Admin-Token header for destructive ops) | 5 |
+| ADR-020 | Soft Delete (is_archived) on modules/programs/exam_regulations + Begründungspflicht | 5 |
+| ADR-021 | is_admin claim embedded in JWT — middleware reads without DB query | 5 |
+| ADR-022 | AdminDataTable server-side paginated (default 25/page) | 5 |
+
+---
+
+## Mandatory Rules for AI Code Generation
+
+1. **Read this file first** before writing any code
+2. **Shell:** fish — never use heredoc EOF syntax in fish commands
+3. **Config:** next.config.js not next.config.ts
+4. **Passwords:** bcrypt 4.1.3 direct, never passlib
+5. **Auth:** httpOnly cookie via Next.js API proxy, never localStorage
+6. **Data fetching:** ALL fetching via TanStack Query custom hooks in `hooks/queries/`. Never manual useEffect fetching in components.
+7. **i18n:** ALL user-facing strings via `useTranslations()`. Zero hardcoded strings. Keys in `messages/de.json` + `messages/en.json`.
+8. **Dates:** Always locale-aware (`useLocale()` + date-fns or `toLocaleDateString`)
+9. **Migrations:** Always use `postgresql.ENUM` (sqlalchemy.dialects.postgresql), never `sa.Enum`
+10. **Commit messages:** `type(scope): description` format
+11. **Never commit .env files**
+12. **Update ANTIGRAVITY.md at the end of every session**
+13. **Shared hooks:** Use `useUserProgram()` from `hooks/queries/useUserProgram.ts` — never duplicate inline `useQuery(["userProgram"])` 
+14. **Semester utils:** Use `semesterUtils.ts` (`computeCurrentSemesterNumber`, `formatSemesterLabel`, `generateSemesterOptions`) — never compute manually
+15. **Admin routes:** `/admin/*` protected by Middleware (is_admin in JWT) + `get_admin_user` FastAPI dependency
+16. **Soft Delete:** Never hard-delete modules/programs/exam_regulations that may have student data — use `is_archived` flag
+17. **Audit Log:** Every admin mutation must call `AuditLogger.log()`
 
 ---
 
 ## Running the Stack
 
-```
-cp .env.example .env
+```bash
 docker compose up --build
 ```
 
-Frontend  -> http://localhost:3000/de
-API docs  -> http://localhost:8000/api/docs
+Frontend  → http://localhost:3000/de  
+API docs  → http://localhost:8000/api/docs
 
-Before building Docker (clears stale pytest cache):
+```bash
+# Migrations
+docker compose exec backend alembic upgrade head
+
+# Tests
+docker compose exec backend pytest tests/ -v
+
+# TypeScript check
+docker compose exec frontend node_modules/.bin/tsc --noEmit
+
+# Reset all users (cascade deletes all student data too)
+docker compose exec db psql -U studynexus -d studynexus -c "TRUNCATE users CASCADE;"
 ```
-sudo rm -rf backend/.pytest_cache
-docker compose up --build
-```
-
-Run migrations: `docker compose exec backend alembic upgrade head`
-Run tests:      `docker compose exec backend pytest tests/ -v`
-
-Migration status:
-- 0001: users table ✅
-- 0002: study plan tables + HSH seed data ✅
-- 0003: kuerzel, gewichtung fixes, has_prerequisites, 9 Wahlpflichtmodule ✅
-- 0004: email verification fields (is_verified, verification_code, verification_code_expires) ✅
-- 0005: tasks + events tables for Mission Control ✅
-- 0006: matrikelnummer field on users ✅
-- 0007: semester_tag, event_date, lecturer fields on events ✅
-- 0008: focus type + is_submission on tasks ✅
-- 0009: profile fields (birth_date, hochschule) on users ✅
-- 0010: plan_semester field on student_modules (StudyPlanBoard-only) ✅
-- 0011: Fix all BIN module data (correct kuerzel BIN-100..BIN-210, ECTS, ist_benotet, has_prerequisites, gewichtung), delete fake placeholder modules, insert BIN-209 "Ergänzende Fächer", add custom_ist_benotet to student_modules ✅
-- 0012: Add pruefungsart VARCHAR(20) + sws SMALLINT (both nullable) to modules; seed all 37 BIN modules with values from ATPO-FIV 2025 §7 + Modulhandbuch BIN 19WS ✅
 
 ---
 
-## API Endpoints
+## Database Migrations (Complete Log)
+
+| Nr | Datum | Inhalt | Status |
+|---|---|---|---|
+| 0001 | 2026-04-05 | users table | ✅ |
+| 0002 | 2026-04-12 | University/Faculty/Program/ExamReg/Module/UserProgram/StudentModule + HSH seed | ✅ |
+| 0003 | 2026-04-12 | kuerzel-Fixes, gewichtung, has_prerequisites, 9 WP-Module | ✅ |
+| 0004 | 2026-04-18 | Email-Verifikation (is_verified, verification_code, expires) | ✅ |
+| 0005 | 2026-04-26 | tasks + events Tabellen | ✅ |
+| 0006 | 2026-04-28 | matrikelnummer auf users | ✅ |
+| 0007 | 2026-04-28 | semester_tag, event_date, lecturer auf events | ✅ |
+| 0008 | 2026-04-28 | FOCUS event type + is_submission auf tasks | ✅ |
+| 0009 | 2026-04-29 | birth_date, hochschule auf users | ✅ |
+| 0010 | 2026-04-29 | plan_semester auf student_modules (StudyPlanBoard-only) | ✅ |
+| 0011 | 2026-05-07 | BIN-Datenfehler-Fix: kuerzel BIN-100..BIN-210, BIN-209 eingefügt, custom_ist_benotet | ✅ |
+| 0012 | 2026-05-08 | pruefungsart + sws auf modules, BIN-Seed für alle 37 Module | ✅ |
+| 0013 | 2026-05-08 | module_prerequisites Tabelle + parent_module_id auf student_modules + BIN §6 Seed | ✅ |
+| 0014 | 2026-05-09 | BIN-209 gewichtung 1.0 → 1.5 (Datenfehler-Fix laut PO Anlage B2) | ✅ |
+| **0015** | **Sprint 5** | **is_admin, is_premium, last_login_at, admin_notes auf users** | 🔜 |
+| **0016** | **Sprint 5** | **admin_audit_logs Tabelle** | 🔜 |
+| **0017** | **Sprint 5** | **is_archived + Soft-Delete-Felder auf modules/programs/exam_regulations** | 🔜 |
+
+---
+
+## API Endpoints (Complete)
 
 ### Auth (`/api/v1/auth`)
-
 | Method | Path | Description | Auth |
 |---|---|---|---|
-| POST | /auth/register | Register user (requires @stud.hs-hannover.de) | No |
+| POST | /auth/register | Register (requires @stud.hs-hannover.de, matrikelnummer, birth_date, university) | No |
 | POST | /auth/verify | Verify 6-digit email code | No |
-| POST | /auth/login | Login, JWT in httpOnly cookie | No |
+| POST | /auth/login | Login → JWT in httpOnly cookie (sets is_admin claim) | No |
 | POST | /auth/logout | Logout, clear cookie | Yes |
 
 ### User Profile (`/api/v1/me`)
-
 | Method | Path | Description | Auth |
 |---|---|---|---|
 | GET | /me | Get current user profile | Yes |
 | PUT | /me/profile | Update profile fields | Yes |
-| PUT | /me/password | Change password (old + new) | Yes |
+| PUT | /me/password | Change password (requires old password) | Yes |
 
-### Study Plan (`/api/v1/me`)
-
+### Study Plan (`/api/v1`)
 | Method | Path | Description | Auth |
 |---|---|---|---|
-| GET | /universities | List universities | No |
+| GET | /universities | List all universities | No |
 | GET | /universities/{id}/faculties | List faculties | No |
 | GET | /faculties/{id}/programs | List programs | No |
-| GET | /programs/{id}/exam-regulations | List exam regs | No |
-| GET | /exam-regulations/{id}/modules | Modules by semester | No |
+| GET | /programs/{id}/exam-regulations | List exam regulations | No |
+| GET | /exam-regulations/{id}/modules | **Modules grouped by semester** `[{semester, modules[]}]` | No |
 | POST | /me/program | Select degree program | Yes |
-| GET | /me/program | Get my program (auto-creates PFLICHT modules) | Yes |
+| GET | /me/program | Get my program | Yes |
 | PUT | /me/program | Change program | Yes |
-| GET | /me/modules | All my modules grouped by semester | Yes |
-| POST | /me/modules | Add WAHLPFLICHT or custom ERGAENZEND module | Yes |
-| PUT | /me/modules/{id} | Update status/note/dates | Yes |
-| DELETE | /me/modules/{id} | Remove module (not if PASSED) | Yes |
-| GET | /me/stats | GPA, ECTS, progress stats | Yes |
+| GET | /me/modules | My modules grouped by semester (with prerequisites_met) | Yes |
+| POST | /me/modules | Add WAHLPFLICHT (module_id) or custom ERGAENZEND | Yes |
+| PUT | /me/modules/{id} | Update status/note/dates (note validated: only 11 HsH grades) | Yes |
+| DELETE | /me/modules/{id} | Remove module (forbidden if PASSED) | Yes |
+| GET | /me/stats | GPA, ECTS, milestone flags (8 BIN-specific fields) | Yes |
 
-### Mission Control - Tasks (`/api/v1/mission/tasks`)
-
+### Mission Control (`/api/v1/mission`)
 | Method | Path | Description | Auth |
 |---|---|---|---|
-| GET | /mission/tasks/ | List all tasks for current user | Yes |
-| POST | /mission/tasks/ | Create a new task | Yes |
-| PUT | /mission/tasks/{id} | Update task (status, priority, etc.) | Yes |
-| DELETE | /mission/tasks/{id} | Delete a task | Yes |
-
-### Mission Control - Events (`/api/v1/mission/events`)
-
-| Method | Path | Description | Auth |
-|---|---|---|---|
+| GET | /mission/tasks/ | List tasks | Yes |
+| POST | /mission/tasks/ | Create task | Yes |
+| PUT | /mission/tasks/{id} | Update task | Yes |
+| DELETE | /mission/tasks/{id} | Delete task | Yes |
 | GET | /mission/events/?semester_tag=X | List events for semester | Yes |
-| POST | /mission/events/ | Create a new event (collision detection) | Yes |
+| POST | /mission/events/ | Create event (collision detection HTTP 409) | Yes |
 | PUT | /mission/events/{id} | Update event | Yes |
 | DELETE | /mission/events/{id} | Delete event | Yes |
 
-### System
+### Admin (`/api/v1/admin/`) — Sprint 5
+All endpoints require `is_admin=true` in JWT. Destructive ops require `X-Admin-Token` (Redis-based session).
+Full endpoint list: `docs/sprints/sprint-5-plan.md`
 
-| Method | Path | Description | Auth |
-|---|---|---|---|
-| GET | /ping | Health ping | No |
-| GET | /health | Health check | No |
+---
+
+## Key Files & Hooks
+
+```
+frontend/src/
+├── hooks/queries/
+│   ├── useUserProgram.ts       ← shared hook for program data (queryKey: ["userProgram"])
+│   ├── useUserModules.ts       ← queryKey: ["userModules"]
+│   ├── useUserStats.ts         ← queryKey: ["userStats"]
+│   ├── useAddModule.ts
+│   ├── useUpdateModule.ts
+│   ├── useTasks.ts
+│   └── useEvents.ts
+├── lib/
+│   └── semesterUtils.ts        ← computeCurrentSemesterNumber, formatSemesterLabel, generateSemesterOptions
+├── types/
+│   └── study.ts                ← All TypeScript interfaces
+└── components/
+    ├── dashboard/
+    │   ├── AppSidebar.tsx      ← Semester-Badge im Footer
+    │   ├── MobileNav.tsx
+    │   ├── MilestoneWidget.tsx ← BIN Vorprüfungs-Status (nur wenn vorpruefung_bestanden !== null)
+    │   ├── MobileQuickAdd.tsx  ← FAB (uses useUserProgram, hidden on /settings /profile /setup /po-uebersicht)
+    │   └── POUebersicht.tsx    ← /po-uebersicht Seite (6 Sektionen, program-aware)
+    ├── study/
+    │   ├── ModuleList.tsx
+    │   ├── ModuleModal.tsx     ← Note: <select> mit 11 HsH-Noten, Lock-Icon bei prerequisites_met=false
+    │   ├── AddModuleModal.tsx  ← Zwei Modi: Wahlpflicht-Katalog + Ergänzungsmodul (BIN-209)
+    │   └── StudyPlanBoard.tsx  ← @dnd-kit, plan_semester
+    └── auth/
+        └── RegisterForm.tsx    ← Hochschule als Dropdown (fetcht /api/universities)
+```
 
 ---
 
 ## Sprint Completion Log
 
-### Sprint 1 – Infrastructure & Auth ✅
-- Docker Compose, FastAPI, Next.js boilerplate
-- JWT Authentication, httpOnly cookies
-- Login/Register UI
+### Sprint 1 – Infrastruktur & Auth ✅
+Docker Compose, FastAPI, Next.js, JWT, Login/Register UI.
 
-### Sprint 2 – Study Plan & Grades ✅
-- 7 DB models (University → StudentModule)
-- GPA & ECTS calculation engine
-- HSH seed data (32 modules, 6 semesters, 180 ECTS)
-- Full frontend: Setup wizard, ModuleList, ModuleModal, AddModuleModal, StatsCard
+### Sprint 2 – Studienplan & Noten ✅
+7 DB-Modelle (University → StudentModule), GPA-Engine, HSH Seed, ModuleList/Modal/StatsCard.
 
 ### Sprint 3A – Auth Hardening ✅
-- Email domain validation (@stud.hs-hannover.de)
-- Email verification (6-digit code via Resend)
-- TanStack Query migration
-- CSRF protection (middleware)
-- StudyNexus branding
+HsH-Domain-Validierung, E-Mail-Verifikation (Resend), TanStack Query, CSRF, Branding.
 
 ### Sprint 3B – Mission Control ✅
-- Interactive Schedule Board (15-min CSS Grid)
-- Kanban Board (Drag & Drop, 4 columns)
-- Smart Timeline, Daily Focus, Exam Countdown widgets
-- Soft collision detection (HTTP 409)
-- Semester binding, block events, ghosting mode
-- Event types: LECTURE, EXERCISE, TUTORIAL, SEMINAR, PRACTICUM, CUSTOM_STUDY, FOCUS, EXAM, WORK, LIFE
+Schedule Board (15-min CSS Grid), Kanban (DnD), Smart Timeline, Exam Countdown, Collision Detection.
 
 ### Sprint 3.5 – Mobile Ergonomics ✅
-- Mobile Quick Add FAB (global floating action button)
-- Mobile Agenda View (replaces grid on small screens)
-- Submissions support (is_submission flag on tasks)
-- iOS Safari auto-zoom fix
+FAB (Mobile Quick Add), Agenda View, Submissions, iOS Safari Fix.
 
 ### Sprint 3.6 – UX Polish ✅
-- Mobile Drag & Drop (mobile-drag-drop polyfill)
-- Visual Study Plan Board (Drag & Drop semester columns)
-- Digital ID Card (glassmorphism design)
-- Settings page (tabs: Personal, Security, Appearance)
-- Dashboard greeting with real user name
+Visual Study Plan Board (DnD Semester-Spalten), Digital ID Card, Settings Page.
 
-### Sprint 3.7 – Rework (Phases 1–5 Complete) ✅
-- **Phase 1:** Registration fields (matrikelnummer, birth_date, hochschule) as required
-- **Phase 2:** Settings with real data, password change API (`PUT /me/password`), language switcher
-- **Phase 3:** Mobile Kanban Rework — `@dnd-kit/core` + `@dnd-kit/sortable`, DragOverlay, KanbanCard/KanbanColumn
-- **Phase 4:** Studienplan Builder — `@dnd-kit`, dynamic `+ Neues Semester`, StudyPlanCard/StudyPlanColumn, optimistic mutations
-- **Phase 5:** Smart FAB — MobileQuickAdd hidden on /settings, /profile, /setup via `usePathname()`
-- **i18n Full Coverage:** all pages/modals/widgets via next-intl (de.json + en.json)
-- **Bugfixes:** Token lifetime 30min→7days, hook-order violations, semester field isolation, 401 auto-redirect
+### Sprint 3.7 – Rework & i18n ✅
+`@dnd-kit` für Kanban + StudyPlanBoard, vollständige i18n (DE/EN), Settings mit echten Daten, Passwort-Änderung, 401-Auto-Redirect.
 
-### Sprint 3.7.7 – BIN PO Data Fix (Complete) ✅
-Review: `docs/sprints/sprint-3.7.7-review.md`
+### Sprint 3.7.7 – BIN PO Datenkorrektur ✅
+Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigiert, custom_ist_benotet, WAHLPFLICHT-Limit (2).
 
-- **Migration 0011:** Alle 27 PFLICHT kuerzel (BIN-100..BIN-210) korrigiert. 9 WAHLPFLICHT-Namen auf echte PO-Namen. BIN-209 "Ergänzende Fächer" eingefügt + für bestehende User provisioniert. Fake-Platzhalter gelöscht. `custom_ist_benotet` Column auf student_modules.
-- **Backend:** `custom_ist_benotet` in Model, Schema, Router. WAHLPFLICHT-Limit (max 2) mit HTTP 409 durchgesetzt.
-- **Frontend:** `custom_ist_benotet` in types + useAddModule. `ModuleModal` Bug-Fix (custom Module zeigten immer "unbenotet"). `AddModuleModal` mit WAHLPFLICHT-Warning, BIN-209 Hinweis, Benotet-Checkbox. `ModuleList` berechnet wahlpflichtCount.
+### Sprint 4 – BIN Studiengang Vollintegration ✅
+**Review:** `docs/sprints/sprint-4-review.md` | **Zeitraum:** 08.–09. Mai 2026 | **Tests:** 66/66 grün
 
----
+- **Phase 1:** Migration 0012 — pruefungsart + sws auf modules, BIN-Seed für alle 37 Module. ModuleModal: farbige PA-Badges (PX=blau, EA=amber, R=lila, BAA+Ko=emerald). ModuleList: PA-Chip.
+- **Phase 2:** GET /me/stats — 8 neue Felder (sem1/2_complete, vorpruefung_bestanden, sem4/5/6_zugaenglich, ba_zulassung_eligible, ects_fuer_ba). MilestoneWidget im Dashboard.
+- **Phase 3:** AddModuleModal — BIN-209 Suggestion-Dropdown (7 offizielle Namen), BWL-Hinweis.
+- **Phase 4:** FAB semesterTag dynamisch (useUserProgram), /api/me/profile Proxy-Route.
+- **Phase 5:** Migration 0013 — module_prerequisites Tabelle + parent_module_id auf student_modules. BIN §6 Seed (alle Voraussetzungsregeln). BIN-209 GPA-Fix (Sub-Module → avg(note) × 1.5). prerequisites_met in GET /me/modules. Lock-Icon in ModuleModal.
+- **Phase 6:** Migration 0014 — BIN-209 gewichtung 1.0→1.5. Note-Validator (nur 11 HsH-Noten). ModuleModal: <select> statt Freitextfeld.
+- **Phase 7:** /dashboard/po-uebersicht — 6 Sektionen (§6 Zulassungsregeln live, §10 Notenscala, Prüfungsarten, §11 Wiederholung, BIN-209 Sondermodul, BA-Fortschrittsbalken). Program-aware via vorpruefung_bestanden !== null.
 
-## Next Steps
-
-### Sprint 4 — BIN Studiengang Vollintegration (NÄCHSTER SPRINT)
-
-**Ziel:** BIN vollständig und intelligent in StudyNexus integrieren — alle PO-Regeln automatisch abgebildet.
-
-**Phase 1 — Prüfungsarten & Modul-Metadaten (Migration 0012):**
-- [ ] `pruefungsart VARCHAR NULLABLE` + `sws SMALLINT NULLABLE` auf modules
-- [ ] BIN-Seed: PX (Standard), EA (BIN-114/206/208), R (BIN-204), BAA+Ko (BIN-210)
-- [ ] Backend Schema + Frontend types + ModuleModal Prüfungsart-Badge
-
-**Phase 2 — Vorprüfungs-Milestone Dashboard:**
-- [ ] `GET /me/stats` erweitern: sem1_complete, vorpruefung_bestanden, sem4/5/6_zugaenglich, ba_zulassung_eligible, ects_fuer_ba
-- [ ] Dashboard: MilestoneWidget (neu) mit Vorprüfungs-Status und BA-Fortschritt
-
-**Phase 3 — BIN-209 Sub-Modul-Katalog:**
-- [ ] AddModuleModal: Dropdown mit 7 offiziellen Namen (BIN-209-01..07: Erg. Fach A-D + BWL-Fach A-C)
-- [ ] Validierung: mind. 1 BWL-Fach bei BIN-209
-
-**Phase 4 — Technische Schulden:**
-- [ ] Semester-Tag im FAB dynamisch (aus `GET /me/program` start_semester)
-- [ ] `/api/me/profile` Route im Next.js Proxy anlegen (GET + PUT)
-
-**Phase 5 — module_prerequisites Tabelle (ADR-010):**
-- [ ] Migration 0013: module_prerequisites Tabelle
-- [ ] BIN-Seed: alle Zulassungsregeln nach §6 PO BIN 2019
-
-**Phase 6 — Notenvalidierung:**
-- [ ] Backend: nur offizielle HsH-Noten (1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0)
-- [ ] Frontend: Dropdown mit 11 Optionen statt Freitextfeld
-
-### Sprint 5 — Admin Panel
-- [ ] is_admin Flag + Admin Auth Guard
-- [ ] CRUD für University/Faculty/Program/ExamRegulation/Module über Admin-UI
-- [ ] CRUD für module_prerequisites
-- [ ] Ersetzt manuelle Alembic-Migrationen für neue Studiengänge
-
-### Sprint 6 — PWA, Branding & Launch
-- [ ] Service Worker + Offline-Cache
-- [ ] GitHub Actions CI/CD
-- [ ] Cloud Deployment (Railway oder Render)
-- [ ] Security Audit (OWASP Top 10)
-- [ ] Landing Page
-
-### Sprint 7 — Multi-Program-Architektur
-- [ ] MDI Studiengang (Medieninformatik) hinzufügen
-- [ ] MIN/MMI Master (optional)
-
-### Sprint 8 — Community & Kollaboration (fern geplant)
-- [ ] Modul-Wiki (Beschreibungen, Prüfungsarten, Bewertungen)
-- [ ] Anonyme Modulevaluationen (DSGVO-konform)
-- [ ] Study Spaces (digitale Lerngruppen mit geteiltem Kanban)
-- [ ] PDF-Upload und -Sharing
+### Post-Sprint-4 UX-Session ✅ (2026-05-09)
+- **Bug-Fix:** AddModuleModal — WP-Katalog war immer leer (API gibt gruppierten Response `[{semester, modules[]}]`, Code behandelte es als flache Liste → Filter fand nie WAHLPFLICHT). Fix: `groups.flatMap(g => g.modules)`. Neuer Typ `ModulesBySemester` in types/study.ts.
+- **Backend-Fix:** ERGAENZEND Sub-Module (BIN-209 Kinder) erscheinen jetzt unter Semester 5 statt "Ungeplant" — Backend lädt Parent-Module und erbt `semester_empfehlung`.
+- **AddModuleModal UX:** Komplett neu — Karten-Modus-Auswahl, Erklärungstext pro Modus, PO-Vorschläge als `<details>` ausklappbar, ECTS default=2.
+- **semesterUtils.ts:** `computeCurrentSemesterNumber`, `formatSemesterLabel`, `generateSemesterOptions` — zentrale Semester-Berechnungslogik.
+- **useUserProgram Hook:** Shared hook (queryKey: ["userProgram"]) — MobileQuickAdd + AppSidebar nutzen diesen statt duplizierter useQuery-Calls.
+- **AppSidebar:** Semester-Badge im Footer (aktuelles Semester + Startsemester).
+- **ProfilePage (ID-Card):** Aktuelles Semester + Studiengang aus Program-Daten angezeigt.
+- **SetupForm:** Semester-Optionen dynamisch via `generateSemesterOptions()`, Anzeige als "WiSe 2024/25".
+- **RegisterForm:** Hochschule-Freitextfeld → `<select>` Dropdown (fetcht `/api/universities`, auto-selektiert wenn nur 1 Hochschule).
+- **Test-Fix:** test_auth.py — `_make_user` fehlende Felder (matrikelnummer/university/profile_picture_url), Register-Tests mit Pflichtfeldern.
 
 ---
 
-## BIN Studiengang — PO-Regeln & Architektur (Referenz)
+## BIN Studiengang — Domain-Wissen
 
-### GPA-Gewichtungen (modules.gewichtung)
+### Modul-Gewichtungen (modules.gewichtung)
 | Modul | Gewichtung | Grund |
 |---|---|---|
-| BIN-114 Programmierprojekt | 0.0 | EA (Experimentelle Arbeit), fließt nicht in GPA |
-| BIN-116 Englisch | 0.0 | Unbewertet für GPA, trotzdem Pflicht für Vorprüfung |
-| BIN-204 Seminar | 0.0 | Referat (R), unbenotet |
+| BIN-114 Programmierprojekt | 0.0 | EA, unbenotet |
+| BIN-116 Englisch | 0.0 | Unbenotet, trotzdem Vorprüfungs-Pflicht |
+| BIN-204 Seminar | 0.0 | R (Referat), unbenotet |
 | BIN-206 Praxisprojekt 1 | 0.0 | EA, unbenotet |
 | BIN-208 Praxisprojekt 2 | 0.0 | EA, unbenotet |
-| BIN-209 Ergänzende Fächer | 1.5 | PFLICHT, sub-Module sollten in BIN-209-Note fließen (Bug — Sprint 4 Phase 5) |
-| BIN-210 Bachelorarbeit + Kolloquium | 4.0 | Höchste Gewichtung im Studium |
+| BIN-209 Ergänzende Fächer | 1.5 | GPA-Gewichtung (3 Sub-Module à 2 ECTS, avg → BIN-209-Note) |
+| BIN-210 Bachelorarbeit + Kolloquium | 4.0 | Höchste Gewichtung |
 
-### §6 PO BIN 2019 — Zulassungsvoraussetzungen (exakt)
+### §6 PO BIN 2019 — Zulassungsvoraussetzungen
+- **Sem 1** (6 Module): BIN-100, 101, 102, 103, 104, 116
+- **Sem 2** (5 Module): BIN-105, 106, 107, 108, 109
+- **Sem 3** (6 Module): BIN-110, 111, 112, 113, 114, 115
+- **Vorprüfung** = alle 17 Module Sem 1–3 bestanden
+- Sem 4 zugänglich: Sem 1 complete
+- Sem 5 zugänglich: Sem 1+2 complete
+- Sem 6 + BIN-206: Vorprüfung bestanden
+- BIN-210 BA: Vorprüfung + ≥134 ECTS
+- BIN-209: **KEINE Voraussetzung**
+- WAHLPFLICHT: **max. 2 Module** (BIN-211..219, je 6 ECTS), Voraussetzung: Sem 1+2
 
-**Semester-Definitionen (BIN, semester_empfehlung-basiert):**
-- Sem 1 (6 Module): BIN-100, BIN-101, BIN-102, BIN-103, BIN-104, BIN-116
-- Sem 2 (5 Module): BIN-105, BIN-106, BIN-107, BIN-108, BIN-109
-- Sem 3 (6 Module): BIN-110, BIN-111, BIN-112, BIN-113, BIN-114, BIN-115
-- Vorprüfung = alle 17 Module Sem 1–3 (BIN-100..BIN-116) bestanden
+### GPA-Berechnung
+```
+GPA = sum(note × ects × gewichtung) / sum(ects × gewichtung)
+```
+BIN-209 Sub-Module: `avg(note_aller_submodule)` als BIN-209-Note → × 6 ECTS × 1.5 gewichtung.
 
-**Zulassungsregeln:**
-- Sem 4: alle Sem-1-Prüfungen bestanden — **BIN-116 Englisch muss dabei sein!**
-- Sem 5: alle Sem-1 + Sem-2-Prüfungen bestanden
-- Sem 6 + BIN-206: Bachelor-Vorprüfung bestanden (alle Sem 1–3)
-- BIN-210 Bachelorarbeit: Vorprüfung + mind. 134 ECTS bestanden
-- BIN-209 Ergänzende Fächer: **KEINE Voraussetzung** — jederzeit zugänglich!
-
-### Prüfungsarten BIN (ATPO-FIV 2025 §7 + PO Anlage B1/B2)
-| Code | Bezeichnung | BIN-Module |
-|---|---|---|
-| PX | Klausur oder mündliche Prüfung (90 Min.) | Alle Standard-PFLICHT + WP |
-| EA | Experimentelle Arbeit | BIN-114, BIN-206, BIN-208 |
-| R | Referat | BIN-204 |
-| BAA+Ko | Bachelorarbeit mit Kolloquium | BIN-210 |
-
-### Multi-Program-Architektur (bereits fertig, kein Code-Change nötig)
-Das DB-Schema `University → Faculty → Program → ExamRegulation → Module → StudentModule` ist vollständig multi-program-fähig. **Neue Studiengänge benötigen NUR eine neue Alembic-Migration mit Seed-Daten** — keine Code-Änderungen.
-
-**Studiengänge Fakultät IV (laut ATPO-FIV 2025):**
-- MDI — Medieninformatik und Interaktives Entertainment (Bachelor) → Sprint 7 zuerst
-- MIN — Informatik (Master)
-- MMI — Medieninformatik (Master)
-
-**Wichtige Invariante:** `StudentModule` hat **keine FK auf `UserProgram`** (bewusst). Bei Programmwechsel bleiben bestehende StudentModules erhalten — Bestandsschutz für bereits eingetragene Noten. Nur wenn explizit gewünscht → `user_program_id` FK nachrüsten.
-
-**WAHLPFLICHT-Limit (2 Module):** Aktuell hardcoded für BIN im Backend. Muss program-aware werden vor Sprint 7 (jedes Programm hat sein eigenes Limit laut PO).
+### API Response Formen (wichtig!)
+- `GET /exam-regulations/{id}/modules` → **`[{semester: N, modules: ModuleResponse[]}]`** (GRUPPIERT)
+- `GET /me/modules` → **`[{semester: N|null, modules: StudentModuleResponse[]}]`** (GRUPPIERT)
+- `GET /me/stats` → flaches StatsResponse-Objekt
 
 ---
 
-## Known Limitations
+## Multi-Program-Architektur (Zukunft)
 
-- Custom ERGAENZEND modules (BIN-209 Ergänzende Fächer) are entered manually. The 7 official sub-module names from PO Anlage B2 (BIN-209-01..07) are not yet offered as a dropdown — Sprint 4 Phase 3.
-- WAHLPFLICHT limit is hardcoded to 2 in the backend — correct for BIN, but must become program-aware before adding other programs (Sprint 7).
-- `pruefungsart` (PX/EA/R/BAA+Ko) is not yet stored per module — Sprint 4 Phase 1.
-- BIN-209 GPA contribution: sub-modules (custom ERGAENZEND) are currently excluded from GPA. Correct behavior per PO: they should flow into BIN-209 module note (gewichtung=1.5). Sprint 4+.
-- Note validation: backend accepts arbitrary decimals. Only 11 official HsH grades should be allowed (1.0/1.3/…/5.0 per ATPO-FIV 2025 §10) — Sprint 4 Phase 6.
-- 404/500 prerender warnings during `next build` (Next.js + next-intl standalone mode issue — does not affect runtime).
-- `module_prerequisites` table (ADR-010) was never built — `has_prerequisites` is only a boolean flag. Full prerequisite logic comes in Sprint 4 Phase 5.
+Das DB-Schema `University → Faculty → Program → ExamRegulation → Module` ist multi-program-fähig. **Neue Studiengänge = neue Migration mit Seed-Daten — kein Code-Change.**
 
----
+**Sprint-7-Kandidaten (ATPO-FIV 2025 Fak. IV):**
+- MDI – Medieninformatik und Interaktives Entertainment (Bachelor)
+- MIN – Informatik (Master)
+- MMI – Medieninformatik (Master)
 
-## Strategic Decisions
+**Wichtige Invariante:** `StudentModule` hat **keine FK auf `UserProgram`** (bewusst — Bestandsschutz bei Programmwechsel).
 
-| Decision | Sprint | Notes |
-|---|---|---|
-| HsH-only platform | Sprint 3A | Registration requires @stud.hs-hannover.de email |
-| Email Provider | Sprint 3A | Resend (resend.com) via Python SDK (ADR-011) |
-| Email verification | Sprint 3A | 6-digit code, expires in 15 min |
-| Matrikelnummer | Sprint 3A | OPTIONAL (not required) - student can add it in profile settings |
-| Vorprüfungs-logic | Sprint 3A | Replaced by module_prerequisites table (ADR-010) |
-| Bachelor/Master compatibility | Sprint 3 / Sprint 5 | DB model supports both via `abschluss` field on Program |
-| Admin panel | Sprint 5 | Yusef-only; used to manage POs and module data |
-| CSRF Protection | Sprint 3B | Custom header `x-studynexus-client` + Origin check (ADR-012) |
-| i18n Full Integration | Sprint 3.7 | next-intl with DE/EN, originally planned for Sprint 6, pulled forward (ADR-013) |
-| Token Lifetime | Sprint 3.7 | 7 days in dev, was 30 min causing constant re-logins (ADR-014) |
-| @dnd-kit für alle DnD | Sprint 3.7 | Ersetzt HTML5 DnD + mobile-drag-drop Polyfill (ADR-015) |
-| plan_semester getrennt von semester | Sprint 3.7 | StudyPlanBoard schreibt nur plan_semester, Notenflow nur semester (ADR-016) |
-| BIN-209 als PFLICHT Container | Sprint 3.7.7 | Ergänzende Fächer als custom ERGAENZEND à 2 ECTS — Option A aus po-architecture-analysis.md |
-| custom_ist_benotet auf StudentModule | Sprint 3.7.7 | Custom-Module ohne Katalogeintrag brauchen eigenes ist_benotet (ADR-017) |
-| WAHLPFLICHT-Limit hardcoded = 2 | Sprint 3.7.7 | BIN PO erlaubt genau 2 WP-Module (12 ECTS) — Backend 409 + Frontend Warning |
+**WAHLPFLICHT-Limit:** Aktuell hardcoded = 2 im Backend (korrekt für BIN). Muss program-aware werden in Sprint 7 (program_rules Tabelle oder PO-Feld auf ExamRegulation).
 
 ---
 
-## Key Domain Language
+## Known Limitations (Stand: Sprint 4 abgeschlossen)
 
-| Term | Meaning |
+| Limitation | Geplant |
 |---|---|
-| Modul | University course with ECTS credits |
-| PO | Pruefungsordnung - exam regulations |
-| ECTS | European Credit Transfer System |
-| GPA | Grade Point Average, calculated dynamically |
-| Skill-Tree | Visual interactive module dependency graph (planned) |
-| Study Space | Digital collaborative study group (planned) |
-| Mission Hub | Central deadline and event management |
-| Sprint | 2-week Scrum development cycle |
-| Matrikelnummer | Student ID number (HsH-issued) |
-| Semester-Tag | Unique identifier for a semester period (e.g. WiSe2425) |
-| Ghosting | Temporarily hiding schedule events without deleting them |
+| §11 ATPO: 13-Monate-Wiederholungsfrist (Fristenverfolgung) | Sprint 5+ |
+| §11 ATPO: Notenverbesserungs-Tracking | Backlog |
+| §11 ATPO: 3 mündliche Ergänzungsprüfungen (Zähler) | Sprint 5+ |
+| WAHLPFLICHT-Limit hardcoded = 2 (muss program-aware werden) | Sprint 7 |
+| BIN-spezifischer Code in AddModuleModal (BIN_209_SUGGESTIONS) | Sprint 7 |
+| POUebersicht rendert BIN-Block hardcoded | Sprint 7 |
+| PDF-Parser für PO-Import | Sprint 7 |
+| MDI/Master-Programme | Sprint 7 |
+| Admin-2FA (TOTP) | Sprint 6 |
+| next build: 404/500 prerender warnings (Next.js + next-intl standalone) | Sprint 6 |
 
 ---
 
-### Open Points — Sprint 4 (Stand 2026-05-08)
+## Next Steps: Sprint 5 — Admin Panel
 
-Vollständige Task-Listen mit Details: `docs/sprints/sprint-plan.md` → Sprint 4 Phasen 1–6.
+**Masterplan:** `docs/sprints/sprint-5-plan.md`
 
-**Phase 1 — Migration 0012** ✅ abgeschlossen:
-- [x] `pruefungsart VARCHAR(20) NULLABLE` + `sws SMALLINT NULLABLE` auf `modules`
-- [x] BIN-Seed: PX (Standard), EA (BIN-114/206/208), R (BIN-204), BAA+Ko (BIN-210)
-- [x] Backend `ModuleResponse` + `module.py` erweitert; i18n-Keys in de.json + en.json
-- [x] ModuleModal: farbige Prüfungsart-Badge (PX=blau, EA=amber, R=lila, BAA+Ko=emerald) + SWS-Chip
-- [x] ModuleList: Prüfungsart-Chip in jeder Modulzeile
+### Migrationen
+- Migration 0015: `is_admin`, `is_premium`, `last_login_at`, `admin_notes` auf users  
+- Migration 0016: `admin_audit_logs` Tabelle  
+- Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
 
-**Phase 2 — Vorprüfungs-Milestone Dashboard** ✅ abgeschlossen:
-- [x] `GET /me/stats` — 8 neue Felder: `sem1/2_complete`, `vorpruefung_bestanden`, `sem4/5/6_zugaenglich`, `ba_zulassung_eligible`, `ects_fuer_ba`
-- [x] Berechnung program-aware via `semester_empfehlung` (nicht BIN-hardcoded)
-- [x] `MilestoneWidget` — Sidebar des Dashboards: Vorprüfungs-Badge + Sem-Locks + BA-Fortschrittsbalken
-- [x] `StatsResponse` schema + `types/study.ts` erweitert; i18n-Keys in de+en
+### Backend (12 Phasen)
+- Admin-Auth: `get_admin_user` Dependency + Admin-Session via Redis (15 Min)
+- 30+ Admin-Endpunkte unter `/api/v1/admin/`
+- Vollständiges CRUD: Universities, Faculties, Programs, ExamRegulations, Modules, Prerequisites
+- Soft Delete mit Begründungspflicht + Restore
+- JSON-Bulk-Import für Module (bis 500, mit Validierung)
+- AuditLogger Dependency → automatisches Logging jeder Mutation
+- Analytics: KPIs, Wachstums-Zeitreihen, Modul-Stats
+- `last_login_at` beim Login gesetzt
 
-**Phase 3 — BIN-209 Sub-Modul-Katalog:**
-- [ ] AddModuleModal: Dropdown mit 7 offiziellen Namen (BIN-209-01 Erg. Fach A–D + BIN-209-05..07 BWL-Fach A–C)
-- [ ] Validierung: mind. 1 BWL-Fach (BIN-209-05..07) bei BIN-209-Belegung
+### Frontend
+- `/admin` Route mit eigenem Layout (keine Dashboard-Komponenten)
+- Middleware: `/admin/*` → 403 für is_admin=false
+- AdminDataTable (server-side paginiert, sortierbar, filterbar, CSV-Export)
+- Dashboard: KPI-Cards + Recharts LineChart
+- User-Management: Tabelle + Detail + Quick-Actions
+- PO-Tree: University → Faculty → Program → ExamReg → Modulkatalog
+- Modul-Formular: alle Felder + Voraussetzungs-Editor + Audit-Sidebar
+- JSON-Import-Seite mit Drag & Drop + Validierungsvorschau
+- Audit-Log Timeline-View
 
-**Phase 4 — Tech Debt:**
-- [ ] FAB `MobileQuickAdd.tsx`: semester_tag dynamisch aus `GET /me/program` (statt hardcoded "WiSe2425")
-- [ ] `frontend/src/app/api/me/profile/route.ts` anlegen (GET + PUT, analog zu anderen Proxy-Routes)
-
-**Phase 5 — module_prerequisites (ADR-010) + BIN-209 GPA-Fix:**
-- [ ] Migration 0013: `module_prerequisites` Tabelle + BIN-Seed (alle §6-Regeln)
-- [ ] BIN-209 GPA-Fix: sub-Module (ERGAENZEND) sollen avg → BIN-209-Note → × 1.5 in GPA fließen
-
-**Phase 6 — Notenvalidierung:**
-- [ ] Backend Pydantic-Validator: nur 1.0/1.3/1.7/2.0/2.3/2.7/3.0/3.3/3.7/4.0/5.0 (ATPO-FIV §10)
-- [ ] Frontend: Dropdown mit 11 Optionen statt Freitextfeld
-
-
-## Important Rules for AI Code Generation
-
-1. Always read this file first before writing any code
-2. Shell is fish - never use heredoc EOF syntax
-3. Use next.config.js not next.config.ts
-4. Password hashing: use bcrypt directly, never passlib
-5. Auth: httpOnly cookie via Next.js API proxy, never localStorage
-6. Follow existing folder structure strictly
-7. Every new component needs a corresponding test file
-8. All API endpoints must be documented in docs/api/
-9. Commit messages: type(scope): description
-10. Never commit .env files
-11. Update ANTIGRAVITY.md at the end of every session
-12. AI Code prompts always in English
-13. .dockerignore handles cache exclusions (`.pytest_cache`, `__pycache__`, etc.) during Docker builds.
-14. Migrations: always use `postgresql.ENUM` (sqlalchemy.dialects.postgresql), never `sa.Enum`
-15. `Program.abschluss` supports "Bachelor" and "Master". Never hardcode semester prerequisites.
-16. TanStack Query Architecture: Install `@tanstack/react-query`, create hooks in `frontend/src/hooks/queries/`. Components only call hooks; no data fetching logic inside components.
-17. TanStack Query Mandate: ALL data fetching and mutations MUST use TanStack Query custom hooks. Manual `useEffect` fetching is strictly forbidden.
-18. i18n Mandate: ALL user-facing strings MUST use `useTranslations()` from next-intl. No hardcoded strings in components. Keys organized under `dashboard.*` namespace in `messages/de.json` and `messages/en.json`.
-19. Date formatting: Always use locale-aware formatting (`useLocale()` from next-intl + `date-fns` locale or `toLocaleDateString`).
+### Seed nach Migration 0015
+```sql
+UPDATE users SET is_admin = TRUE WHERE email = 'yusefbach01@gmail.com';
+```
