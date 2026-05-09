@@ -671,12 +671,12 @@ Import-Flow:
 - [x] Seed: Admin-Flag manuell setzen (kein Email-Seed im Code — Anleitung in ANTIGRAVITY.md)
 - [x] Backend-Tests: 15/15 grün — Zugriffskontrolle, Session-Flow, mock_admin_user + admin_client Fixtures
 
-### Phase 2 – User-Management Backend (1–2 Tage) ← nächste Session
-- [ ] `app/schemas/admin/user.py` – AdminUserListResponse, AdminUserDetailResponse, AdminUserPatch
-- [ ] `app/routers/admin/users.py` – alle User-Endpunkte (GET List, GET Detail, PATCH, DELETE)
+### Phase 2 – User-Management Backend ✅ (2026-05-09)
+- [x] `app/schemas/admin/user.py` – AdminUserListItem, AdminUserListResponse, AdminUserDetailResponse, AdminUserPatch, DeleteUserRequest
+- [x] `app/routers/admin/users.py` – GET List (paginated + search + filter), GET Detail, PATCH, POST reset-password, DELETE (cascade)
 - [x] `last_login_at` wird bei jedem Login gesetzt (bereits in Phase 1 erledigt)
-- [ ] Audit-Logging für alle User-Mutationen
-- [ ] Tests: Paginated User-Liste, PATCH User, Schutzprüfung
+- [x] Audit-Logging für PATCH (UPDATE), reset-password (RESET_PASSWORD), DELETE (DELETE) via AuditLogger
+- [x] Tests: 10 neue Tests — Paginated Liste, Detail, 404, PATCH+Audit, DELETE-Guards, 25/25 grün
 
 ### Phase 3 – PO-Verwaltung Backend (2–3 Tage)
 - [ ] `app/routers/admin/universities.py` – CRUD mit Schutzprüfung

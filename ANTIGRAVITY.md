@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
-**Status:** 🔧 Sprint 5 In Progress — Phase 1 (Backend Fundament) complete
+**Status:** 🔧 Sprint 5 In Progress — Phase 2 (User-Management Backend) complete
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-05-09
 
@@ -350,11 +350,11 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 ### Phase 1 ✅ Backend Fundament (komplett)
 Migrations 0015–0017, admin_auth, audit, Admin-Session, JWT is_admin claim.
 
-### Phase 2 — User-Management Backend (nächste Session)
-- `app/schemas/admin/user.py` — AdminUserListResponse, AdminUserDetailResponse, AdminUserPatch
-- `app/routers/admin/users.py` — GET (paginated + filter), GET detail, PATCH, DELETE
-- Audit-Logging für alle User-Mutationen
-- Tests: Paginated User-Liste, PATCH User, 403-Schutz
+### Phase 2 ✅ User-Management Backend (2026-05-09)
+- `app/schemas/admin/user.py` — AdminUserListItem, AdminUserListResponse, AdminUserDetailResponse, AdminUserPatch, DeleteUserRequest
+- `app/routers/admin/users.py` — GET (paginated + search/filter), GET detail (GPA+ECTS+modules), PATCH (audit), POST reset-password (Admin-Token), DELETE cascade (Admin-Token + Begründung)
+- Audit-Logging: UPDATE, RESET_PASSWORD, DELETE — alle via AuditLogger
+- Tests: 25/25 grün — Pagination, 404, PATCH+Audit, Delete-Guards (401/403/404)
 
 ### Phase 3 — PO-Verwaltung Backend
 - 30+ Admin-Endpunkte: Universities, Faculties, Programs, ExamRegulations, Modules + JSON-Import
