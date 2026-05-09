@@ -39,14 +39,14 @@ def list_faculties(university_id: UUID, db: Session = Depends(get_db)):
 def list_programs(faculty_id: UUID, db: Session = Depends(get_db)):
     if not db.get(Faculty, faculty_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Faculty not found")
-    return db.query(Program).filter(Program.faculty_id == faculty_id).all()
+    return db.query(Program).filter(Program.faculty_id == faculty_id, Program.is_archived == False).all()
 
 
 @router.get("/programs/{program_id}/exam-regulations", response_model=List[ExamRegulationResponse])
 def list_exam_regulations(program_id: UUID, db: Session = Depends(get_db)):
     if not db.get(Program, program_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Program not found")
-    return db.query(ExamRegulation).filter(ExamRegulation.program_id == program_id).all()
+    return db.query(ExamRegulation).filter(ExamRegulation.program_id == program_id, ExamRegulation.is_archived == False).all()
 
 
 @router.get("/exam-regulations/{exam_reg_id}/modules", response_model=List[ModulesBySemester])
@@ -54,7 +54,7 @@ def list_modules_by_semester(exam_reg_id: UUID, db: Session = Depends(get_db)):
     if not db.get(ExamRegulation, exam_reg_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Exam regulation not found")
 
-    modules = db.query(Module).filter(Module.exam_regulation_id == exam_reg_id).all()
+    modules = db.query(Module).filter(Module.exam_regulation_id == exam_reg_id, Module.is_archived == False).all()
 
     grouped: dict = defaultdict(list)
     for m in modules:

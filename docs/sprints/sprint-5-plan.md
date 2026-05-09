@@ -678,20 +678,23 @@ Import-Flow:
 - [x] Audit-Logging für PATCH (UPDATE), reset-password (RESET_PASSWORD), DELETE (DELETE) via AuditLogger
 - [x] Tests: 10 neue Tests — Paginated Liste, Detail, 404, PATCH+Audit, DELETE-Guards, 25/25 grün
 
-### Phase 3 – PO-Verwaltung Backend (2–3 Tage)
-- [ ] `app/routers/admin/universities.py` – CRUD mit Schutzprüfung
-- [ ] `app/routers/admin/faculties.py` – CRUD
-- [ ] `app/routers/admin/programs.py` – CRUD + Archive/Restore
-- [ ] `app/routers/admin/exam_regulations.py` – CRUD + Archive/Restore
-- [ ] `app/routers/admin/modules.py`:
-  - CRUD mit allen Feldern
-  - `POST /archive` – Soft Delete (Admin-Token + Begründung PFLICHT)
-  - `POST /restore` – Wiederherstellen
-  - `POST /import/json` – Bulk-Import mit Validierung und Fehlerreporting
+### Phase 3 – PO-Verwaltung Backend ✅ (2026-05-09)
+- [x] `app/schemas/admin/po.py` – alle PO-Schemas (University/Faculty/Program/ExamReg/Module/Prerequisite)
+- [x] `app/routers/admin/universities.py` – CRUD + DELETE-Schutz (409 wenn Fakultäten vorhanden)
+- [x] `app/routers/admin/faculties.py` – CRUD + DELETE-Schutz (409 wenn Programme vorhanden)
+- [x] `app/routers/admin/programs.py` – CRUD + Archive/Restore [Admin-Token + Begründung]
+- [x] `app/routers/admin/exam_regulations.py` – CRUD + Archive/Restore [Admin-Token + Begründung]
+- [x] `app/routers/admin/modules.py`:
+  - CRUD mit allen Feldern (name, kuerzel, ects, semester_empfehlung, modul_typ, ist_benotet, …)
+  - `POST /archive` – Soft Delete [Admin-Token + Begründung PFLICHT]
+  - `POST /restore` – Wiederherstellen [Admin-Token]
+  - `POST /import/json` – Bulk-Import bis 500 Module, Duplikat-Erkennung per kuerzel
   - `POST /import/pdf` – 501 Placeholder
-- [ ] `app/routers/admin/prerequisites.py` – CRUD
-- [ ] Öffentliche Module-Endpunkte: filtern jetzt auf `is_archived = false`
-- [ ] Tests: Archive/Restore Flow, JSON-Import, Duplikat-Erkennung
+  - Import-Routes vor `/{id}` definiert (verhindert UUID-Parse-Konflikt)
+- [x] `app/routers/admin/prerequisites.py` – CRUD (Hard Delete erlaubt per ADR-020)
+- [x] `app/routers/admin/__init__.py` – alle Phase-3-Router registriert
+- [x] Öffentliche Endpunkte (`/faculties/{id}/programs`, `/programs/{id}/exam-regulations`, `/exam-regulations/{id}/modules`) filtern jetzt auf `is_archived = false`
+- [x] Tests: 22 neue Tests — Archive/Restore Flow, JSON-Import, Duplikat-Erkennung, 501, 409, 99/99 grün
 
 ### Phase 4 – Analytics Backend (1 Tag)
 - [ ] `app/routers/admin/analytics.py`:
