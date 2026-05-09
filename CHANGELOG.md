@@ -15,6 +15,16 @@ All notable changes to this project will be documented in this file.
 - **i18n**: `dashboard.modules.pruefungsart.{PX,EA,R,BAA+Ko,label,sws}` in de.json + en.json
 - **ADR-018**: Als abgeschlossen dokumentiert
 
+### Sprint 4 Phase 7 — PO-Übersicht-Seite (2026-05-09)
+#### Added
+- **Route `/dashboard/po-uebersicht`**: Neue Seite mit allen wichtigen PO-Regeln auf einen Blick
+- **Sidebar + MobileNav**: neues Nav-Item "Studienordnung" (ScrollText-Icon) nach "Degree Plan"
+- **`POUebersicht.tsx`**: 6 Sektionen — Zulassungsregeln §6 (mit Live-Status-Badges), Notenscala §10, Prüfungsarten, Wiederholungsregeln §11, Sondermodule (BIN-209 + WP-Limit), BA-Zulassung mit ECTS-Fortschrittsbalken
+- **Program-Detection**: rendert BIN-Content wenn `vorpruefung_bestanden !== null` (program-aware, kein Hardcode); zeigt Placeholder für andere Studiengänge
+- **`MobileQuickAdd`**: `/po-uebersicht` zu `hiddenPaths` hinzugefügt (FAB wird dort ausgeblendet)
+- **i18n**: `dashboard.nav.poUebersicht` + kompletter `dashboard.poUebersicht`-Block (6 Sektionen × alle Keys) in de.json + en.json
+- **Backend Tests**: alle 9 pre-existing Test-Failures behoben — `_make_module()` + `_make_sm()` in allen Test-Dateien um Sprint-4-Felder erweitert (`pruefungsart`, `sws`, `plan_semester`, `custom_ist_benotet`, `parent_module_id`); Mock-Setup für neue DB-Queries in `test_get_my_modules_grouped`, `test_add_wahlpflicht_module_success`, `test_add_custom_ergaenzend_success` aktualisiert
+
 ### Sprint 4 Phase 6 — Notenvalidierung & BIN-209 Gewichtungs-Fix (2026-05-09)
 #### Added
 - **Migration 0014**: `modules.gewichtung` für BIN-209 korrigiert: 1.0 → 1.5 (PO BIN 2019 Anlage B2, war Datenfehler aus Migration 0011)
@@ -70,9 +80,9 @@ All notable changes to this project will be documented in this file.
 - **`docs/api/stats.md`**: alle neuen Felder dokumentiert
 
 ### Planned
-- **Sprint 4 Phase 7**: PO-Übersicht-Seite (`/dashboard/po-uebersicht`) — alle wichtigen PO-Regeln übersichtlich dargestellt (§6 Zulassungsregeln, Notenscala, Prüfungsarten, Wiederholungsregeln, BIN-209 Sonderregel, BA-Zulassung)
 - **Sprint 5**: Admin Panel (PO-Verwaltung ohne Alembic-Migrationen)
 - **Sprint 6**: PWA, Branding & Launch
+- **Sprint 7**: Multi-Programm (MDI, Master-Programme)
 
 ## [v0.3.7.7] - 2026-05-07 (Sprint 3.7.7 - BIN PO Datenkorrektur)
 ### Fixed

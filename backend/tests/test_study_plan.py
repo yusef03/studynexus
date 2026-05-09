@@ -56,6 +56,8 @@ def _make_module(typ=ModulTyp.PFLICHT, ects=6, sem=1, benotet=True):
     m.max_versuche = 3
     m.gewichtung = 1.0
     m.has_prerequisites = False
+    m.pruefungsart = None  # Sprint 4 Phase 1
+    m.sws = None           # Sprint 4 Phase 1
     return m
 
 
@@ -72,6 +74,9 @@ def _make_student_module(module_id=None, status=StudiengangStatus.PLANNED):
     sm.anmelde_datum = None
     sm.pruefungs_datum = None
     sm.semester = None
+    sm.plan_semester = None        # Sprint 4 Phase 3
+    sm.custom_ist_benotet = None   # Sprint 3.7.7
+    sm.parent_module_id = None     # Sprint 4 Phase 5
     return sm
 
 
@@ -159,8 +164,18 @@ def test_get_my_modules_grouped(authed_client, mock_db):
 
     def query_side_effect(model):
         q = MagicMock()
-        q.filter.return_value.all.return_value = [sm]
-        q.filter.return_value.filter.return_value.all.return_value = [m]
+        name = getattr(model, "__name__", "")
+        if name == "StudentModule":
+            q.filter.return_value.all.return_value = [sm]
+        elif name == "Module":
+            # _load_modules_by_id + _get_semester_flags sem-filter both use Module
+            q.filter.return_value.all.return_value = [m]
+        elif name == "UserProgram":
+            # _get_semester_flags: no program → returns empty sem_flags
+            q.filter.return_value.first.return_value = None
+        else:
+            # ModulePrerequisite → no prereqs
+            q.filter.return_value.all.return_value = []
         return q
 
     mock_db.query.side_effect = query_side_effect
@@ -182,8 +197,10 @@ def test_add_wahlpflicht_module_success(authed_client, mock_db):
         if model is UP:
             q.filter.return_value.first.return_value = _make_user_program()
         elif model is SM:
-            # duplicate check returns None → not already added
+            # duplicate check: .filter().first() → None (not already added)
             q.filter.return_value.first.return_value = None
+            # wahlpflicht count: .join().filter().count() → 0 (below limit)
+            q.join.return_value.filter.return_value.count.return_value = 0
         return q
 
     mock_db.query.side_effect = query_side_effect
@@ -223,11 +240,21 @@ def test_add_pflicht_module_rejected(authed_client, mock_db):
 
 
 def test_add_custom_ergaenzend_success(authed_client, mock_db):
-    mock_db.query.return_value.filter.return_value.first.return_value = _make_user_program()
+    up = _make_user_program()
     sm = _make_student_module()
     sm.module_id = None
     sm.custom_name = "Extra Kurs"
     sm.custom_ects = 3
+
+    def query_side_effect(model):
+        q = MagicMock()
+        # UserProgram → return user program (for program check + BIN-209 parent lookup)
+        q.filter.return_value.first.return_value = up
+        # Module (BIN-209 lookup) → None: no parent found, parent_module_id stays None
+        q.filter.return_value.filter.return_value.first.return_value = None
+        return q
+
+    mock_db.query.side_effect = query_side_effect
 
     with patch("app.routers.study_plan.StudentModule", return_value=sm):
         response = authed_client.post("/api/v1/me/modules", json={

@@ -19,7 +19,7 @@
 | Sprint 3.6 | UX Polish & Visual Features | ✅ Fertig | 1 Woche | [sprint-3.6-review.md](sprint-3.6-review.md) |
 | Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3.7-review.md](sprint-3.7-review.md) |
 | Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3.7.7-review.md](sprint-3.7.7-review.md) |
-| **Sprint 4** | **BIN Studiengang Vollintegration** | **Als Nächstes** | **3 Wochen** | — |
+| **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | — |
 | Sprint 5 | Admin Panel | Geplant | 2 Wochen | — |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
@@ -242,14 +242,14 @@ Detailliertes Review: [sprint-3.7.7-review.md](sprint-3.7.7-review.md)
 
 ---
 
-## Aktive & Geplante Sprints
+## Abgeschlossene Sprints (Fortsetzung)
 
 ---
 
-### Sprint 4 – BIN Studiengang Vollintegration
+### Sprint 4 – BIN Studiengang Vollintegration ✅
 
-**Status:** Als Nächstes
-**Zeitraum:** ca. 3 Wochen ab jetzt
+**Status:** Abgeschlossen
+**Zeitraum:** 08.–09. Mai 2026
 **Ziel:** Den BIN-Studiengang "Angewandte Informatik" vollständig, intelligent und lückenlos in StudyNexus integrieren — alle PO-Regeln automatisch abgebildet, kein manuelles Nachschauen in PDFs mehr.
 
 **Hintergrund & Motivation:**
@@ -455,24 +455,27 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 **Backend:** keine Änderungen (nutzt bestehenden `GET /api/study/program`-Endpunkt)
 
-**Frontend — neue Seite `src/app/[locale]/dashboard/po-uebersicht/page.tsx`:**
-- Lädt UserProgramResponse via `useQuery(["userProgram"])`
-- Erkennt BIN via `program.name.includes("BIN")` oder Kürzel-Check
-- Rendert 6 Sektionen als Cards/Accordions:
+**Frontend:**
+- [x] `src/app/[locale]/dashboard/(main)/po-uebersicht/page.tsx` — neue Route
+- [x] `src/components/dashboard/POUebersicht.tsx` — Client-Komponente mit 6 Sektionen als Cards:
+  - Zulassungsregeln §6 (Tabelle mit Live-Status-Badges aus `useUserStats`)
+  - Notenscala §10 ATPO-FIV (farbkodiert nach Bedeutung)
+  - Prüfungsarten (PX/EA/R/BAA+Ko mit Farb-Badges)
+  - Wiederholungsregeln §11 (Aufzählung)
+  - Sondermodule (BIN-209 + WP-Limit)
+  - BA-Zulassung mit Live-ECTS-Fortschrittsbalken
+- [x] Program-Detection via `vorpruefung_bestanden !== null` — kein BIN-Hardcode
+- [x] Sidebar (`AppSidebar.tsx`) + MobileNav: "Studienordnung" Nav-Item (ScrollText-Icon)
+- [x] `MobileQuickAdd.tsx`: `/po-uebersicht` zu `hiddenPaths` hinzugefügt
+- [x] i18n: `dashboard.nav.poUebersicht` + vollständiger `dashboard.poUebersicht`-Block in de.json + en.json
 
-  | Sektion | Inhalt |
-  |---|---|
-  | Zulassungsregeln | §6-Tabelle: Sem 4 → Sem 1 bestanden; Sem 5 → Sem 1+2; Sem 6/BIN-206/208 → Vorprüfung; BIN-210 → VP + 134 ECTS; BIN-209 → keine Voraussetzung |
-  | Notenscala | 11 offizielle Noten mit Bedeutung (sehr gut / gut / befriedigend / ausreichend / nicht ausreichend) + Bestehensgrenze ≤ 4,0 |
-  | Prüfungsarten | PX (Klausur/mdl. Prüfung), EA (Experimentelle Arbeit), R (Referat/Präsentation), BAA+Ko (Bachelorarbeit + Kolloquium) |
-  | Wiederholungsregeln | §11: max. 2 Wiederholungen, Frist 13 Monate; max. 3 mündl. Ergänzungsprüfungen im Studium; Notenverbesserung 1× möglich (bis 7. Fachsem) |
-  | Sondermodule | BIN-209: 6 ECTS (3 × 2 ECTS Sub-Module), gewichtung 1.5, mind. 1 BWL-Fach; WP-Limit: max. 2 Wahlpflichtmodule (12 ECTS) |
-  | Bachelor-Zulassung | Vorprüfung bestanden + mind. 134 ECTS → BA-Zulassung möglich |
-
-- `MilestoneWidget` integriert (oder verlinkt) für Live-Status der Vorprüfung
-- Kein neuer Backend-Endpunkt nötig
-
-**i18n:** `dashboard.poUebersicht.{title, subtitle, binOnly, sections.{zulassung, noten, pruefungsarten, wiederholung, sondermodule, ba}}` in de.json + en.json
+**Backend Tests:**
+- [x] `_make_module()` in test_grades.py / test_study_plan.py / test_universities.py: `pruefungsart = None`, `sws = None` ergänzt
+- [x] `_make_sm()` / `_make_student_module()`: `plan_semester`, `custom_ist_benotet`, `parent_module_id` ergänzt
+- [x] `test_get_my_modules_grouped`: Mock-Side-Effect nach Modell-Typ differenziert
+- [x] `test_add_wahlpflicht_module_success`: `.join().filter().count()` → 0 gemockt
+- [x] `test_add_custom_ergaenzend_success`: Query-Side-Effect für BIN-209-Parent-Lookup ergänzt
+- [x] **Ergebnis: 58/58 Tests grün** (war 49/58 vor Fixes)
 
 ---
 

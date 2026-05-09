@@ -21,6 +21,8 @@ def _make_module(benotet=True, max_versuche=3, typ=ModulTyp.PFLICHT):
     m.max_versuche = max_versuche
     m.gewichtung = 1.0
     m.has_prerequisites = False
+    m.pruefungsart = None  # Sprint 4 Phase 1
+    m.sws = None           # Sprint 4 Phase 1
     return m
 
 
@@ -37,6 +39,9 @@ def _make_sm(status=StudiengangStatus.PLANNED, versuch=1, module_id=None, note=N
     sm.anmelde_datum = None
     sm.pruefungs_datum = None
     sm.semester = None
+    sm.plan_semester = None        # Sprint 4 Phase 3
+    sm.custom_ist_benotet = None   # Sprint 3.7.7
+    sm.parent_module_id = None     # Sprint 4 Phase 5
     return sm
 
 

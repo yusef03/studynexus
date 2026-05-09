@@ -70,6 +70,8 @@ def _make_module(name="Programmieren 1", ects=6, sem=1, typ="PFLICHT", benotet=T
     m.max_versuche = 3
     m.gewichtung = 1.0
     m.has_prerequisites = False
+    m.pruefungsart = None  # Sprint 4 Phase 1
+    m.sws = None           # Sprint 4 Phase 1
     return m
 
 

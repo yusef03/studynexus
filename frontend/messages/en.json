@@ -48,6 +48,7 @@
       "kanban": "Kanban",
       "schedule": "Schedule",
       "studyPlan": "Degree Plan",
+      "poUebersicht": "Study Regulations",
       "profile": "ID Card",
       "settings": "Settings"
     },
@@ -261,6 +262,91 @@
       "baEcts": "{current} / {required} ECTS",
       "baEligible": "✓ Bachelor thesis admission possible",
       "baLocked": "Vorprüfung + {required} ECTS required"
+    },
+    "poUebersicht": {
+      "title": "Study Regulations",
+      "subtitle": "Key study regulations for your programme at a glance",
+      "programBadge": "Programme: {name}",
+      "binOnly": "No study regulations are available for your programme yet. This will be added in Sprint 7 (multi-programme support).",
+      "loading": "Loading…",
+      "liveStatus": "Live Status",
+      "unlocked": "Always",
+      "locked": "Locked",
+      "met": "Met",
+      "open": "Not yet met",
+      "sections": {
+        "zulassung": {
+          "title": "Admission Rules §6 PO BIN",
+          "subtitle": "Access requirements for modules and semesters",
+          "colExam": "Module / Exam",
+          "colReq": "Prerequisite",
+          "sem4": "Semester 4 exams",
+          "sem4Req": "All Semester 1 exams passed",
+          "sem5": "Semester 5 exams",
+          "sem5Req": "All Semester 1+2 exams passed",
+          "bin206": "BIN-206 (Internship Project 1)",
+          "bin206Req": "Preliminary exam passed (Sem 1–3)",
+          "sem6": "Semester 6 exams",
+          "sem6Req": "Preliminary exam passed (Sem 1–3)",
+          "bin209": "BIN-209 (Supplementary Subjects)",
+          "bin209Req": "No prerequisites",
+          "bin210": "BIN-210 (Bachelor Thesis)",
+          "bin210Req": "Prelim. exam + min. 134 ECTS"
+        },
+        "noten": {
+          "title": "Grading Scale §10 ATPO-FIV",
+          "subtitle": "11 official grade levels at Hochschule Hannover",
+          "colNote": "Grade",
+          "colMeaning": "Meaning",
+          "bestehensgrenze": "Passing threshold: grade ≤ 4.0 counts as passed — grade 5.0 = fail",
+          "sehrGut": "Excellent",
+          "gut": "Good",
+          "befriedigend": "Satisfactory",
+          "ausreichend": "Sufficient",
+          "nichtAusreichend": "Fail"
+        },
+        "pruefungsarten": {
+          "title": "Exam Types",
+          "subtitle": "Examination formats in the BIN programme (ATPO-FIV §7 + PO BIN)",
+          "colKuerzel": "Code",
+          "colName": "Description",
+          "colModules": "Modules",
+          "pxName": "Written / oral exam",
+          "pxModules": "Standard PFLICHT (Sem 1–5), all electives",
+          "eaName": "Experimental work",
+          "eaModules": "BIN-114, BIN-206, BIN-208",
+          "rName": "Presentation / seminar paper",
+          "rModules": "BIN-204 (Seminar)",
+          "baakoName": "Bachelor thesis + colloquium",
+          "baakoModules": "BIN-210"
+        },
+        "wiederholung": {
+          "title": "Retake Rules §11 ATPO-FIV",
+          "subtitle": "Rules for re-sitting exams",
+          "rule1": "Max. 2 retakes per exam (3 attempts total)",
+          "rule2": "Retake deadline: 13 months after result notification",
+          "rule3": "Max. 3 oral supplementary exams during the whole degree",
+          "rule4": "Grade improvement: passed exams may be retaken once (before 7th semester)"
+        },
+        "sondermodule": {
+          "title": "Special Modules & Limits",
+          "bin209Title": "BIN-209 Supplementary Subjects",
+          "bin209Rule1": "6 ECTS total (3 sub-modules × 2 ECTS each)",
+          "bin209Rule2": "GPA weighting: 1.5 (higher than standard PFLICHT modules at 1.0)",
+          "bin209Rule3": "At least 1 of the 3 subjects must be a Business subject (Annex B2 PO BIN)",
+          "bin209Rule4": "No prerequisites — can be registered at any time",
+          "wpTitle": "Elective Modules (WP)",
+          "wpRule1": "Max. 2 elective modules (6 ECTS each = 12 ECTS total)",
+          "wpRule2": "Accessible after passing Sem 1+2 (§6 PO BIN)"
+        },
+        "ba": {
+          "title": "Bachelor Thesis BIN-210",
+          "subtitle": "Admission requirements for the bachelor thesis",
+          "req1": "Preliminary exam passed (all exams from Semesters 1–3)",
+          "req2": "At least 134 ECTS passed",
+          "meta": "15 ECTS · Weighting 3.0 · Exam type: BAA + Colloquium"
+        }
+      }
     },
     "addModule": {
       "title": "Add module",

@@ -48,6 +48,7 @@
       "kanban": "Kanban",
       "schedule": "Stundenplan",
       "studyPlan": "Studienverlauf",
+      "poUebersicht": "Studienordnung",
       "profile": "ID Card",
       "settings": "Einstellungen"
     },
@@ -261,6 +262,91 @@
       "baEcts": "{current} / {required} ECTS",
       "baEligible": "✓ Zulassung zur BA möglich",
       "baLocked": "Vorprüfung + {required} ECTS erforderlich"
+    },
+    "poUebersicht": {
+      "title": "Studienordnung",
+      "subtitle": "Wichtigste PO-Regeln für deinen Studiengang auf einen Blick",
+      "programBadge": "Studiengang: {name}",
+      "binOnly": "Für deinen Studiengang liegen noch keine PO-Regeln vor. In Sprint 7 (Multi-Programm) wird dies für alle Studiengänge ergänzt.",
+      "loading": "Wird geladen…",
+      "liveStatus": "Live-Status",
+      "unlocked": "Jederzeit",
+      "locked": "Gesperrt",
+      "met": "Erfüllt",
+      "open": "Noch offen",
+      "sections": {
+        "zulassung": {
+          "title": "Zulassungsregeln §6 PO BIN",
+          "subtitle": "Zugangsvoraussetzungen für Module und Semester",
+          "colExam": "Modul / Prüfung",
+          "colReq": "Voraussetzung",
+          "sem4": "Prüfungen Semester 4",
+          "sem4Req": "Alle Prüfungen Sem 1 bestanden",
+          "sem5": "Prüfungen Semester 5",
+          "sem5Req": "Alle Prüfungen Sem 1+2 bestanden",
+          "bin206": "BIN-206 (Praxisprojekt 1)",
+          "bin206Req": "Vorprüfung (Sem 1–3) bestanden",
+          "sem6": "Prüfungen Semester 6",
+          "sem6Req": "Vorprüfung (Sem 1–3) bestanden",
+          "bin209": "BIN-209 (Ergänzende Fächer)",
+          "bin209Req": "Keine Voraussetzung",
+          "bin210": "BIN-210 (Bachelorarbeit)",
+          "bin210Req": "Vorprüfung + mind. 134 ECTS"
+        },
+        "noten": {
+          "title": "Notenscala §10 ATPO-FIV",
+          "subtitle": "11 offizielle Notenstufen der Hochschule Hannover",
+          "colNote": "Note",
+          "colMeaning": "Bedeutung",
+          "bestehensgrenze": "Bestehensgrenze: Note ≤ 4,0 gilt als bestanden — Note 5,0 = nicht ausreichend",
+          "sehrGut": "Sehr gut",
+          "gut": "Gut",
+          "befriedigend": "Befriedigend",
+          "ausreichend": "Ausreichend",
+          "nichtAusreichend": "Nicht ausreichend"
+        },
+        "pruefungsarten": {
+          "title": "Prüfungsarten",
+          "subtitle": "Prüfungsformen im Studiengang BIN (ATPO-FIV §7 + PO BIN)",
+          "colKuerzel": "Kürzel",
+          "colName": "Bezeichnung",
+          "colModules": "Module",
+          "pxName": "Klausur / mündliche Prüfung",
+          "pxModules": "Standard-PFLICHT (Sem 1–5), alle WP",
+          "eaName": "Experimentelle Arbeit",
+          "eaModules": "BIN-114, BIN-206, BIN-208",
+          "rName": "Referat / Präsentation",
+          "rModules": "BIN-204 (Seminar)",
+          "baakoName": "Bachelorarbeit + Kolloquium",
+          "baakoModules": "BIN-210"
+        },
+        "wiederholung": {
+          "title": "Wiederholungsregeln §11 ATPO-FIV",
+          "subtitle": "Regelungen zu Prüfungswiederholungen",
+          "rule1": "Max. 2 Wiederholungen pro Prüfung (3 Versuche gesamt)",
+          "rule2": "Wiederholungsfrist: 13 Monate ab Bekanntgabe des Ergebnisses",
+          "rule3": "Max. 3 mündliche Ergänzungsprüfungen im gesamten Studium",
+          "rule4": "Notenverbesserung: bestandene Prüfungen können einmalig (bis 7. Fachsemester) wiederholt werden"
+        },
+        "sondermodule": {
+          "title": "Sondermodule & Limits",
+          "bin209Title": "BIN-209 Ergänzende Fächer",
+          "bin209Rule1": "6 ECTS gesamt (3 Sub-Module à 2 ECTS)",
+          "bin209Rule2": "GPA-Gewichtung: 1,5 (höher als PFLICHT-Normalmodule mit 1,0)",
+          "bin209Rule3": "Mind. 1 der 3 Fächer muss ein BWL-Fach sein (Anlage B2 PO BIN)",
+          "bin209Rule4": "Keine Zulassungsvoraussetzungen — jederzeit buchbar",
+          "wpTitle": "Wahlpflichtmodule (WP)",
+          "wpRule1": "Max. 2 Wahlpflichtmodule (je 6 ECTS = 12 ECTS gesamt)",
+          "wpRule2": "Zugänglich nach Bestehen von Sem 1+2 (§6 PO BIN)"
+        },
+        "ba": {
+          "title": "Bachelorarbeit BIN-210",
+          "subtitle": "Zulassungsbedingungen für die Bachelorarbeit",
+          "req1": "Vorprüfung bestanden (alle Prüfungen der Semester 1–3)",
+          "req2": "Mind. 134 ECTS im Studium bestanden",
+          "meta": "15 ECTS · Gewichtung 3,0 · Prüfungsart: BAA + Kolloquium"
+        }
+      }
     },
     "addModule": {
       "title": "Modul hinzufügen",

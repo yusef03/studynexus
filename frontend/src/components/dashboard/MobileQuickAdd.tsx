@@ -36,7 +36,7 @@ export function MobileQuickAdd() {
   const semesterTag = programData?.start_semester ?? "";
 
   // Phase 5: Only show FAB on pages where it makes sense
-  const hiddenPaths = ["/settings", "/profile", "/setup"];
+  const hiddenPaths = ["/settings", "/profile", "/setup", "/po-uebersicht"];
   const shouldHide = hiddenPaths.some(p => pathname.includes(p));
   if (shouldHide) return null;
 

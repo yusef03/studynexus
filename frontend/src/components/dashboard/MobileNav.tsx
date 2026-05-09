@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, X, Settings, UserCircle, Map } from "lucide-react";
+import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, X, Settings, UserCircle, Map, ScrollText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 
@@ -19,6 +19,7 @@ export function MobileNav({ locale }: { locale: string }) {
     { href: `/${locale}/dashboard/kanban`, label: t("kanban"), icon: ListTodo },
     { href: `/${locale}/dashboard/schedule`, label: t("schedule"), icon: Calendar },
     { href: `/${locale}/dashboard/study-plan`, label: t("studyPlan"), icon: Map },
+    { href: `/${locale}/dashboard/po-uebersicht`, label: t("poUebersicht"), icon: ScrollText },
     { href: `/${locale}/dashboard/profile`, label: t("profile"), icon: UserCircle },
     { href: `/${locale}/dashboard/settings`, label: t("settings"), icon: Settings },
   ];
