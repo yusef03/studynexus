@@ -696,14 +696,15 @@ Import-Flow:
 - [x] Öffentliche Endpunkte (`/faculties/{id}/programs`, `/programs/{id}/exam-regulations`, `/exam-regulations/{id}/modules`) filtern jetzt auf `is_archived = false`
 - [x] Tests: 22 neue Tests — Archive/Restore Flow, JSON-Import, Duplikat-Erkennung, 501, 409, 99/99 grün
 
-### Phase 4 – Analytics Backend (1 Tag)
-- [ ] `app/routers/admin/analytics.py`:
-  - `GET /stats` – KPIs (User-Counts, Module-Counts, DB-Größe)
-  - `GET /stats/growth` – Tages-Aggregation der Registrierungen (letzte N Tage)
-  - `GET /stats/modules` – Top-Module, Ø-Noten, Bestehensquoten
-  - `GET /stats/users` – Segmentierung nach Studiengang, Aktivität
-- [ ] `app/routers/admin/system.py` – Health-Check + Systeminfo
-- [ ] Tests: Analytics-Responses
+### Phase 4 – Analytics Backend ✅ (2026-05-09)
+- [x] `app/schemas/admin/analytics.py` – AdminStatsResponse, GrowthResponse, ModuleStatsResponse, UserStatsResponse, SystemInfoResponse, SystemHealthResponse
+- [x] `app/routers/admin/analytics.py`:
+  - `GET /stats` – KPIs (User-Counts, Module-Counts, DB-Größe via pg_database_size)
+  - `GET /stats/growth?period=7d|30d|90d|1y` – Tages-Aggregation der Registrierungen
+  - `GET /stats/modules?limit=N` – Top-Module (nach Studierendenzahl, Ø-Note, Bestehensquote)
+  - `GET /stats/users` – Segmentierung nach Programm, Aktivität, Premium
+- [x] `app/routers/admin/system.py` – `GET /system` (DB-Version, -Größe, Counts) + `GET /system/health` (DB + Redis Ping)
+- [x] Tests: 12 neue Tests — KPI-Shape, Growth-Period-Validation, Module-Stats, User-Segmentation, System-Health, 111/111 grün
 
 ### Phase 5 – Frontend Fundament (1–2 Tage)
 - [ ] `app/[locale]/admin/layout.tsx` – AdminLayout (separate Sidebar, kein Dashboard-Frame)
