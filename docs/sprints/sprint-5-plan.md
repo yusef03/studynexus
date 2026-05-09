@@ -67,7 +67,7 @@ ALTER TABLE users ADD COLUMN last_login_at TIMESTAMP WITH TIME ZONE;
 ALTER TABLE users ADD COLUMN admin_notes TEXT;  -- interne Notizen (nur Admin sichtbar)
 ```
 
-> **Seed:** `UPDATE users SET is_admin = TRUE WHERE email = 'yusefbach01@gmail.com';`
+> **Admin-Seed:** Nicht in der Migration — manuell setzen nach erstem Login (siehe ANTIGRAVITY.md → "Admin-Flag setzen").
 
 ### Migration 0016 – Audit Log
 
@@ -659,7 +659,7 @@ Import-Flow:
 ## Implementierungs-Phasen
 
 ### Phase 1 – Backend Fundament ✅ (2026-05-09)
-- [x] Migration 0015: `is_admin`, `last_login_at`, `admin_notes` auf users + Seed yusefbach01@gmail.com
+- [x] Migration 0015: `is_admin`, `last_login_at`, `admin_notes` auf users (kein Email-Seed im Code)
 - [x] Migration 0016: `admin_audit_logs` Tabelle (3 Indizes: admin_id, entity, created DESC)
 - [x] Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
 - [x] `app/models/admin_audit_log.py` – SQLAlchemy Model
@@ -668,7 +668,7 @@ Import-Flow:
 - [x] `app/core/security.py` – `create_access_token` mit `is_admin` JWT-Claim
 - [x] `app/routers/admin/auth.py` – `POST /admin/auth/session`, `DELETE /admin/auth/session`, `GET /admin/auth/me`
 - [x] `app/routers/auth.py` – Login setzt `last_login_at` + übergibt `is_admin` an JWT
-- [x] Seed: Admin-Flag für Yusef (yusefbach01@gmail.com) in Migration 0015
+- [x] Seed: Admin-Flag manuell setzen (kein Email-Seed im Code — Anleitung in ANTIGRAVITY.md)
 - [x] Backend-Tests: 15/15 grün — Zugriffskontrolle, Session-Flow, mock_admin_user + admin_client Fixtures
 
 ### Phase 2 – User-Management Backend (1–2 Tage) ← nächste Session

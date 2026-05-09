@@ -6,7 +6,10 @@ Create Date: 2026-05-09 12:00:00.000000
 
 Sprint 5 Phase 1 (ADR-021): Adds is_admin flag for JWT claim and admin-panel access,
 last_login_at for User-Management UI, admin_notes for internal Super-Admin remarks.
-Seeds is_admin = TRUE for yusefbach01@gmail.com (sole Super-Admin).
+
+Admin seeding is intentionally NOT done here — set manually after first login:
+  docker compose exec db psql -U studynexus -d studynexus \
+    -c "UPDATE users SET is_admin = TRUE WHERE email = 'your@email.de';"
 """
 from alembic import op
 import sqlalchemy as sa
@@ -21,7 +24,6 @@ def upgrade() -> None:
     op.add_column("users", sa.Column("is_admin", sa.Boolean(), nullable=False, server_default="false"))
     op.add_column("users", sa.Column("last_login_at", sa.DateTime(timezone=True), nullable=True))
     op.add_column("users", sa.Column("admin_notes", sa.Text(), nullable=True))
-    op.execute("UPDATE users SET is_admin = TRUE WHERE email = 'yusefbach01@gmail.com'")
 
 
 def downgrade() -> None:

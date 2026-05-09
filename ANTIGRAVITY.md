@@ -121,7 +121,7 @@ docker compose exec db psql -U studynexus -d studynexus -c "TRUNCATE users CASCA
 | 0012 | 2026-05-08 | pruefungsart + sws auf modules, BIN-Seed für alle 37 Module | ✅ |
 | 0013 | 2026-05-08 | module_prerequisites Tabelle + parent_module_id auf student_modules + BIN §6 Seed | ✅ |
 | 0014 | 2026-05-09 | BIN-209 gewichtung 1.0 → 1.5 (Datenfehler-Fix laut PO Anlage B2) | ✅ |
-| 0015 | 2026-05-09 | is_admin, last_login_at, admin_notes auf users + Seed für yusefbach01@gmail.com | ✅ |
+| 0015 | 2026-05-09 | is_admin, last_login_at, admin_notes auf users (Admin-Flag manuell setzen — kein Email-Seed im Code) | ✅ |
 | 0016 | 2026-05-09 | admin_audit_logs Tabelle (3 Indizes: admin_id, entity, created DESC) | ✅ |
 | 0017 | 2026-05-09 | is_archived + Soft-Delete-Felder auf modules/programs/exam_regulations | ✅ |
 
@@ -263,7 +263,7 @@ Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigie
 - **Test-Fix:** test_auth.py — `_make_user` fehlende Felder (matrikelnummer/university/profile_picture_url), Register-Tests mit Pflichtfeldern.
 
 ### Sprint 5 Phase 1 ✅ (2026-05-09) — Backend Fundament
-- **Migrations 0015–0017:** is_admin + last_login_at + admin_notes auf users, admin_audit_logs Tabelle, Soft-Delete auf modules/programs/exam_regulations. Alle migriert + Yusef-Seed aktiv.
+- **Migrations 0015–0017:** is_admin + last_login_at + admin_notes auf users, admin_audit_logs Tabelle, Soft-Delete auf modules/programs/exam_regulations. Alle migriert. Admin-Flag manuell setzen (kein Email-Seed im Code — siehe "Admin-Flag setzen" unten).
 - **`app/core/admin_auth.py`:** `get_admin_user` (403 für Nicht-Admins), `get_verified_admin` (Redis 15-min Admin-Session Token), `create/revoke/verify_admin_session_token`.
 - **`app/core/audit.py`:** `AuditLogger` FastAPI-Dependency — `audit.log(action, entity_type, ...)`, db.flush() in gleicher Transaktion.
 - **`app/core/security.py`:** `create_access_token` hat jetzt `is_admin: bool` Parameter → JWT-Claim für Frontend-Middleware.
@@ -379,7 +379,13 @@ KPIs/Analytics → Frontend Layout → Dashboard → AdminDataTable → User-UI 
 - JSON-Import-Seite mit Drag & Drop + Validierungsvorschau
 - Audit-Log Timeline-View
 
-### Seed nach Migration 0015
-```sql
-UPDATE users SET is_admin = TRUE WHERE email = 'yusefbach01@gmail.com';
+### Admin-Flag setzen (einmalig nach erstem Login)
+
+Kein Email-Seed im Code — Admin-Flag wird manuell gesetzt, damit keine persönlichen Daten im Repository landen:
+
+```bash
+docker compose exec db psql -U studynexus -d studynexus \
+  -c "UPDATE users SET is_admin = TRUE WHERE email = 'deine@email.de';"
 ```
+
+> Danach beim nächsten Login erhält der Account `is_admin: true` im JWT und hat Zugang zu `/admin/*`.
