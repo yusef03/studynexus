@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -8,6 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { VerifyForm } from "./VerifyForm";
+
+interface University {
+  id: string;
+  name: string;
+  kuerzel: string;
+}
 
 interface RegisterFormProps {
   locale: string;
@@ -21,6 +27,20 @@ export function RegisterForm({ locale }: RegisterFormProps) {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const [universities, setUniversities] = useState<University[]>([]);
+  const [selectedUniversity, setSelectedUniversity] = useState("");
+  const [univLoading, setUnivLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/universities")
+      .then((r) => r.json())
+      .then((data: University[]) => {
+        setUniversities(data);
+        if (data.length === 1) setSelectedUniversity(data[0].name);
+      })
+      .catch(() => {})
+      .finally(() => setUnivLoading(false));
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -47,7 +67,7 @@ export function RegisterForm({ locale }: RegisterFormProps) {
           full_name: data.get("full_name") as string,
           matrikelnummer: data.get("matrikelnummer") as string,
           birth_date: data.get("birth_date") ? new Date(data.get("birth_date") as string).toISOString() : undefined,
-          university: data.get("university") as string,
+          university: selectedUniversity,
         }),
       });
 
@@ -114,14 +134,21 @@ export function RegisterForm({ locale }: RegisterFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="university">Hochschule</Label>
-          <Input
+          <Label htmlFor="university">{t("fields.university")}</Label>
+          <select
             id="university"
             name="university"
-            type="text"
-            placeholder="Hochschule Hannover"
             required
-          />
+            disabled={univLoading}
+            value={selectedUniversity}
+            onChange={(e) => setSelectedUniversity(e.target.value)}
+            className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <option value="" disabled>{univLoading ? "…" : t("fields.selectUniversity")}</option>
+            {universities.map((u) => (
+              <option key={u.id} value={u.name}>{u.name}</option>
+            ))}
+          </select>
         </div>
       </div>
 

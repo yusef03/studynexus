@@ -12,13 +12,9 @@ import type {
   ExamRegulationResponse,
   UniversityResponse,
 } from "@/types/study";
+import { generateSemesterOptions, formatSemesterLabel } from "@/lib/semesterUtils";
 
-const SEMESTER_OPTIONS = [
-  "WS2022/23", "SoSe2023",
-  "WS2023/24", "SoSe2024",
-  "WS2024/25", "SoSe2025",
-  "WS2025/26", "SoSe2026",
-];
+const SEMESTER_OPTIONS = generateSemesterOptions();
 
 const selectClass = cn(
   "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2",
@@ -253,7 +249,7 @@ export function SetupForm({ locale }: SetupFormProps) {
               <option value="">{t("selectSemester")}</option>
               {SEMESTER_OPTIONS.map((s) => (
                 <option key={s} value={s}>
-                  {s}
+                  {formatSemesterLabel(s)}
                 </option>
               ))}
             </select>

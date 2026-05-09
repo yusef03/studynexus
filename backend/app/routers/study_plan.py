@@ -111,6 +111,12 @@ def get_my_modules(
 
     modules_by_id = _load_modules_by_id(db, student_modules)
 
+    # Also load parent modules for custom sub-modules (e.g. BIN-209 sub-modules)
+    parent_ids = [sm.parent_module_id for sm in student_modules if sm.parent_module_id and sm.parent_module_id not in modules_by_id]
+    if parent_ids:
+        for m in db.query(Module).filter(Module.id.in_(parent_ids)).all():
+            modules_by_id[m.id] = m
+
     # Compute semester completion flags + reached ECTS for prerequisites_met
     sem_flags = _get_semester_flags(db, current_user.id, student_modules)
     reached_ects = sum(
@@ -134,7 +140,14 @@ def get_my_modules(
         module = modules_by_id.get(sm.module_id) if sm.module_id else None
         semester_key = sm.semester
         if semester_key is None:
-            semester_key = str(module.semester_empfehlung) if module and module.semester_empfehlung else "Ungeplant"
+            if module and module.semester_empfehlung:
+                semester_key = str(module.semester_empfehlung)
+            elif sm.parent_module_id and sm.parent_module_id in modules_by_id:
+                # Custom sub-module: inherit semester from parent (e.g. BIN-209 → Sem 5)
+                parent = modules_by_id[sm.parent_module_id]
+                semester_key = str(parent.semester_empfehlung) if parent.semester_empfehlung else "Ungeplant"
+            else:
+                semester_key = "Ungeplant"
 
         prereqs_met = _eval_prerequisites(
             sm.module_id,

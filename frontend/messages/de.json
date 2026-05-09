@@ -14,7 +14,9 @@
       "confirmPassword": "Passwort bestätigen",
       "fullName": "Vollständiger Name",
       "showPassword": "Passwort anzeigen",
-      "hidePassword": "Passwort verbergen"
+      "hidePassword": "Passwort verbergen",
+      "university": "Hochschule",
+      "selectUniversity": "-- Hochschule auswählen --"
     },
     "login": {
       "title": "Willkommen zurück",
@@ -188,7 +190,13 @@
       "description": "Dein interaktiver Stundenplan und Kalender.",
       "board": {
         "loading": "Lade Stundenplan...",
-        "days": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"],
+        "days": [
+          "Montag",
+          "Dienstag",
+          "Mittwoch",
+          "Donnerstag",
+          "Freitag"
+        ],
         "showGhosts": "Geister-Blöcke (ausgeblendet) anzeigen",
         "collisionWarning": "Überschneidet sich zeitlich mit",
         "deadline": "Deadline",
@@ -221,7 +229,15 @@
         "recurringLabel": "Wöchentlich wiederholen",
         "ghostingLabel": "Ghosting (Versteckt)",
         "dayLabel": "Wochentag",
-        "days": ["Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "Sonntag"],
+        "days": [
+          "Montag",
+          "Dienstag",
+          "Mittwoch",
+          "Donnerstag",
+          "Freitag",
+          "Samstag",
+          "Sonntag"
+        ],
         "dateLabel": "Spezifisches Datum",
         "fromLabel": "Von",
         "toLabel": "Bis",
@@ -363,8 +379,8 @@
       "wahlpflichtFull": "Limit erreicht – laut PO sind genau 2 Wahlpflichtmodule (12 ECTS) vorgesehen",
       "ergaenzendHint": "BIN-209 Ergänzende Fächer: Füge 3 Module (je 2 ECTS) hinzu – mind. 1 aus dem BWL-Bereich. Wähle offizielle Namen aus dem Katalog.",
       "ergaenzendSuggestions": {
-        "label": "Aus BIN-209-Katalog wählen",
-        "selectHint": "-- Offiziellen Namen wählen (optional) --",
+        "label": "Offiziellen PO-Namen übernehmen (optional)",
+        "selectHint": "-- Nur wenn du den PO-Platzhalternamen möchtest --",
         "bin20901": "Ergänzendes Fach A",
         "bin20902": "Ergänzendes Fach B",
         "bin20903": "Ergänzendes Fach C",
@@ -376,7 +392,16 @@
       },
       "wpPrerequisitesLocked": "Wahlpflichtmodule zugänglich, sobald Sem 1+2 abgeschlossen sind (PO §6)",
       "loadError": "Fehler beim Laden des Modulkatalogs",
-      "saveError": "Fehler beim Hinzufügen des Moduls"
+      "saveError": "Fehler beim Hinzufügen des Moduls",
+      "modeWahlpflichtDesc": "Max. 2 aus 9 PO-Modulen",
+      "modeCustomDesc": "Eigenes Fach (BIN-209)",
+      "wpExplainTitle": "Was sind Wahlpflichtmodule?",
+      "wpExplainBody": "Das sind 9 spezielle Module aus deiner Prüfungsordnung (BIN-211 bis BIN-219). Du wählst genau 2 davon aus – sie ersetzen keine Pflichtmodule, sondern ergänzen deinen Abschluss mit einem Schwerpunkt.",
+      "selectModuleLabel": "Wahlpflichtmodul auswählen",
+      "wpCountHint": "{count} von {max} Wahlpflichtmodulen bereits gewählt",
+      "ergaenzendExplainTitle": "Was sind Ergänzende Fächer (BIN-209)?",
+      "ergaenzendExplainBody": "BIN-209 besteht aus 3 kleinen Kursen à 2 ECTS, die du frei wählen kannst. Trage einfach den echten Kursnamen ein (z. B. \"Planspiel\" oder \"Datenschutz\"). Mindestens 1 Fach muss ein BWL-Fach sein.",
+      "customNamePlaceholder": "z. B. Planspiel, Datenschutz, …"
     },
     "modal": {
       "title": "Modul bearbeiten",
@@ -408,6 +433,11 @@
       "saving": "Wird gespeichert…",
       "loadError": "Fehler beim Laden der Daten. Bitte Seite neu laden.",
       "saveError": "Fehler beim Speichern des Studiengangs"
+    },
+    "semester": {
+      "current": "Aktuelles Semester",
+      "label": "{n}. Semester",
+      "startedWith": "Start: {sem}"
     }
   },
   "settings": {
@@ -462,7 +492,8 @@
       "name": "Name",
       "matrikelnummer": "Matrikel-Nr.",
       "birthDate": "Geburtsdatum",
-      "university": "Hochschule"
+      "university": "Hochschule",
+      "program": "Studiengang"
     },
     "editLink": "Profil in den Einstellungen ansehen"
   }

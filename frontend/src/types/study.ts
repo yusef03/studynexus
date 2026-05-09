@@ -81,6 +81,12 @@ export interface StudentModulesBySemester {
   modules: StudentModuleResponse[];
 }
 
+/** Response shape for GET /exam-regulations/{id}/modules */
+export interface ModulesBySemester {
+  semester: number | null;
+  modules: ModuleResponse[];
+}
+
 export interface StatsResponse {
   gpa: number | null;
   erreichte_ects: number;

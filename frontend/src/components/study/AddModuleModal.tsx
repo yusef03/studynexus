@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import type { ModuleResponse, UserProgramResponse } from "@/types/study";
+import type { ModuleResponse, ModulesBySemester, UserProgramResponse } from "@/types/study";
 import { useAddModule } from "@/hooks/queries/useAddModule";
 
 const BIN_209_SUGGESTIONS = [
@@ -41,7 +41,7 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, wp
   const [catalog, setCatalog] = useState<ModuleResponse[]>([]);
   const [selectedModuleId, setSelectedModuleId] = useState("");
   const [customName, setCustomName] = useState("");
-  const [customEcts, setCustomEcts] = useState("");
+  const [customEcts, setCustomEcts] = useState("2");
   const [customIsGraded, setCustomIsGraded] = useState(true);
   const [selectedSuggestionKey, setSelectedSuggestionKey] = useState<string>("");
   const [loading, setLoading] = useState(true);
@@ -71,17 +71,17 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, wp
       )
       .then((res) => {
         if (!res.ok) throw new Error();
-        return res.json() as Promise<ModuleResponse[]>;
+        return res.json() as Promise<ModulesBySemester[]>;
       })
-      .then((modules) => {
-        const available = modules.filter(
+      .then((groups) => {
+        const allModules = groups.flatMap((g) => g.modules);
+        const available = allModules.filter(
           (m) => m.modul_typ === "WAHLPFLICHT" && !alreadyAddedModuleIds.has(m.id)
         );
         setCatalog(available);
       })
       .catch(() => setLoadError(t("loadError")))
       .finally(() => setLoading(false));
-    // alreadyAddedModuleIds and t are stable at call time; no re-fetch needed
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -132,107 +132,141 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, wp
 
         <div className="px-6 py-4 space-y-4">
           {/* Mode selector */}
-          <div className="flex gap-4">
-            <label className="flex items-center gap-2 cursor-pointer text-sm">
-              <input
-                type="radio"
-                name="add-mode"
-                value="wahlpflicht"
-                checked={mode === "wahlpflicht"}
-                onChange={() => setMode("wahlpflicht")}
-              />
-              {t("modeWahlpflicht")}
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer text-sm">
-              <input
-                type="radio"
-                name="add-mode"
-                value="custom"
-                checked={mode === "custom"}
-                onChange={() => setMode("custom")}
-              />
-              {t("modeCustom")}
-            </label>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => setMode("wahlpflicht")}
+              className={cn(
+                "rounded-md border px-3 py-2 text-sm text-left transition-colors",
+                mode === "wahlpflicht"
+                  ? "border-primary bg-primary/5 text-primary font-medium"
+                  : "border-input text-muted-foreground hover:border-foreground/40",
+              )}
+            >
+              <div className="font-medium text-sm">{t("modeWahlpflicht")}</div>
+              <div className="text-xs opacity-70 mt-0.5">{t("modeWahlpflichtDesc")}</div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMode("custom")}
+              className={cn(
+                "rounded-md border px-3 py-2 text-sm text-left transition-colors",
+                mode === "custom"
+                  ? "border-primary bg-primary/5 text-primary font-medium"
+                  : "border-input text-muted-foreground hover:border-foreground/40",
+              )}
+            >
+              <div className="font-medium text-sm">{t("modeCustom")}</div>
+              <div className="text-xs opacity-70 mt-0.5">{t("modeCustomDesc")}</div>
+            </button>
           </div>
 
-          {/* WP prerequisites not met */}
-          {mode === "wahlpflicht" && wpLocked && (
-            <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
-              {t("wpPrerequisitesLocked")}
-            </p>
-          )}
-
-          {loading && (
-            <p className="text-sm text-muted-foreground">{t("loadError")}</p>
-          )}
-
-          {loadError && (
-            <p className="text-sm text-destructive" role="alert">{loadError}</p>
-          )}
-
-          {!loading && !loadError && mode === "wahlpflicht" && (
-            <div className="space-y-1.5">
-              <Label htmlFor="add-module-select">{t("modeWahlpflicht")}</Label>
-              {wahlpflichtFull ? (
-                <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
-                  {t("wahlpflichtFull")}
-                </p>
-              ) : catalog.length === 0 ? (
-                <p className="text-sm text-muted-foreground">{t("noModules")}</p>
-              ) : (
-                <select
-                  id="add-module-select"
-                  className={selectClass}
-                  value={selectedModuleId}
-                  onChange={(e) => setSelectedModuleId(e.target.value)}
-                >
-                  <option value="">{t("selectModule")}</option>
-                  {catalog.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.kuerzel ? `${m.kuerzel} – ` : ""}{m.name} ({m.ects} ECTS)
-                    </option>
-                  ))}
-                </select>
-              )}
-            </div>
-          )}
-
-          {!loading && !loadError && mode === "custom" && (
+          {/* ── WAHLPFLICHT MODE ── */}
+          {mode === "wahlpflicht" && (
             <>
-              <p className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2">
-                {t("ergaenzendHint")}
-              </p>
-              {/* BIN-209 catalogue dropdown */}
-              <div className="space-y-1.5">
-                <Label htmlFor="add-suggestion-select">{t("ergaenzendSuggestions.label")}</Label>
-                <select
-                  id="add-suggestion-select"
-                  className={selectClass}
-                  value={selectedSuggestionKey}
-                  onChange={(e) => handleSuggestionChange(e.target.value)}
-                >
-                  <option value="">{t("ergaenzendSuggestions.selectHint")}</option>
-                  {BIN_209_SUGGESTIONS.map((s) => (
-                    <option key={s.key} value={s.key}>
-                      {t(`ergaenzendSuggestions.${s.key}` as Parameters<typeof t>[0])}
-                    </option>
-                  ))}
-                </select>
-                {selectedSuggestion && !selectedSuggestion.isBwl && (
-                  <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
-                    {t("ergaenzendSuggestions.bwlHint")}
-                  </p>
-                )}
+              {/* Explanation box */}
+              <div className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2 space-y-1">
+                <p className="font-medium text-foreground">{t("wpExplainTitle")}</p>
+                <p>{t("wpExplainBody")}</p>
               </div>
+
+              {wpLocked && (
+                <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+                  {t("wpPrerequisitesLocked")}
+                </p>
+              )}
+
+              {loading && (
+                <p className="text-sm text-muted-foreground">{t("loadError")}</p>
+              )}
+              {loadError && (
+                <p className="text-sm text-destructive" role="alert">{loadError}</p>
+              )}
+
+              {!loading && !loadError && (
+                <div className="space-y-1.5">
+                  <Label htmlFor="add-module-select">{t("selectModuleLabel")}</Label>
+                  {wahlpflichtFull ? (
+                    <p className="text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+                      {t("wahlpflichtFull")}
+                    </p>
+                  ) : catalog.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">{t("noModules")}</p>
+                  ) : (
+                    <select
+                      id="add-module-select"
+                      className={selectClass}
+                      value={selectedModuleId}
+                      onChange={(e) => setSelectedModuleId(e.target.value)}
+                    >
+                      <option value="">{t("selectModule")}</option>
+                      {catalog.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.kuerzel ? `${m.kuerzel} – ` : ""}{m.name} ({m.ects} ECTS)
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  {wahlpflichtCount > 0 && !wahlpflichtFull && (
+                    <p className="text-xs text-muted-foreground">
+                      {t("wpCountHint", { count: wahlpflichtCount, max: 2 })}
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* ── CUSTOM / ERGAENZEND MODE ── */}
+          {mode === "custom" && (
+            <>
+              {/* Explanation box */}
+              <div className="text-xs text-muted-foreground bg-muted/50 rounded-md px-3 py-2 space-y-1">
+                <p className="font-medium text-foreground">{t("ergaenzendExplainTitle")}</p>
+                <p>{t("ergaenzendExplainBody")}</p>
+              </div>
+
+              {/* 1. Course name – primary field */}
               <div className="space-y-1.5">
                 <Label htmlFor="add-custom-name">{t("customName")}</Label>
                 <Input
                   id="add-custom-name"
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
-                  placeholder="z. B. Unternehmerisches Planspiel"
+                  placeholder={t("customNamePlaceholder")}
                 />
               </div>
+
+              {/* 2. PO official name suggestion – optional, secondary */}
+              <details className="group">
+                <summary className="text-xs text-muted-foreground cursor-pointer hover:text-foreground select-none list-none flex items-center gap-1">
+                  <span className="group-open:hidden">▸</span>
+                  <span className="group-open:hidden">▾</span>
+                  {t("ergaenzendSuggestions.label")}
+                </summary>
+                <div className="mt-2 space-y-1.5">
+                  <select
+                    id="add-suggestion-select"
+                    className={selectClass}
+                    value={selectedSuggestionKey}
+                    onChange={(e) => handleSuggestionChange(e.target.value)}
+                  >
+                    <option value="">{t("ergaenzendSuggestions.selectHint")}</option>
+                    {BIN_209_SUGGESTIONS.map((s) => (
+                      <option key={s.key} value={s.key}>
+                        {t(`ergaenzendSuggestions.${s.key}` as Parameters<typeof t>[0])}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedSuggestion && !selectedSuggestion.isBwl && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-md px-3 py-2">
+                      {t("ergaenzendSuggestions.bwlHint")}
+                    </p>
+                  )}
+                </div>
+              </details>
+
+              {/* 3. ECTS */}
               <div className="space-y-1.5">
                 <Label htmlFor="add-custom-ects">{t("customEcts")}</Label>
                 <Input
@@ -242,9 +276,11 @@ export function AddModuleModal({ alreadyAddedModuleIds, wahlpflichtCount = 0, wp
                   max="30"
                   value={customEcts}
                   onChange={(e) => setCustomEcts(e.target.value)}
-                  placeholder="z. B. 2"
+                  placeholder="2"
                 />
               </div>
+
+              {/* 4. Graded */}
               <label className="flex items-center gap-2 cursor-pointer text-sm">
                 <input
                   type="checkbox"

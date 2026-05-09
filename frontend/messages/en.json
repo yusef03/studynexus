@@ -14,7 +14,9 @@
       "confirmPassword": "Confirm password",
       "fullName": "Full name",
       "showPassword": "Show password",
-      "hidePassword": "Hide password"
+      "hidePassword": "Hide password",
+      "university": "University",
+      "selectUniversity": "-- Select university --"
     },
     "login": {
       "title": "Welcome back",
@@ -188,7 +190,13 @@
       "description": "Your interactive timetable and calendar.",
       "board": {
         "loading": "Loading Schedule...",
-        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday"
+        ],
         "showGhosts": "Show ghost blocks (hidden)",
         "collisionWarning": "Time overlap with",
         "deadline": "Deadline",
@@ -221,7 +229,15 @@
         "recurringLabel": "Repeat weekly",
         "ghostingLabel": "Ghosting (Hidden)",
         "dayLabel": "Day of the week",
-        "days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
+        "days": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
         "dateLabel": "Specific Date",
         "fromLabel": "From",
         "toLabel": "To",
@@ -363,8 +379,8 @@
       "wahlpflichtFull": "Limit reached – the PO allows exactly 2 elective modules (12 ECTS)",
       "ergaenzendHint": "BIN-209 Supplementary Subjects: Add 3 modules (2 ECTS each) – at least 1 from the Business area. Use the catalogue for official names.",
       "ergaenzendSuggestions": {
-        "label": "Select from BIN-209 catalogue",
-        "selectHint": "-- Choose an official name (optional) --",
+        "label": "Use official PO placeholder name (optional)",
+        "selectHint": "-- Only if you want the official PO placeholder name --",
         "bin20901": "Supplementary Subject A",
         "bin20902": "Supplementary Subject B",
         "bin20903": "Supplementary Subject C",
@@ -376,7 +392,16 @@
       },
       "wpPrerequisitesLocked": "Elective modules become accessible once Sem 1+2 are complete (PO §6)",
       "loadError": "Error loading module catalogue",
-      "saveError": "Error adding module"
+      "saveError": "Error adding module",
+      "modeWahlpflichtDesc": "Max. 2 from 9 PO modules",
+      "modeCustomDesc": "Custom course (BIN-209)",
+      "wpExplainTitle": "What are elective modules?",
+      "wpExplainBody": "These are 9 special modules from your exam regulations (BIN-211 to BIN-219). You choose exactly 2 of them – they complement your degree with a specialisation.",
+      "selectModuleLabel": "Select elective module",
+      "wpCountHint": "{count} of {max} elective modules already chosen",
+      "ergaenzendExplainTitle": "What are supplementary courses (BIN-209)?",
+      "ergaenzendExplainBody": "BIN-209 consists of 3 small courses of 2 ECTS each, freely chosen by you. Just enter the actual course name (e.g. \"Business Simulation\" or \"Data Protection\"). At least 1 must be a business (BWL) course.",
+      "customNamePlaceholder": "e.g. Business Simulation, Data Protection, …"
     },
     "modal": {
       "title": "Edit module",
@@ -408,6 +433,11 @@
       "saving": "Saving…",
       "loadError": "Error loading data. Please reload the page.",
       "saveError": "Error saving programme selection"
+    },
+    "semester": {
+      "current": "Current Semester",
+      "label": "Semester {n}",
+      "startedWith": "Start: {sem}"
     }
   },
   "settings": {
@@ -462,7 +492,8 @@
       "name": "Name",
       "matrikelnummer": "Matriculation No.",
       "birthDate": "Date of Birth",
-      "university": "University"
+      "university": "University",
+      "program": "Program"
     },
     "editLink": "View profile in settings"
   }

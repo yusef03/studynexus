@@ -3,13 +3,17 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, Settings, UserCircle, Map, ScrollText } from "lucide-react";
+import { LayoutDashboard, Calendar, ListTodo, BookOpen, Settings, UserCircle, Map, ScrollText } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
+import { useUserProgram } from "@/hooks/queries/useUserProgram";
+import { computeCurrentSemesterNumber, formatSemesterLabel } from "@/lib/semesterUtils";
 
 export function AppSidebar({ locale }: { locale: string }) {
   const t = useTranslations("dashboard.nav");
+  const tDash = useTranslations("dashboard");
   const pathname = usePathname();
+  const { data: program } = useUserProgram();
 
   const routes = [
     { href: `/${locale}/dashboard`, exact: true, label: t("overview"), icon: LayoutDashboard },
@@ -22,6 +26,13 @@ export function AppSidebar({ locale }: { locale: string }) {
     { href: `/${locale}/dashboard/settings`, label: t("settings"), icon: Settings },
   ];
 
+  const semesterNum = program?.start_semester
+    ? computeCurrentSemesterNumber(program.start_semester)
+    : null;
+  const semesterLabel = program?.start_semester
+    ? formatSemesterLabel(program.start_semester, locale)
+    : null;
+
   return (
     <aside className="w-64 border-r bg-muted/20 hidden md:flex flex-col h-screen sticky top-0">
       <div className="h-14 flex items-center px-6 border-b">
@@ -31,7 +42,6 @@ export function AppSidebar({ locale }: { locale: string }) {
       </div>
       <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {routes.map((route) => {
-          // If exact match is required (like /dashboard root), check exact, else check startsWith
           const isActive = route.exact
             ? pathname === route.href
             : pathname.startsWith(route.href);
@@ -53,7 +63,25 @@ export function AppSidebar({ locale }: { locale: string }) {
           );
         })}
       </nav>
-      {/* Footer area inside sidebar (e.g. user settings or current semester) */}
+
+      {semesterNum !== null && (
+        <div className="border-t px-4 py-3">
+          <p className="text-[10px] uppercase font-semibold text-muted-foreground tracking-wider mb-1">
+            {tDash("semester.current")}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center justify-center rounded-full bg-primary/10 text-primary font-bold text-sm h-8 w-8">
+              {semesterNum}
+            </span>
+            <div>
+              <p className="text-sm font-medium leading-tight">{tDash("semester.label", { n: semesterNum })}</p>
+              {semesterLabel && (
+                <p className="text-[11px] text-muted-foreground">{tDash("semester.startedWith", { sem: semesterLabel })}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 }

@@ -16,6 +16,10 @@ def _make_user(**kwargs):
     user.is_active = True
     user.is_premium = False
     user.created_at = _FIXED_DT
+    user.matrikelnummer = None
+    user.birth_date = None
+    user.university = None
+    user.profile_picture_url = None
     for k, v in kwargs.items():
         setattr(user, k, v)
     return user
@@ -32,6 +36,9 @@ def test_register_success(client, mock_db):
             "email": "new@stud.hs-hannover.de",
             "password": "Password1!",
             "full_name": "New User",
+            "matrikelnummer": "1234567",
+            "birth_date": "2000-01-01T00:00:00Z",
+            "university": "Hochschule Hannover",
         })
 
     assert response.status_code == 201
@@ -48,6 +55,10 @@ def test_register_duplicate_email_returns_409(client, mock_db):
     response = client.post("/api/v1/auth/register", json={
         "email": "existing@stud.hs-hannover.de",
         "password": "Password1!",
+        "full_name": "Existing User",
+        "matrikelnummer": "1234567",
+        "birth_date": "2000-01-01T00:00:00Z",
+        "university": "Hochschule Hannover",
     })
 
     assert response.status_code == 409
