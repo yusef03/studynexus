@@ -1,8 +1,8 @@
 # Sprint 5 – Admin Panel Masterplan
 
-**Status:** Planung abgeschlossen – bereit zur Implementierung  
-**Zeitraum:** nach Sprint 4 (Schätzung: 2–3 Wochen)  
-**Basis:** ADR-009 (Admin PO-Verwaltung), Antworten aus Planungssession 2026-05-09
+**Status:** 🔧 In Bearbeitung — Phasen 1–8 abgeschlossen (2026-05-10)  
+**Zeitraum:** 2026-05-09 – laufend  
+**Basis:** ADR-009 (Admin PO-Verwaltung), ADR-019–022
 
 ---
 
@@ -716,23 +716,37 @@ Import-Flow:
 - [x] `app/[locale]/admin/page.tsx` – Dashboard-Placeholder mit 4 Quick-Nav-Cards
 - [x] `app/[locale]/admin/login/page.tsx` – Admin-Re-Auth: POST /api/admin/auth/session → saveSession() → redirect /admin; dunkles Design
 
-### Phase 6 – Dashboard + Analytics Frontend (1 Tag)
-- [ ] `components/admin/KPICard.tsx`
-- [ ] `components/admin/GrowthChart.tsx` (Recharts LineChart)
-- [ ] `app/[locale]/admin/page.tsx` – Dashboard mit KPIs + Charts + Recent Activity
+### Phase 6 – Dashboard + Analytics Frontend ✅ (2026-05-09)
+- [x] `components/admin/KPICard.tsx` — label/value/sub/icon/trend-Indikatoren, Skeleton, `className` Prop
+- [x] `components/admin/GrowthChart.tsx` — Recharts `ResponsiveContainer + LineChart`, CSS-Vars-Theming, i18n, h-40 sm:h-48
+- [x] `app/[locale]/admin/page.tsx` — 4 primäre KPI-Cards + 3 sekundäre + GrowthChart (30d) + DB-Größe + Quick-Nav; p-4 sm:p-6; vollständig i18n
 
-### Phase 7 – Reusable Admin-Tabelle (1 Tag)
-- [ ] `components/admin/AdminDataTable.tsx`:
-  - Props: columns, data, onSearch, onFilter, onSort, onPageChange, isLoading
-  - Features: Pagination, Suche, Sort, Bulk-Select, CSV-Export
-  - Keyboard-Navigation
-- [ ] `components/admin/ArchiveDialog.tsx` – Bestätigungs-Modal mit Begründungs-Feld
-- [ ] `components/admin/DeleteDialog.tsx` – Hard-Delete + Admin-Session-Token-Eingabe
-- [ ] `components/admin/AdminFormModal.tsx` – Universelles Modal für Create/Edit
+### Phase 7 – Mobile/i18n + Reusable Admin-Komponenten ✅ (2026-05-10)
+**Bug-Fix:**
+- [x] `hooks/useAdminSession.ts` — Cross-Instance-Sync via `window.dispatchEvent("sn-admin-session-change")`, damit Sidebar/Banner nach Login sofort aktualisiert werden
 
-### Phase 8 – User-Management Frontend (1 Tag)
-- [ ] `app/[locale]/admin/users/page.tsx` – User-Tabelle (alle Filter + Quick-Actions)
-- [ ] `app/[locale]/admin/users/[id]/page.tsx` – User-Detail
+**Mobile:**
+- [x] `components/admin/AdminMobileHeader.tsx` — Sticky Top-Bar + Hamburger → Slide-Drawer (CSS translate-x), Backdrop, Body-Scroll-Lock, schließt bei Route-Wechsel
+- [x] `app/[locale]/admin/layout.tsx` — `<AdminMobileHeader>` eingebaut
+- [x] Vollständige i18n aller Admin-Strings: `admin.nav`, `admin.sidebar`, `admin.sessionBanner`, `admin.login`, `admin.dashboard`, `admin.table`, `admin.status`, `admin.archiveDialog`, `admin.deleteDialog`, `admin.formModal`, `admin.auditBadge`
+
+**Reusable Komponenten:**
+- [x] `components/admin/AdminDataTable.tsx` — Generisch `<T>`, Column-Sort (SortState), debounced Search (350ms), server-side Pagination, `hideOnMobile` pro Spalte, 5-Zeilen-Skeleton
+- [x] `components/admin/AdminFormModal.tsx` — Bottom-Sheet auf Mobile / zentriertes Modal auf Desktop, Escape + Backdrop schließt, Body-Scroll-Lock, save/create Varianten
+- [x] `components/admin/ArchiveDialog.tsx` — Pflicht-Begründung (Textarea), Admin-Session-Prüfung, amber Danger-Styling, i18n
+- [x] `components/admin/DeleteDialog.tsx` — Tippe Bestätigungswort (i18n: "LÖSCHEN"/"DELETE"), Admin-Session-Prüfung, rotes Danger-Styling
+- [x] `components/admin/StatusBadge.tsx` — 6 Varianten (active/inactive/archived/verified/unverified/premium), dark-mode-aware
+- [x] `components/admin/AuditBadge.tsx` — created/modified Varianten, locale-aware Datum + Uhrzeit
+
+**Hinweis:** Bulk-Select und CSV-Export wurden bewusst weggelassen (kein Use-Case in Phase 8).
+
+### Phase 8 – User-Management Frontend ✅ (2026-05-10)
+- [x] `types/admin.ts` — `AdminUserListItem`, `AdminUserListResponse`, `AdminUserDetail` (extends List + university/birth_date/admin_notes/gpa), `AdminUserPatch`
+- [x] `lib/adminFetch.ts` — `adminGet<T>(path)` + `adminMutate<T>(path, method, {body?, adminToken?})` — Content-Type + x-admin-token, 204-safe
+- [x] `hooks/admin/useAdminUsers.ts` — TanStack Query, page/search/filter, staleTime 30s, placeholderData
+- [x] `hooks/admin/useAdminUser.ts` — TanStack Query single-user, enabled-Guard
+- [x] `app/[locale]/admin/users/page.tsx` — 7-spaltige Tabelle (User, Matrikel, Status, Programm, Fortschritt, Letzter Login, Registriert), 5 Filter-Tabs, debounced Search, Row-Click → Detail
+- [x] `app/[locale]/admin/users/[id]/page.tsx` — Persönliche Daten, Studienplan, Toggle-Switches (PATCH), Admin-Notes, Danger Zone (Passwort-Reset + DeleteDialog)
 
 ### Phase 9 – PO-Verwaltung Frontend (2–3 Tage)
 - [ ] `app/[locale]/admin/universities/page.tsx` + `[id]/page.tsx`

@@ -2,7 +2,7 @@
 
 > **Single Source of Truth** für alle Sprints. Abgeschlossene Sprints sind finalisiert.
 > Sprint-Reviews mit vollständigen Details befinden sich als separate Dateien im selben Verzeichnis.
-> Zuletzt aktualisiert: 2026-05-08
+> Zuletzt aktualisiert: 2026-05-10
 
 ---
 
@@ -20,7 +20,7 @@
 | Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3.7-review.md](sprint-3.7-review.md) |
 | Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3.7.7-review.md](sprint-3.7.7-review.md) |
 | **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | — |
-| Sprint 5 | Admin Panel | Geplant | 2–3 Wochen | [sprint-5-plan.md](sprint-5-plan.md) |
+| **Sprint 5** | **Admin Panel** | **🔧 In Bearbeitung (Phase 8/12)** | **laufend** | [sprint-5-plan.md](sprint-5-plan.md) |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
 | Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
@@ -479,9 +479,9 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-### Sprint 5 – Admin Panel
+### Sprint 5 – Admin Panel 🔧
 
-**Status:** Geplant (nach Sprint 4)  
+**Status:** In Bearbeitung — Phasen 1–8 abgeschlossen (2026-05-10)  
 **Detailplanung:** [sprint-5-plan.md](sprint-5-plan.md)  
 **Ziel:** Vollständiges, professionelles Admin-Panel — PO-Verwaltung, User-Management, Analytics, Audit-Log.
 
@@ -495,30 +495,28 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - Als Admin möchte ich KPIs und Wachstums-Statistiken auf einem Dashboard sehen
 
 **Migrationen:**
-- [ ] Migration 0015: `is_admin`, `is_premium`, `last_login_at`, `admin_notes` auf users
-- [ ] Migration 0016: `admin_audit_logs` Tabelle (vollständiger Audit-Trail)
-- [ ] Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
+- [x] Migration 0015: `is_admin`, `is_premium`, `last_login_at`, `admin_notes` auf users
+- [x] Migration 0016: `admin_audit_logs` Tabelle (vollständiger Audit-Trail)
+- [x] Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
 
-**Backend (12 Phasen, Details in sprint-5-plan.md):**
-- [ ] Admin-Auth: `get_admin_user`, `get_verified_admin`, Admin-Session via Redis (15 Min)
-- [ ] User-Management: GET List/Detail, PATCH (is_active/is_premium/is_verified), DELETE
-- [ ] PO-CRUD: Universities, Faculties, Programs, ExamRegulations, Modules, Prerequisites
-- [ ] Soft Delete: Archive/Restore mit Begründungspflicht
-- [ ] JSON-Bulk-Import: bis 500 Module, mit Validierung + Duplikat-Erkennung
-- [ ] Analytics: KPIs, Wachstums-Zeitreihen, Modul-Statistiken
-- [ ] Audit-Logging: automatisch für jede Mutation (old/new JSON, IP, Begründung)
+**Backend (Phasen 1–4 abgeschlossen):**
+- [x] Phase 1: Admin-Auth (`get_admin_user`, `get_verified_admin`), Admin-Session via Redis (15 Min), JWT is_admin-Claim, AuditLogger-Klasse
+- [x] Phase 2: User-Management — GET List (paginated+filter), GET Detail, PATCH (is_active/is_premium/is_verified/admin_notes), POST reset-password, DELETE (cascade+reason)
+- [x] Phase 3: PO-CRUD — Universities, Faculties, Programs, ExamRegulations, Modules (inkl. Archive/Restore, JSON-Import, PDF-Placeholder), Prerequisites
+- [x] Phase 4: Analytics — GET /stats (13 KPIs), GET /stats/growth?period, GET /stats/modules, GET /stats/users; System Health-Check (DB + Redis)
+- [x] Tests: 111/111 grün (Phase 4 Abschluss)
 
-**Frontend (Route: `/admin`, eigenes Layout):**
-- [ ] Admin-Layout: eigene Sidebar, kein Dashboard-Frame, Admin-Badge
-- [ ] Middleware-Schutz: is_admin im JWT → 403 für Non-Admins
-- [ ] Admin-Session-Banner: Auto-Expiry-Warning nach 15 Min
-- [ ] AdminDataTable: sortierbar, filterbar, server-side paginiert, CSV-Export
-- [ ] Dashboard: KPI-Cards + Recharts LineChart + Recent Activity
-- [ ] User-Tabelle + User-Detail mit Quick-Actions
-- [ ] PO-Tree: University → Faculty → Program → ExamRegulation → Modulkatalog
-- [ ] Modul-Formular: alle Felder + Voraussetzungs-Editor + Audit-Sidebar
-- [ ] JSON-Import-Seite: Drag & Drop, Validierung, Vorschau, PDF-Placeholder
-- [ ] Audit-Log: Timeline-View mit Entity/Action/Datum-Filter
+**Frontend (Phasen 5–8 abgeschlossen):**
+- [x] Phase 5: Middleware-Schutz (`is_admin` im JWT), Catch-all API-Proxy, Admin-Session-Hook, AdminSidebar, AdminSessionBanner, Admin-Layout, Login-Seite
+- [x] Phase 6: Dashboard — KPI-Cards, GrowthChart (Recharts), p-4 sm:p-6 responsive, vollständig i18n
+- [x] Phase 7: Mobile (AdminMobileHeader + Slide-Drawer), vollständige i18n aller Admin-Strings, AdminDataTable, AdminFormModal, ArchiveDialog, DeleteDialog, StatusBadge, AuditBadge; Bug-Fix: Cross-Instance Admin-Session-Sync
+- [x] Phase 8: types/admin.ts, lib/adminFetch.ts, hooks/admin/useAdminUsers+useAdminUser, /admin/users Listenseite (Filter-Tabs + Tabelle), /admin/users/[id] Detailseite (Toggles + Notes + Danger Zone)
+
+**Ausstehend:**
+- [ ] Phase 9: PO-Verwaltung Frontend (universities, programs, exam-regulations, modules pages)
+- [ ] Phase 10: Import + Audit-Log Frontend (JsonImportZone, Timeline)
+- [ ] Phase 11: Admin-Link im User-Dashboard (AppSidebar + MobileNav, nur wenn is_admin)
+- [ ] Phase 12: Tests + TypeScript-Härtung
 
 ---
 

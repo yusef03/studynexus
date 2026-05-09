@@ -16,6 +16,7 @@ import {
   Shield,
   Users,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useAdminSession } from "@/hooks/useAdminSession";
 
@@ -25,27 +26,26 @@ interface Props {
 }
 
 export function AdminSidebar({ locale, adminName }: Props) {
+  const t = useTranslations("admin");
   const pathname = usePathname();
-  const { isActive, isExpiringSoon, secondsLeft, clearSession } = useAdminSession();
+  const { isActive, isExpiringSoon, secondsLeft } = useAdminSession();
 
   const base = `/${locale}/admin`;
 
   const navItems = [
-    { href: base, label: "Dashboard", icon: BarChart3, exact: true },
-    { href: `${base}/users`, label: "Nutzer", icon: Users },
-    { href: `${base}/universities`, label: "Hochschulen", icon: Building2 },
-    { href: `${base}/programs`, label: "Studiengänge", icon: GraduationCap },
-    { href: `${base}/modules`, label: "Module", icon: BookOpen },
-    { href: `${base}/prerequisites`, label: "Voraussetzungen", icon: Link2 },
-    { href: `${base}/import`, label: "Bulk-Import", icon: FileUp },
-    { href: `${base}/audit-log`, label: "Audit-Log", icon: ClipboardList },
-    { href: `${base}/system`, label: "System", icon: Server },
+    { href: base, label: t("nav.dashboard"), icon: BarChart3, exact: true },
+    { href: `${base}/users`, label: t("nav.users"), icon: Users },
+    { href: `${base}/universities`, label: t("nav.universities"), icon: Building2 },
+    { href: `${base}/programs`, label: t("nav.programs"), icon: GraduationCap },
+    { href: `${base}/modules`, label: t("nav.modules"), icon: BookOpen },
+    { href: `${base}/prerequisites`, label: t("nav.prerequisites"), icon: Link2 },
+    { href: `${base}/import`, label: t("nav.bulkImport"), icon: FileUp },
+    { href: `${base}/audit-log`, label: t("nav.auditLog"), icon: ClipboardList },
+    { href: `${base}/system`, label: t("nav.system"), icon: Server },
   ];
 
   function formatTime(s: number) {
-    const m = Math.floor(s / 60);
-    const sec = s % 60;
-    return `${m}:${String(sec).padStart(2, "0")}`;
+    return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   }
 
   return (
@@ -53,8 +53,8 @@ export function AdminSidebar({ locale, adminName }: Props) {
       {/* Brand */}
       <div className="h-14 flex items-center gap-2 px-5 border-b border-zinc-800">
         <Shield className="h-5 w-5 text-red-400 shrink-0" />
-        <span className="font-bold text-sm tracking-wide">ADMIN</span>
-        <span className="text-zinc-500 text-sm font-light">StudyNexus</span>
+        <span className="font-bold text-sm tracking-wide">{t("sidebar.brand")}</span>
+        <span className="text-zinc-500 text-sm font-light">{t("sidebar.appName")}</span>
       </div>
 
       {/* Navigation */}
@@ -85,20 +85,11 @@ export function AdminSidebar({ locale, adminName }: Props) {
           <div
             className={cn(
               "flex items-center gap-2 rounded-md px-3 py-2 text-xs",
-              isExpiringSoon
-                ? "bg-amber-900/40 text-amber-300"
-                : "bg-zinc-800 text-zinc-400"
+              isExpiringSoon ? "bg-amber-900/40 text-amber-300" : "bg-zinc-800 text-zinc-400"
             )}
           >
-            <span
-              className={cn(
-                "h-1.5 w-1.5 rounded-full shrink-0",
-                isExpiringSoon ? "bg-amber-400" : "bg-green-400"
-              )}
-            />
-            <span className="flex-1">
-              {isExpiringSoon ? "Session läuft ab" : "Session aktiv"}
-            </span>
+            <span className={cn("h-1.5 w-1.5 rounded-full shrink-0", isExpiringSoon ? "bg-amber-400" : "bg-green-400")} />
+            <span className="flex-1">{isExpiringSoon ? t("sidebar.sessionExpiring") : t("sidebar.sessionActive")}</span>
             <span className="font-mono tabular-nums">{formatTime(secondsLeft)}</span>
           </div>
         ) : (
@@ -107,20 +98,17 @@ export function AdminSidebar({ locale, adminName }: Props) {
             className="flex items-center gap-2 rounded-md px-3 py-2 text-xs bg-zinc-800/50 text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors"
           >
             <span className="h-1.5 w-1.5 rounded-full bg-zinc-600 shrink-0" />
-            Keine Admin-Session
+            {t("sidebar.noSession")}
           </Link>
         )}
 
-        {/* Admin identity + logout */}
         <div className="flex items-center gap-2 px-3 py-1.5 rounded-md">
           <ScrollText className="h-3.5 w-3.5 text-zinc-600 shrink-0" />
-          <span className="text-xs text-zinc-500 flex-1 truncate">
-            {adminName ?? "Admin"}
-          </span>
+          <span className="text-xs text-zinc-500 flex-1 truncate">{adminName ?? "Admin"}</span>
           <Link
             href={`/${locale}/dashboard`}
             className="text-zinc-600 hover:text-zinc-400 transition-colors"
-            title="Zum Dashboard"
+            title={t("nav.backToDashboard")}
           >
             <LogOut className="h-3.5 w-3.5" />
           </Link>

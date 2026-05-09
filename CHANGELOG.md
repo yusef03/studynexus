@@ -4,6 +4,86 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Sprint 5 Phase 8 — User Management Frontend (2026-05-10)
+#### Added
+- **`types/admin.ts`**: TypeScript-Interfaces: `AdminUserListItem`, `AdminUserListResponse`, `AdminUserDetail` (extends List + university/birth_date/admin_notes/gpa), `AdminUserPatch`
+- **`lib/adminFetch.ts`**: `adminGet<T>(path)` + `adminMutate<T>(path, method, {body?, adminToken?})` — setzt `Content-Type` und `x-admin-token` Header, 204-safe (gibt `undefined` zurück)
+- **`hooks/admin/useAdminUsers.ts`**: TanStack Query Hook, paginated (page/page_size), filter-fähig (is_active/is_premium/is_verified), search, staleTime 30s, placeholderData für smooth pagination
+- **`hooks/admin/useAdminUser.ts`**: TanStack Query Hook für Single-User-Detail, enabled-Guard wenn ID leer
+- **`app/[locale]/admin/users/page.tsx`**: Nutzerliste — AdminDataTable mit 7 Spalten (User, Matrikel, Status-Badges, Programm, Fortschritt, Letzter Login, Registriert), 5 Filter-Tabs (Alle/Aktiv/Inaktiv/Premium/Unverifiziert), debounced Search, Row-Click → Detail-Seite, mobile-first (hideOnMobile Spalten)
+- **`app/[locale]/admin/users/[id]/page.tsx`**: Nutzer-Detail — Persönliche Daten (InfoRow-Grid), Studienplan-Summary, Toggle-Switches für is_active/is_premium/is_verified (PATCH, kein Admin-Token nötig), Admin-Notes-Textarea (PATCH + save), Danger Zone: Passwort-Reset (POST + Admin-Token), Nutzer löschen (DELETE + Admin-Token, DeleteDialog), Admin-Flag-Badge
+- **i18n**: `admin.users.*` + `admin.users.detail.*` in DE+EN (ca. 50 Keys)
+
+### Sprint 5 Phase 7 — Mobile/i18n + Reusable Admin Components (2026-05-10)
+#### Fixed
+- **`hooks/useAdminSession.ts`**: Cross-Instance-Sync via `window.dispatchEvent("sn-admin-session-change")` — Banner und Sidebar erkennen jetzt sofort wenn Login-Seite `saveSession()` aufruft (vorher: anderes Hook-Instance, kein State-Update)
+#### Added
+- **`components/admin/AdminMobileHeader.tsx`**: Mobile Top-Bar (sticky, zinc-950) + Hamburger → Slide-Drawer von links (CSS-Transition), Backdrop-Tap schließt, Body-Scroll-Lock, i18n
+- **i18n Admin vollständig**: Alle bisherigen deutschen Hardcoded-Strings in `admin.*` Namespace (de.json + en.json). Keys: `nav`, `sidebar`, `sessionBanner`, `login`, `dashboard`, `table`, `status`, `archiveDialog`, `deleteDialog`, `formModal`, `auditBadge`
+- **`components/admin/AdminDataTable.tsx`**: Generische Tabelle `<T>`, Column-Sort (SortState + SortIcon), debounced Search (350ms), server-side Pagination, `hideOnMobile` per Spalte, 5-Zeilen Skeleton beim Laden, leerer State
+- **`components/admin/AdminFormModal.tsx`**: Bottom-Sheet auf Mobile / zentriertes Modal auf Desktop, Escape + Backdrop schließt, Body-Scroll-Lock, `save`/`create` Varianten
+- **`components/admin/ArchiveDialog.tsx`**: Pflicht-Begründung (Textarea), Admin-Session-Prüfung, amber Danger-Styling, i18n
+- **`components/admin/DeleteDialog.tsx`**: Tippe-Bestätigungswort (`LÖSCHEN`/`DELETE`, i18n-fähig), Admin-Session-Prüfung, rotes Danger-Styling
+- **`components/admin/StatusBadge.tsx`**: 6 Varianten (active/inactive/archived/verified/unverified/premium), dark-mode-aware Farben, i18n
+- **`components/admin/AuditBadge.tsx`**: created/modified Varianten, locale-aware Datum + Uhrzeit, Clock-Icon
+- **Mobile-Regeln**: ANTIGRAVITY.md Regel 18–20 — mobile-first, i18n-Admin-Namespace, Admin-Nav-Architektur
+
+### Sprint 5 Phase 6 — Admin Dashboard + Analytics Frontend (2026-05-09)
+#### Added
+- **`components/admin/KPICard.tsx`**: Reusable KPI-Card mit label/value/sub/icon/trend (TrendingUp/Down), Loading-Skeleton via `animate-pulse`
+- **`components/admin/GrowthChart.tsx`**: Recharts `ResponsiveContainer + LineChart` — CSS-Vars für Theming (`hsl(var(--primary))`), DE-Datumsformatierung, leerer State + Loading-Skeleton
+- **`app/[locale]/admin/page.tsx`**: Dashboard komplett neu als Client-Component — fetcht `/api/admin/stats` + `/api/admin/stats/growth?period=30d`, rendert 4 primäre KPI-Cards (Nutzer gesamt/Aktiv/Premium/Bestandene Module heute), GrowthChart (30 Tage), 3 sekundäre KPI-Cards (Hochschulen/Studiengänge/Module), DB-Größen-Info-Bar, Quick-Nav-Karten
+- **recharts**: In Frontend-Container installiert (`npm install recharts`)
+
+### Sprint 5 Phase 5 — Frontend Fundament (2026-05-09)
+#### Added
+- **`middleware.ts`**: Edge-Runtime JWT-Decode via `atob()` + manuelles Base64url-Padding. `/admin/*` Guard: kein Token → /login, `is_admin=false` → /dashboard
+- **`app/api/admin/[...path]/route.ts`**: Catch-all Proxy für alle HTTP-Methoden → Backend `/api/v1/admin/*`, leitet Bearer + X-Admin-Token weiter, 204-safe
+- **`hooks/useAdminSession.ts`**: sessionStorage (Key: `sn_admin_session`), 15-min TTL, 1s-Countdown-Timer, 120s Warn-Schwelle — exports `{ token, isActive, isExpiringSoon, secondsLeft, saveSession, clearSession }`
+- **`components/admin/AdminSidebar.tsx`**: Dark sidebar (zinc-950), rotes ADMIN-Badge, 9 Nav-Items (Dashboard/Nutzer/Hochschulen/Studiengänge/Module/Voraussetzungen/Bulk-Import/Audit-Log/System), Live-Session-Timer-Chip (grün/amber), Re-Auth-Link
+- **`components/admin/AdminSessionBanner.tsx`**: Amber-Warning-Banner wenn <2 min verbleibend ("Verlängern"-Link), Zinc-Info-Bar wenn keine aktive Session
+- **`app/[locale]/admin/layout.tsx`**: Server-Component, fetcht Admin-Name via `GET /admin/me`, rendert AdminSidebar + AdminSessionBanner + Kinder (kein Dashboard-Chrome)
+- **`app/[locale]/admin/login/page.tsx`**: Dark-Design (zinc-950), Passwort-Form → `POST /api/admin/auth/session` → `saveSession(admin_token)` → redirect zu `/admin`
+
+### Sprint 5 Phase 4 — Analytics Backend (2026-05-09)
+#### Added
+- **`schemas/admin/analytics.py`**: `AdminStatsResponse` (13 Felder), `GrowthResponse`, `DailyRegistration`, `ModuleStatItem`, `ModuleStatsResponse`, `UserStatsResponse`, `SystemHealthResponse`, `SystemInfoResponse`
+- **`routers/admin/analytics.py`**: `GET /admin/stats` (13-Felder KPI-Übersicht), `GET /admin/stats/growth?period=7d|30d|90d|1y` (Tages-Zeitreihe), `GET /admin/stats/modules` (Top/Worst/BestAvgNote), `GET /admin/stats/users` (Segmentierung + by_program)
+- **`routers/admin/system.py`**: `GET /admin/system` (DB-Version + `pg_database_size()` + Counts), `GET /admin/system/health` (DB-Ping + Redis.ping → "ok"/"degraded"/"down")
+- **Backend Tests**: 12 neue Tests, 111/111 gesamt grün
+
+### Sprint 5 Phase 3 — PO-Verwaltung Backend (2026-05-09)
+#### Added
+- **`routers/admin/universities.py`**: CRUD Hochschulen (GET list/detail, POST, PATCH, DELETE)
+- **`routers/admin/faculties.py`**: CRUD Fakultäten (GET, POST, PATCH, DELETE)
+- **`routers/admin/programs.py`**: CRUD Studiengänge + Archive/Restore (Admin-Token + Begründung)
+- **`routers/admin/exam_regulations.py`**: CRUD PO-Versionen + Archive/Restore
+- **`routers/admin/modules.py`**: CRUD Modulkatalog + Archive/Restore + `POST /import/json` (Bulk-Import bis 500 Module, Duplikat-Detection via `kuerzel`, skip + count, Audit-logged). Import-Route vor `/{module_id}` registriert.
+- **`routers/admin/prerequisites.py`**: CRUD Modulvoraussetzungen (Hard Delete erlaubt — kein Bestandsschutz nach ADR-020)
+- **ADR-020**: Soft Delete (`is_archived`) — Module/Studiengänge/POs die Studentdaten haben dürfen nie hard-deleted werden
+- **Public Routes**: Alle 3 öffentlichen Endpoints in `universities.py` filtern `is_archived == False`
+- **Backend Tests**: 22 neue Tests, 99/99 gesamt grün
+
+### Sprint 5 Phase 2 — User-Management Backend (2026-05-09)
+#### Added
+- **`schemas/admin/user.py`**: `AdminUserListItem`, `AdminUserListResponse` (paginated), `AdminUserDetailResponse` (mit GPA/ECTS), `AdminUserPatch`, `DeleteUserRequest`
+- **`routers/admin/users.py`**: GET paginated (25/page, Search + Filter), GET Detail (GPA+ECTS+Module-Count), PATCH mit Audit-Log, POST reset-password (Admin-Token required), DELETE cascade (Admin-Token + Begründung)
+- **Backend Tests**: 25 neue Tests, 87/87 gesamt grün
+
+### Sprint 5 Phase 1 — Backend Fundament (2026-05-09)
+#### Added
+- **Migration 0015**: `is_admin BOOLEAN`, `last_login_at TIMESTAMP WITH TIME ZONE`, `admin_notes TEXT` auf `users`. Admin-Flag wird manuell gesetzt (kein Email-Seed im Code).
+- **Migration 0016**: `admin_audit_logs` Tabelle (id, admin_id, action, entity_type, entity_id, old_values, new_values, reason, created_at) + 3 Indizes
+- **Migration 0017**: `is_archived BOOLEAN`, `archived_at`, `archived_by_id`, `archive_reason` auf `modules`, `programs`, `exam_regulations`
+- **`app/core/admin_auth.py`**: `get_admin_user` (403), `get_verified_admin` (Redis 15-min Token-Prüfung), `create/revoke/verify_admin_session_token`
+- **`app/core/audit.py`**: `AuditLogger` FastAPI-Dependency — `audit.log(action, entity_type, entity_id, old_values, new_values, reason)`, db.flush() in gleicher Transaktion
+- **`app/core/security.py`**: `create_access_token` mit `is_admin: bool` Parameter → JWT-Claim `is_admin` für Next.js Middleware
+- **`app/routers/admin/auth.py`**: `POST /admin/auth/session` (Passwort → 15-min Redis-Token), `DELETE /admin/auth/session`, `GET /admin/me`
+- **`app/routers/auth.py`**: Login setzt `last_login_at` + übergibt `is_admin` an JWT
+- **ADR-019**: Admin-Session via Redis (15 min TTL, UUID-Token, `X-Admin-Token` Header)
+- **ADR-021**: `is_admin` im JWT-Payload — Next.js Middleware liest via `atob()` ohne DB-Query
+- **Backend Tests**: 15 neue Tests, 15/15 grün
+
 ### Sprint 4 Phase 1 — Prüfungsart & Modul-Metadaten (2026-05-08)
 #### Added
 - **Migration 0012**: `pruefungsart VARCHAR(20) NULLABLE` + `sws SMALLINT NULLABLE` auf `modules`

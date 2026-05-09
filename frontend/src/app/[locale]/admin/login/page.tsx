@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { KeyRound, Loader2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAdminSession } from "@/hooks/useAdminSession";
@@ -11,6 +12,7 @@ interface Props {
 }
 
 export default function AdminLoginPage({ params: { locale } }: Props) {
+  const t = useTranslations("admin.login");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -34,7 +36,7 @@ export default function AdminLoginPage({ params: { locale } }: Props) {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        setError(data.detail ?? "Authentifizierung fehlgeschlagen.");
+        setError(data.detail ?? t("errorDefault"));
         return;
       }
 
@@ -43,14 +45,14 @@ export default function AdminLoginPage({ params: { locale } }: Props) {
       router.push(`/${locale}/admin`);
       router.refresh();
     } catch {
-      setError("Netzwerkfehler. Bitte versuche es erneut.");
+      setError(t("errorNetwork"));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-950 px-4 py-8">
       <div className="w-full max-w-sm space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
@@ -59,17 +61,15 @@ export default function AdminLoginPage({ params: { locale } }: Props) {
               <KeyRound className="h-6 w-6 text-red-400" />
             </div>
           </div>
-          <h1 className="text-xl font-bold text-zinc-100">Admin-Authentifizierung</h1>
-          <p className="text-sm text-zinc-500">
-            Bestätige dein Passwort für Admin-Operationen (15 Min Session).
-          </p>
+          <h1 className="text-xl font-bold text-zinc-100">{t("title")}</h1>
+          <p className="text-sm text-zinc-500">{t("subtitle")}</p>
         </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-300" htmlFor="password">
-              Passwort
+              {t("passwordLabel")}
             </label>
             <input
               id="password"
@@ -78,8 +78,8 @@ export default function AdminLoginPage({ params: { locale } }: Props) {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoFocus
-              className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500"
-              placeholder="••••••••"
+              className="w-full rounded-md border border-zinc-700 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+              placeholder={t("passwordPlaceholder")}
             />
           </div>
 
@@ -92,25 +92,23 @@ export default function AdminLoginPage({ params: { locale } }: Props) {
           <Button
             type="submit"
             disabled={loading || !password}
-            className="w-full bg-red-600 hover:bg-red-700 text-white"
+            className="w-full bg-red-600 hover:bg-red-700 text-white h-11"
           >
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Authentifiziere…
+                {t("submitLoading")}
               </>
             ) : (
               <>
                 <ShieldCheck className="h-4 w-4 mr-2" />
-                Admin-Session starten
+                {t("submit")}
               </>
             )}
           </Button>
         </form>
 
-        <p className="text-center text-xs text-zinc-600">
-          Nach 15 Minuten Inaktivität wird die Session automatisch beendet.
-        </p>
+        <p className="text-center text-xs text-zinc-600">{t("footer")}</p>
       </div>
     </div>
   );

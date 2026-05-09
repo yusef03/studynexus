@@ -5,31 +5,40 @@ import { useCallback, useEffect, useState } from "react";
 const SESSION_KEY = "sn_admin_session";
 const TTL_MS = 15 * 60 * 1000; // 15 minutes
 const WARN_THRESHOLD_S = 120; // show warning below 2 minutes
+const SYNC_EVENT = "sn-admin-session-change"; // cross-instance sync
 
 interface StoredSession {
   token: string;
   expiresAt: number; // Unix ms
 }
 
+function readFromStorage(): StoredSession | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredSession;
+    if (parsed.expiresAt > Date.now()) return parsed;
+    sessionStorage.removeItem(SESSION_KEY);
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 export function useAdminSession() {
   const [session, setSession] = useState<StoredSession | null>(null);
   const [secondsLeft, setSecondsLeft] = useState(0);
 
-  // Hydrate from sessionStorage on mount
+  // Hydrate on mount AND whenever another hook instance saves/clears a session
   useEffect(() => {
-    try {
-      const raw = sessionStorage.getItem(SESSION_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as StoredSession;
-      if (parsed.expiresAt > Date.now()) {
-        setSession(parsed);
-        setSecondsLeft(Math.floor((parsed.expiresAt - Date.now()) / 1000));
-      } else {
-        sessionStorage.removeItem(SESSION_KEY);
-      }
-    } catch {
-      // sessionStorage unavailable (SSR guard)
+    function hydrate() {
+      const s = readFromStorage();
+      setSession(s);
+      setSecondsLeft(s ? Math.floor((s.expiresAt - Date.now()) / 1000) : 0);
     }
+    hydrate();
+    window.addEventListener(SYNC_EVENT, hydrate);
+    return () => window.removeEventListener(SYNC_EVENT, hydrate);
   }, []);
 
   // 1-second countdown
@@ -41,6 +50,7 @@ export function useAdminSession() {
       if (left === 0) {
         sessionStorage.removeItem(SESSION_KEY);
         setSession(null);
+        window.dispatchEvent(new Event(SYNC_EVENT));
       }
     }, 1000);
     return () => clearInterval(id);
@@ -51,12 +61,15 @@ export function useAdminSession() {
     sessionStorage.setItem(SESSION_KEY, JSON.stringify(s));
     setSession(s);
     setSecondsLeft(TTL_MS / 1000);
+    // Notify all other instances of this hook (Banner, Sidebar, etc.)
+    window.dispatchEvent(new Event(SYNC_EVENT));
   }, []);
 
   const clearSession = useCallback(() => {
     sessionStorage.removeItem(SESSION_KEY);
     setSession(null);
     setSecondsLeft(0);
+    window.dispatchEvent(new Event(SYNC_EVENT));
   }, []);
 
   const isActive = session !== null && secondsLeft > 0;

@@ -512,3 +512,121 @@ Display-Fallback im StudyPlanBoard: `plan_semester → semester_empfehlung → "
 - Backend verwendet `model_fields_set` um zwischen „nicht gesendet" und „explizit null" zu unterscheiden
 - StudyPlanBoard sendet ausschließlich `{ plan_semester: value }` im PUT-Body
 - `useUpdateModule` (Notenübersicht) sendet niemals `plan_semester` → sauber getrennt
+
+---
+
+## ADR-019: Admin-Session via Redis (15-Minuten-Token für destruktive Operationen)
+
+**Status:** Akzeptiert ✅ (Sprint 5 Phase 1)
+**Datum:** 2026-05-09
+
+**Kontext:**
+Admin-Operationen wie Archivieren oder Löschen sind riskant. Ein dauerhafter `is_admin`-Flag im JWT reicht nicht aus — wenn ein JWT gestohlen wird, hätte der Angreifer dauerhaften Vollzugriff. Das Sudo-Konzept aus Unix (kurze Re-Authentifizierung für privilegierte Aktionen) bietet einen besseren Ansatz.
+
+**Entscheidung:**
+- Separate Admin-Session via Redis: `POST /admin/auth/session` → Passwort-Verifikation → UUID-Token mit 15-min TTL in Redis gespeichert
+- Token wird als `X-Admin-Token` Header gesendet (nicht im Cookie — explizit)
+- FastAPI `get_verified_admin` Dependency prüft `X-Admin-Token` via Redis — nur für destruktive Ops
+- `is_admin` im JWT reicht für lesende Admin-Ops (GET endpoints)
+- Frontend speichert Token in `sessionStorage` (nicht localStorage — tab-scoped, kein XSS-Risiko durch httpOnly-Cookies)
+
+**Begründung:**
+- Zeitbegrenzung: 15-min Fenster reduziert Missbrauchsrisiko drastisch
+- Explizit: Header-basiert (kein Cookie) — klar von normaler Auth getrennt
+- Einfach: Redis-TTL macht Session-Management trivial
+- Sudo-Semantik: Benutzer muss Passwort re-eingeben, stärkt Bewusstsein für riskante Aktionen
+
+**Konsequenzen:**
+- Redis muss laufen (bereits Teil des Stacks)
+- Frontend: `useAdminSession` Hook mit Countdown-Timer, Warning ab 120s, `saveSession`/`clearSession`
+- Alle destruktiven Endpunkte: `Depends(get_verified_admin)` statt `Depends(get_admin_user)`
+- `/admin/login` Seite für Re-Auth
+
+---
+
+## ADR-020: Soft Delete (is_archived) für Module, Studiengänge und POs
+
+**Status:** Akzeptiert ✅ (Sprint 5 Phase 1)
+**Datum:** 2026-05-09
+
+**Kontext:**
+Module, Studiengänge und Prüfungsordnungen sind mit `StudentModule`-Einträgen verknüpft. Ein Hard Delete würde Studentendaten inkonsistent machen oder kaskadierend zerstören — beides inakzeptabel für eine Studienplattform.
+
+**Entscheidung:**
+Soft Delete via `is_archived`-Flag auf drei Tabellen:
+```sql
+ALTER TABLE modules ADD COLUMN is_archived BOOLEAN NOT NULL DEFAULT FALSE;
+ALTER TABLE modules ADD COLUMN archived_at TIMESTAMP WITH TIME ZONE;
+ALTER TABLE modules ADD COLUMN archived_by_id UUID REFERENCES users(id);
+ALTER TABLE modules ADD COLUMN archive_reason TEXT;
+-- analog für programs, exam_regulations
+```
+- Hard Delete ist in der Admin-API verboten für diese Entitäten
+- Archive/Restore erfordert `X-Admin-Token` + `reason` (Begründungspflicht)
+- Öffentliche Endpoints filtern `is_archived == False` automatisch
+- `module_prerequisites` (keine Studentdaten) erlaubt Hard Delete — Ausnahme zu dieser Regel
+
+**Begründung:**
+- Bestandsschutz: Bestehende StudentModule-Einträge bleiben valide
+- Auditierbarkeit: `archived_at` + `archived_by_id` + `archive_reason` → vollständiger Audit-Trail
+- Reversibel: Restore möglich ohne Datenverlust
+
+**Konsequenzen:**
+- Migration 0017: 4 neue Spalten auf modules/programs/exam_regulations
+- Admin-API: `POST /{id}/archive` + `POST /{id}/restore` statt `DELETE /{id}`
+- Public-APIs: explizite `is_archived == False` Filter in allen öffentlichen Endpoints
+- Frontend: ArchiveDialog-Komponente mit Pflicht-Begründungsfeld (Phase 7)
+
+---
+
+## ADR-021: is_admin-Claim im JWT — Middleware liest ohne DB-Query
+
+**Status:** Akzeptiert ✅ (Sprint 5 Phase 1)
+**Datum:** 2026-05-09
+
+**Kontext:**
+Die Next.js Middleware muss `/admin/*` Routen schützen. Optionen: (A) DB-Query pro Request, (B) Claim im JWT, (C) separates Cookie. Next.js Middleware läuft im Edge Runtime — kein direkter DB-Zugriff möglich.
+
+**Entscheidung:**
+- `is_admin: bool` wird beim Login in den JWT-Payload eingebettet: `create_access_token(..., is_admin=user.is_admin)`
+- Next.js Middleware dekodiert JWT-Payload mit `atob()` + manuelles Base64url-Padding (kein `Buffer` im Edge Runtime)
+- Keine Signaturverifikation in der Middleware (Signatur wird im Backend geprüft)
+- Beim Admin-Flag-Wechsel: nächster Login erzeugt neuen JWT mit korrektem Claim
+
+**Begründung:**
+- Edge Runtime: `Buffer` nicht verfügbar — `atob()` + manuelle Padding-Korrektur ist die einzige Option ohne externe Dependencies
+- Performance: Kein DB-Round-trip pro Request
+- Einfach: JWT ist bereits vorhanden, ein Feld hinzufügen kostet nichts
+- Sicherheit: Middleware macht "fast-fail" für Nicht-Admins, echte Verifikation findet im Backend statt (`get_admin_user` Dependency)
+
+**Konsequenzen:**
+- `create_access_token()` Signatur erweitert: `is_admin: bool = False`
+- `app/routers/auth.py`: `login()` übergibt `is_admin=user.is_admin`
+- `frontend/src/middleware.ts`: `parseJwtPayload()` Funktion mit `atob()` + Base64url-Padding
+- Kein Re-Login nötig für existierende Sessions bis zur natürlichen Token-Expiry
+
+---
+
+## ADR-022: AdminDataTable server-side paginiert (25 Einträge/Seite)
+
+**Status:** Akzeptiert ✅ (implementiert Sprint 5 Phasen 7+8)
+**Datum:** 2026-05-09
+
+**Kontext:**
+User- und Modul-Tabellen können tausende Einträge haben. Client-side Pagination würde alle Daten auf einmal laden.
+
+**Entscheidung:**
+- Alle Admin-Listendaten werden server-side paginiert (default: 25/Seite)
+- URL-Parameter: `?page=1&limit=25&search=&sort_by=created_at&sort_dir=desc`
+- Backend gibt `{ items: [...], total: N, page: N, limit: N }` zurück
+- Frontend verwendet `useQuery` mit Page-Parameter (kein TanStack Table client-side Sorting)
+
+**Begründung:**
+- Skalierbar: 10.000 User + 1000 Module kein Problem
+- Konsistent: Alle Admin-Listen verhalten sich gleich
+- Einfacher als Virtualisierung (react-virtual) für Admin-Use-Case
+
+**Konsequenzen:**
+- Alle Admin-Router haben `skip`/`limit` Parameter
+- `AdminUserListResponse` Schema: `{ items, total, page, limit }`
+- Frontend: Pagination-Komponente mit Seiten-Navigation

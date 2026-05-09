@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { BACKEND, bearerHeaders } from "@/lib/backend";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
+import { AdminMobileHeader } from "@/components/admin/AdminMobileHeader";
 import { AdminSessionBanner } from "@/components/admin/AdminSessionBanner";
 
 interface Props {
@@ -32,16 +33,14 @@ export default async function AdminLayout({ children, params: { locale } }: Prop
 
   return (
     <div className="flex min-h-screen bg-background">
+      {/* Desktop sidebar */}
       <AdminSidebar locale={locale} adminName={adminName} />
 
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile top bar (admin label) */}
-        <div className="md:hidden h-12 flex items-center gap-2 px-4 border-b bg-zinc-950 text-zinc-100">
-          <span className="text-xs font-bold tracking-widest text-red-400">ADMIN</span>
-          <span className="text-xs text-zinc-400">StudyNexus</span>
-        </div>
+        {/* Mobile header with hamburger + slide drawer */}
+        <AdminMobileHeader locale={locale} adminName={adminName} />
 
-        {/* Session warning banner */}
+        {/* Session warning / info banner */}
         <AdminSessionBanner locale={locale} />
 
         {/* Page content */}
