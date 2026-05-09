@@ -658,21 +658,23 @@ Import-Flow:
 
 ## Implementierungs-Phasen
 
-### Phase 1 – Backend Fundament (2–3 Tage)
-- [ ] Migration 0015: `is_admin`, `is_premium`, `last_login_at`, `admin_notes` auf users
-- [ ] Migration 0016: `admin_audit_logs` Tabelle
-- [ ] Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
-- [ ] `app/models/admin_audit_log.py` – SQLAlchemy Model
-- [ ] `app/core/admin_auth.py` – `get_admin_user`, `get_verified_admin`, Admin-Session via Redis
-- [ ] `app/core/audit.py` – `AuditLogger` Klasse als FastAPI Dependency
-- [ ] `app/routers/admin/auth.py` – `POST /admin/auth/session`, `DELETE /admin/auth/session`
-- [ ] Seed: Admin-Flag für Yusef setzen
-- [ ] Backend-Tests: Admin-Auth-Guard (403 für Non-Admins), Admin-Session-Flow
+### Phase 1 – Backend Fundament ✅ (2026-05-09)
+- [x] Migration 0015: `is_admin`, `last_login_at`, `admin_notes` auf users + Seed yusefbach01@gmail.com
+- [x] Migration 0016: `admin_audit_logs` Tabelle (3 Indizes: admin_id, entity, created DESC)
+- [x] Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
+- [x] `app/models/admin_audit_log.py` – SQLAlchemy Model
+- [x] `app/core/admin_auth.py` – `get_admin_user`, `get_verified_admin`, Admin-Session via Redis (15 Min)
+- [x] `app/core/audit.py` – `AuditLogger` Klasse als FastAPI Dependency (flush() in gleicher Transaktion)
+- [x] `app/core/security.py` – `create_access_token` mit `is_admin` JWT-Claim
+- [x] `app/routers/admin/auth.py` – `POST /admin/auth/session`, `DELETE /admin/auth/session`, `GET /admin/auth/me`
+- [x] `app/routers/auth.py` – Login setzt `last_login_at` + übergibt `is_admin` an JWT
+- [x] Seed: Admin-Flag für Yusef (yusefbach01@gmail.com) in Migration 0015
+- [x] Backend-Tests: 15/15 grün — Zugriffskontrolle, Session-Flow, mock_admin_user + admin_client Fixtures
 
-### Phase 2 – User-Management Backend (1–2 Tage)
+### Phase 2 – User-Management Backend (1–2 Tage) ← nächste Session
 - [ ] `app/schemas/admin/user.py` – AdminUserListResponse, AdminUserDetailResponse, AdminUserPatch
 - [ ] `app/routers/admin/users.py` – alle User-Endpunkte (GET List, GET Detail, PATCH, DELETE)
-- [ ] `last_login_at` wird bei jedem Login gesetzt (`POST /auth/login` Router anpassen)
+- [x] `last_login_at` wird bei jedem Login gesetzt (bereits in Phase 1 erledigt)
 - [ ] Audit-Logging für alle User-Mutationen
 - [ ] Tests: Paginated User-Liste, PATCH User, Schutzprüfung
 

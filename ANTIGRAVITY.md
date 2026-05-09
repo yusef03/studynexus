@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 4 Complete — Sprint 5 (Admin Panel) next
+**Status:** 🔧 Sprint 5 In Progress — Phase 1 (Backend Fundament) complete
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-05-09
 
@@ -121,9 +121,9 @@ docker compose exec db psql -U studynexus -d studynexus -c "TRUNCATE users CASCA
 | 0012 | 2026-05-08 | pruefungsart + sws auf modules, BIN-Seed für alle 37 Module | ✅ |
 | 0013 | 2026-05-08 | module_prerequisites Tabelle + parent_module_id auf student_modules + BIN §6 Seed | ✅ |
 | 0014 | 2026-05-09 | BIN-209 gewichtung 1.0 → 1.5 (Datenfehler-Fix laut PO Anlage B2) | ✅ |
-| **0015** | **Sprint 5** | **is_admin, is_premium, last_login_at, admin_notes auf users** | 🔜 |
-| **0016** | **Sprint 5** | **admin_audit_logs Tabelle** | 🔜 |
-| **0017** | **Sprint 5** | **is_archived + Soft-Delete-Felder auf modules/programs/exam_regulations** | 🔜 |
+| 0015 | 2026-05-09 | is_admin, last_login_at, admin_notes auf users + Seed für yusefbach01@gmail.com | ✅ |
+| 0016 | 2026-05-09 | admin_audit_logs Tabelle (3 Indizes: admin_id, entity, created DESC) | ✅ |
+| 0017 | 2026-05-09 | is_archived + Soft-Delete-Felder auf modules/programs/exam_regulations | ✅ |
 
 ---
 
@@ -262,6 +262,15 @@ Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigie
 - **RegisterForm:** Hochschule-Freitextfeld → `<select>` Dropdown (fetcht `/api/universities`, auto-selektiert wenn nur 1 Hochschule).
 - **Test-Fix:** test_auth.py — `_make_user` fehlende Felder (matrikelnummer/university/profile_picture_url), Register-Tests mit Pflichtfeldern.
 
+### Sprint 5 Phase 1 ✅ (2026-05-09) — Backend Fundament
+- **Migrations 0015–0017:** is_admin + last_login_at + admin_notes auf users, admin_audit_logs Tabelle, Soft-Delete auf modules/programs/exam_regulations. Alle migriert + Yusef-Seed aktiv.
+- **`app/core/admin_auth.py`:** `get_admin_user` (403 für Nicht-Admins), `get_verified_admin` (Redis 15-min Admin-Session Token), `create/revoke/verify_admin_session_token`.
+- **`app/core/audit.py`:** `AuditLogger` FastAPI-Dependency — `audit.log(action, entity_type, ...)`, db.flush() in gleicher Transaktion.
+- **`app/core/security.py`:** `create_access_token` hat jetzt `is_admin: bool` Parameter → JWT-Claim für Frontend-Middleware.
+- **`app/routers/admin/auth.py`:** `POST /admin/auth/session` (Passwort → 15-min Token), `DELETE /admin/auth/session`, `GET /admin/auth/me`.
+- **`app/routers/auth.py`:** Login setzt `last_login_at` + übergibt `is_admin` an JWT.
+- **Tests:** 15/15 grün — Zugriffskontrolle (403/401), Session Create/Revoke, MagicMock-Fixes (`is_admin=False` in `_make_user`, `mock_admin_user` + `admin_client` Fixtures).
+
 ---
 
 ## BIN Studiengang — Domain-Wissen
@@ -317,7 +326,7 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 
 ---
 
-## Known Limitations (Stand: Sprint 4 abgeschlossen)
+## Known Limitations (Stand: Sprint 5 Phase 1 abgeschlossen)
 
 | Limitation | Geplant |
 |---|---|
@@ -334,19 +343,25 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 
 ---
 
-## Next Steps: Sprint 5 — Admin Panel
+## Next Steps: Sprint 5 Phase 2 — User-Management Backend
 
 **Masterplan:** `docs/sprints/sprint-5-plan.md`
 
-### Migrationen
-- Migration 0015: `is_admin`, `is_premium`, `last_login_at`, `admin_notes` auf users  
-- Migration 0016: `admin_audit_logs` Tabelle  
-- Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
+### Phase 1 ✅ Backend Fundament (komplett)
+Migrations 0015–0017, admin_auth, audit, Admin-Session, JWT is_admin claim.
 
-### Backend (12 Phasen)
-- Admin-Auth: `get_admin_user` Dependency + Admin-Session via Redis (15 Min)
-- 30+ Admin-Endpunkte unter `/api/v1/admin/`
-- Vollständiges CRUD: Universities, Faculties, Programs, ExamRegulations, Modules, Prerequisites
+### Phase 2 — User-Management Backend (nächste Session)
+- `app/schemas/admin/user.py` — AdminUserListResponse, AdminUserDetailResponse, AdminUserPatch
+- `app/routers/admin/users.py` — GET (paginated + filter), GET detail, PATCH, DELETE
+- Audit-Logging für alle User-Mutationen
+- Tests: Paginated User-Liste, PATCH User, 403-Schutz
+
+### Phase 3 — PO-Verwaltung Backend
+- 30+ Admin-Endpunkte: Universities, Faculties, Programs, ExamRegulations, Modules + JSON-Import
+- Archive/Restore mit Admin-Token + Begründungspflicht
+
+### Phasen 4–12
+KPIs/Analytics → Frontend Layout → Dashboard → AdminDataTable → User-UI → PO-UI → Import/Audit-Log → Admin-Link in Sidebar
 - Soft Delete mit Begründungspflicht + Restore
 - JSON-Bulk-Import für Module (bis 500, mit Validierung)
 - AuditLogger Dependency → automatisches Logging jeder Mutation
