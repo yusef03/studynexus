@@ -20,7 +20,7 @@
 | Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3.7-review.md](sprint-3.7-review.md) |
 | Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3.7.7-review.md](sprint-3.7.7-review.md) |
 | **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | — |
-| Sprint 5 | Admin Panel | Geplant | 2 Wochen | — |
+| Sprint 5 | Admin Panel | Geplant | 2–3 Wochen | [sprint-5-plan.md](sprint-5-plan.md) |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
 | Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
@@ -481,29 +481,44 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ### Sprint 5 – Admin Panel
 
-**Status:** Geplant (nach Sprint 4)
-**Ziel:** Yusef-only Admin-Panel für PO-Verwaltung — ersetzt manuelle Alembic-Migrationen für neue Studiengänge und Module.
+**Status:** Geplant (nach Sprint 4)  
+**Detailplanung:** [sprint-5-plan.md](sprint-5-plan.md)  
+**Ziel:** Vollständiges, professionelles Admin-Panel — PO-Verwaltung, User-Management, Analytics, Audit-Log.
 
-**Basis:** ADR-009 (Admin-only PO-Verwaltung)
+**Basis:** ADR-009, ADR-019 (Admin-Session Redis), ADR-020 (Soft Delete), ADR-021 (JWT is_admin), ADR-022 (Server-side Pagination)
 
 **User Stories:**
-- Als Admin möchte ich Studiengänge, Module und Prüfungsordnungen ohne Code-Änderung verwalten
-- Als Admin möchte ich Modul-Voraussetzungen (module_prerequisites) über ein UI eintragen
-- Als Admin möchte ich neue HsH-Studiengänge (z.B. MDI) über das Panel hinzufügen
+- Als Admin möchte ich alle Nutzer sehen, aktivieren/deaktivieren und Premium setzen
+- Als Admin möchte ich Studiengänge, Module und PO-Regeln ohne Code-Änderung verwalten
+- Als Admin möchte ich neue Studiengänge per JSON-Import anlegen (nicht Modul für Modul)
+- Als Admin möchte ich jede Änderung im Audit-Log nachvollziehen können
+- Als Admin möchte ich KPIs und Wachstums-Statistiken auf einem Dashboard sehen
 
-**Technische Tasks:**
-- [ ] `is_admin BOOLEAN DEFAULT FALSE` auf `users` (Migration 0014)
-- [ ] Admin Auth Guard: FastAPI-Dependency `get_admin_user` (wirft 403 wenn not is_admin)
-- [ ] Admin API-Endpunkte (unter `/api/v1/admin/`):
-  - CRUD University, Faculty, Program, ExamRegulation
-  - CRUD Module (mit pruefungsart, sws, gewichtung, semester_empfehlung)
-  - CRUD module_prerequisites
-  - User-Übersicht (read-only, kein Passwort-Zugriff)
-- [ ] Next.js `/dashboard/admin/` Route (nur wenn is_admin=true)
-- [ ] Admin Sidebar-Link (nur sichtbar für Admins)
-- [ ] Admin-Tabellen: Studiengänge, Module, Voraussetzungen
-- [ ] Admin-Formulare: Modul anlegen/bearbeiten mit allen Feldern
-- [ ] Admin-Schutz: Next.js Middleware wirft 403 für Nicht-Admins auf /admin-Routes
+**Migrationen:**
+- [ ] Migration 0015: `is_admin`, `is_premium`, `last_login_at`, `admin_notes` auf users
+- [ ] Migration 0016: `admin_audit_logs` Tabelle (vollständiger Audit-Trail)
+- [ ] Migration 0017: Soft-Delete-Felder auf modules/programs/exam_regulations
+
+**Backend (12 Phasen, Details in sprint-5-plan.md):**
+- [ ] Admin-Auth: `get_admin_user`, `get_verified_admin`, Admin-Session via Redis (15 Min)
+- [ ] User-Management: GET List/Detail, PATCH (is_active/is_premium/is_verified), DELETE
+- [ ] PO-CRUD: Universities, Faculties, Programs, ExamRegulations, Modules, Prerequisites
+- [ ] Soft Delete: Archive/Restore mit Begründungspflicht
+- [ ] JSON-Bulk-Import: bis 500 Module, mit Validierung + Duplikat-Erkennung
+- [ ] Analytics: KPIs, Wachstums-Zeitreihen, Modul-Statistiken
+- [ ] Audit-Logging: automatisch für jede Mutation (old/new JSON, IP, Begründung)
+
+**Frontend (Route: `/admin`, eigenes Layout):**
+- [ ] Admin-Layout: eigene Sidebar, kein Dashboard-Frame, Admin-Badge
+- [ ] Middleware-Schutz: is_admin im JWT → 403 für Non-Admins
+- [ ] Admin-Session-Banner: Auto-Expiry-Warning nach 15 Min
+- [ ] AdminDataTable: sortierbar, filterbar, server-side paginiert, CSV-Export
+- [ ] Dashboard: KPI-Cards + Recharts LineChart + Recent Activity
+- [ ] User-Tabelle + User-Detail mit Quick-Actions
+- [ ] PO-Tree: University → Faculty → Program → ExamRegulation → Modulkatalog
+- [ ] Modul-Formular: alle Felder + Voraussetzungs-Editor + Audit-Sidebar
+- [ ] JSON-Import-Seite: Drag & Drop, Validierung, Vorschau, PDF-Placeholder
+- [ ] Audit-Log: Timeline-View mit Entity/Action/Datum-Filter
 
 ---
 
