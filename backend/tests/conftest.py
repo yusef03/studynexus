@@ -28,6 +28,22 @@ def mock_user():
     user.full_name = "Test User"
     user.is_active = True
     user.is_premium = False
+    user.is_admin = False
+    user.last_login_at = None
+    user.created_at = _FIXED_DT
+    return user
+
+
+@pytest.fixture
+def mock_admin_user():
+    user = MagicMock()
+    user.id = _FIXED_UUID
+    user.email = "admin@stud.hs-hannover.de"
+    user.full_name = "Admin User"
+    user.is_active = True
+    user.is_premium = False
+    user.is_admin = True
+    user.last_login_at = None
     user.created_at = _FIXED_DT
     return user
 
@@ -44,6 +60,15 @@ def client(mock_db):
 def authed_client(mock_db, mock_user):
     app.dependency_overrides[get_db] = lambda: mock_db
     app.dependency_overrides[get_current_user] = lambda: mock_user
+    with TestClient(app) as c:
+        yield c
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def admin_client(mock_db, mock_admin_user):
+    app.dependency_overrides[get_db] = lambda: mock_db
+    app.dependency_overrides[get_current_user] = lambda: mock_admin_user
     with TestClient(app) as c:
         yield c
     app.dependency_overrides.clear()

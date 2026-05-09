@@ -56,7 +56,10 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     if not user.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account deactivated")
 
-    return TokenResponse(access_token=create_access_token(str(user.id)))
+    user.last_login_at = datetime.now(timezone.utc)
+    db.commit()
+
+    return TokenResponse(access_token=create_access_token(str(user.id), is_admin=user.is_admin))
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

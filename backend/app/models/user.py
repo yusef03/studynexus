@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import Column, String, Boolean, DateTime
+from sqlalchemy import Column, String, Boolean, DateTime, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
 from app.database import Base
@@ -16,15 +16,21 @@ class User(Base):
     full_name = Column(String, nullable=True)
     is_active = Column(Boolean, default=True, nullable=False)
     is_premium = Column(Boolean, default=False, nullable=False)
+    is_admin = Column(Boolean, default=False, nullable=False)
     is_verified = Column(Boolean, default=False, nullable=False)
     verification_code = Column(String, nullable=True)
     verification_expires_at = Column(DateTime(timezone=True), nullable=True)
     preferred_language = Column(String(2), default="de", nullable=False)
-    
+
     # Profile fields
     birth_date = Column(DateTime(timezone=True), nullable=True)
     university = Column(String, nullable=True)
     profile_picture_url = Column(String, nullable=True)
+
+    # Admin fields (Sprint 5, Migration 0015)
+    last_login_at = Column(DateTime(timezone=True), nullable=True)
+    admin_notes = Column(Text, nullable=True)
+
     # Python default keeps the field populated before DB flush (needed for tests/serialisation)
     created_at = Column(
         DateTime(timezone=True),

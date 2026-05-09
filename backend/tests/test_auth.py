@@ -15,6 +15,7 @@ def _make_user(**kwargs):
     user.preferred_language = "de"
     user.is_active = True
     user.is_premium = False
+    user.is_admin = False
     user.created_at = _FIXED_DT
     user.matrikelnummer = None
     user.birth_date = None
