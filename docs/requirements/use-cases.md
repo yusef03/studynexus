@@ -31,7 +31,7 @@
 | UC11 | Study Space gründen | Studierender | 🗓 Sprint 8 | - |
 | UC12 | Admin-Panel betreten (Re-Auth) | Admin | ✅ implementiert | - |
 | UC13 | Nutzer verwalten | Admin | ✅ implementiert | - |
-| UC14 | PO-Daten verwalten | Admin | 🔧 Backend ✅, Frontend Phase 9 | - |
+| UC14 | PO-Daten verwalten | Admin | ✅ implementiert → [Detaillierte Use Cases](admin-po-use-cases.md) | - |
 | UC15 | Analytics-Dashboard einsehen | Admin | ✅ implementiert | - |
 | UC16 | Audit-Log einsehen | Admin | 🔧 Backend ✅, Frontend Phase 10 | - |
 

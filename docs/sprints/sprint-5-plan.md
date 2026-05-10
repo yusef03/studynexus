@@ -1,6 +1,6 @@
 # Sprint 5 – Admin Panel Masterplan
 
-**Status:** 🔧 In Bearbeitung — Phasen 1–8 abgeschlossen (2026-05-10)  
+**Status:** 🔧 In Bearbeitung — Phasen 1–9 + 11 abgeschlossen (2026-05-10)  
 **Zeitraum:** 2026-05-09 – laufend  
 **Basis:** ADR-009 (Admin PO-Verwaltung), ADR-019–022
 
@@ -748,14 +748,16 @@ Import-Flow:
 - [x] `app/[locale]/admin/users/page.tsx` — 7-spaltige Tabelle (User, Matrikel, Status, Programm, Fortschritt, Letzter Login, Registriert), 5 Filter-Tabs, debounced Search, Row-Click → Detail
 - [x] `app/[locale]/admin/users/[id]/page.tsx` — Persönliche Daten, Studienplan, Toggle-Switches (PATCH), Admin-Notes, Danger Zone (Passwort-Reset + DeleteDialog)
 
-### Phase 9 – PO-Verwaltung Frontend (2–3 Tage)
-- [ ] `app/[locale]/admin/universities/page.tsx` + `[id]/page.tsx`
-- [ ] `app/[locale]/admin/programs/page.tsx` + `[id]/page.tsx`
-- [ ] `app/[locale]/admin/exam-regulations/[id]/page.tsx` (Hauptseite: PO + Modulkatalog)
-- [ ] `app/[locale]/admin/modules/page.tsx` – globale Modul-Übersicht
-- [ ] `app/[locale]/admin/modules/new/page.tsx` – Erstell-Formular
-- [ ] `app/[locale]/admin/modules/[id]/page.tsx` – Edit + Audit-Sidebar + Voraussetzungs-Editor
-- [ ] `app/[locale]/admin/prerequisites/page.tsx`
+### Phase 9 – PO-Verwaltung Frontend (2–3 Tage) ✅
+- [x] `app/[locale]/admin/universities/page.tsx` + `[id]/page.tsx` — Liste + Detail mit Fakultäten-Editor
+- [x] `app/[locale]/admin/programs/page.tsx` + `[id]/page.tsx` — Liste/Filter + Detail mit PO-Tabelle + Archivierung
+- [x] `app/[locale]/admin/exam-regulations/[id]/page.tsx` — PO-Hub: Modulkatalog, JSON-Import, Modul anlegen, PO archivieren
+- [x] `app/[locale]/admin/modules/page.tsx` — globale Modul-Übersicht mit Filter-Tabs + Live-Suche
+- [x] `app/[locale]/admin/modules/[id]/page.tsx` — Edit + Voraussetzungs-Editor (add/delete, TYPE-conditional fields)
+- [x] `types/admin.ts` — AdminFaculty, AdminUniversity(Detail), AdminProgram(Detail), AdminExamReg(Detail), AdminModule(Detail), AdminPrerequisite
+- [x] `hooks/admin/useAdminUniversities.ts`, `useAdminPrograms.ts`, `useAdminModules.ts`
+- [x] i18n (DE+EN): admin.common, admin.universities, admin.programs, admin.examRegs, admin.modules, admin.prerequisites
+- **Ausgelassen:** `modules/new/page.tsx` (Erstellen inline in ER-Detail), `prerequisites/page.tsx` (aus Modul-Detail heraus)
 
 ### Phase 10 – Import + Audit-Log Frontend (1 Tag)
 - [ ] `components/admin/JsonImportZone.tsx` – Drag & Drop + JSON-Validierung + Vorschau
@@ -763,9 +765,9 @@ Import-Flow:
 - [ ] `app/[locale]/admin/audit-log/page.tsx` – Timeline-View mit Filtern
 - [ ] `app/[locale]/admin/system/page.tsx`
 
-### Phase 11 – Admin-Link im User-Dashboard (0.5 Tage)
-- [ ] `AppSidebar.tsx`: Admin-Link ganz unten (nur wenn `is_admin` im JWT)
-- [ ] `MobileNav.tsx`: gleicher Admin-Link
+### Phase 11 – Admin-Link im User-Dashboard (0.5 Tage) ✅
+- [x] `AppSidebar.tsx`: Admin-Link ganz unten (nur wenn `is_admin` im JWT)
+- [x] `MobileNav.tsx`: gleicher Admin-Link
 
 ### Phase 12 – Tests + Härtung (1 Tag)
 - [ ] Backend-Tests: alle Admin-Endpunkte (401/403-Schutz, Audit-Log-Einträge)

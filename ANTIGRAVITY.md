@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
-**Status:** 🔧 Sprint 5 In Progress — Phase 8 (User Management Frontend) complete
+**Status:** 🔧 Sprint 5 In Progress — Phase 9 (PO-Verwaltung Frontend) complete
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-05-10
 
@@ -349,6 +349,21 @@ Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigie
 - **`components/admin/AuditBadge.tsx`:** created/modified Varianten, locale-aware Datum + Zeit.
 - **Mobile-Regeln** in ANTIGRAVITY.md Regel 18–20 dokumentiert.
 
+### Sprint 5 Phase 9 ✅ (2026-05-10) — PO-Verwaltung Frontend + Phase 11 Admin-Link
+- **`types/admin.ts`:** 10 neue Interfaces — AdminFaculty, AdminUniversity(Detail), AdminProgram(Detail), AdminExamReg(Detail), AdminModule(Detail), AdminPrerequisite.
+- **`hooks/admin/useAdminUniversities.ts`:** useAdminUniversities() + useAdminUniversity(id).
+- **`hooks/admin/useAdminPrograms.ts`:** useAdminPrograms(params?) + useAdminProgram(id).
+- **`hooks/admin/useAdminModules.ts`:** useAdminModules(params?) + useAdminModule(id) + useAdminExamReg(id) → AdminExamRegDetail.
+- **`app/[locale]/admin/universities/page.tsx`:** Liste mit Create-Modal (5 Felder inkl. Typ FH/Uni), Live-Suche.
+- **`app/[locale]/admin/universities/[id]/page.tsx`:** Detail + Fakultäten-Tabelle (anlegen/löschen), Edit-Modal, DeleteDialog (Admin-Token).
+- **`app/[locale]/admin/programs/page.tsx`:** Liste + Filter-Tabs (Alle/Aktiv/Archiviert) + Create-Modal.
+- **`app/[locale]/admin/programs/[id]/page.tsx`:** Detail + PO-Tabelle + ExamReg anlegen + Edit + Archive/Restore.
+- **`app/[locale]/admin/exam-regulations/[id]/page.tsx`:** PO-Hub — Modulkatalog (useMemo filter+search), Modul anlegen, JSON-Bulk-Import (client-side JSON.parse validation → POST /modules/import/json), Archive/Restore.
+- **`app/[locale]/admin/modules/page.tsx`:** Globale Übersicht, Filter-Tabs + Live-Suche, ModulTypBadge.
+- **`app/[locale]/admin/modules/[id]/page.tsx`:** 11 InfoRows, Edit-Modal, Voraussetzungs-Editor (TYPE-conditional: MODULE/ECTS_THRESHOLD/SEMESTER_COMPLETE), Prereq löschen (Admin-Token), Archive/Restore.
+- **i18n (DE+EN):** admin.common, admin.universities, admin.programs, admin.examRegs, admin.modules, admin.prerequisites — ~200 neue Keys.
+- **Phase 11:** AppSidebar + MobileNav Admin-Link (is_admin guard).
+
 ### Sprint 5 Phase 8 ✅ (2026-05-10) — User Management Frontend
 - **`types/admin.ts`:** AdminUserListItem, AdminUserListResponse, AdminUserDetail (extends List + university/birth_date/admin_notes/gpa), AdminUserPatch.
 - **`lib/adminFetch.ts`:** `adminGet<T>(path)` + `adminMutate<T>(path, method, {body?, adminToken?})` — Content-Type + x-admin-token forwarding, 204-safe.
@@ -429,7 +444,7 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 
 ---
 
-## Next Steps: Sprint 5 Phase 9 — PO-Verwaltung Frontend
+## Next Steps: Sprint 5 Phase 10 — Import + Audit-Log Frontend
 
 **Masterplan:** `docs/sprints/sprint-5-plan.md`
 
@@ -442,11 +457,11 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 - **Phase 6** — Dashboard + Analytics Frontend (KPICard, GrowthChart, Dashboard-Page)
 - **Phase 7** — Mobile/i18n Rework + Reusable Components (AdminDataTable, Dialogs, Badges)
 - **Phase 8** — User Management Frontend (`/admin/users`, `/admin/users/[id]`)
+- **Phase 9** — PO-Verwaltung Frontend (universities, programs, exam-regulations, modules, prerequisites)
+- **Phase 11** — Admin-Link im User-Dashboard (AppSidebar + MobileNav, is_admin guard)
 
 ### Ausstehend 🔧
-- **Phase 9** — PO-Verwaltung Frontend (universities, programs, exam-regulations, modules pages)
-- **Phase 10** — Import + Audit-Log Frontend (JsonImportZone, Audit-Log Timeline)
-- **Phase 11** — Admin-Link im User-Dashboard (AppSidebar + MobileNav, nur wenn is_admin)
+- **Phase 10** — Import + Audit-Log Frontend (JsonImportZone, Audit-Log Timeline, System-Health page)
 - **Phase 12** — Tests + Härtung (TypeScript clean, middleware, JSON-Import error cases)
 
 ### Admin-Flag setzen (einmalig nach erstem Login)

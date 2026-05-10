@@ -4,6 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Sprint 5 Phase 9 — PO-Verwaltung Frontend + Phase 11 Admin-Link (2026-05-10)
+#### Added
+- **`types/admin.ts`**: 8 neue Interfaces — `AdminFaculty`, `AdminUniversity`, `AdminUniversityDetail`, `AdminProgram`, `AdminProgramDetail`, `AdminExamReg`, `AdminExamRegDetail`, `AdminModule`, `AdminModuleDetail`, `AdminPrerequisite`
+- **`hooks/admin/useAdminUniversities.ts`**: `useAdminUniversities()` (Liste) + `useAdminUniversity(id)` (Detail mit Fakultäten)
+- **`hooks/admin/useAdminPrograms.ts`**: `useAdminPrograms(params?)` (Liste, filter: faculty_id, include_archived) + `useAdminProgram(id)` (Detail mit ExamRegs + student_count)
+- **`hooks/admin/useAdminModules.ts`**: `useAdminModules(params?)` (Liste, filter: exam_regulation_id, include_archived) + `useAdminModule(id)` + `useAdminExamReg(id)` → `AdminExamRegDetail`
+- **`app/[locale]/admin/universities/page.tsx`**: Liste aller Hochschulen, inline Create-Modal (Name/Kürzel/Stadt/Bundesland/Typ), Live-Suche, Row-Click → Detail
+- **`app/[locale]/admin/universities/[id]/page.tsx`**: Detail-Seite — Hochschul-Info, Fakultäten-Tabelle (anlegen/löschen), Edit-Modal, Delete (nur wenn keine Fakultäten), Admin-Session-Guard
+- **`app/[locale]/admin/programs/page.tsx`**: Liste mit Filter-Tabs (Alle/Aktiv/Archiviert), Live-Suche, StatusBadge, Create-Modal
+- **`app/[locale]/admin/programs/[id]/page.tsx`**: Detail — Studiengang-Info, PO-Tabelle mit `ist_aktuell`-Indikator + Link, ExamReg anlegen Modal, Edit-Modal, Archive/Restore via ArchiveDialog
+- **`app/[locale]/admin/exam-regulations/[id]/page.tsx`**: PO-Hub — Info-Section, Modulkatalog (7 Spalten, Filter-Tabs + Suche via useMemo), Modul anlegen inline, JSON-Bulk-Import (Array.isArray-Validation → POST `/modules/import/json` → Result-Anzeige), PO bearbeiten + archivieren
+- **`app/[locale]/admin/modules/page.tsx`**: Globale Modul-Übersicht, Filter-Tabs + Live-Suche, ModulTypBadge (PFLICHT/WAHLPFLICHT/ERGAENZEND), StatusBadge, Row-Click → Detail
+- **`app/[locale]/admin/modules/[id]/page.tsx`**: Modul-Detail — 11 InfoRows, Edit-Modal (pre-filled), Voraussetzungs-Tabelle (PrereqTypeBadge), Voraussetzung anlegen (TYPE-conditional fields: MODULE/ECTS_THRESHOLD/SEMESTER_COMPLETE), Voraussetzung löschen (DELETE + Admin-Token), Archivieren/Wiederherstellen
+- **i18n (DE+EN)**: `admin.common` (yes/no/edit/restore/archive/delete/noSession/saved/saveError), `admin.universities`, `admin.programs`, `admin.examRegs`, `admin.modules`, `admin.prerequisites` (je ~20–40 Keys)
+- **Phase 11**: `AppSidebar.tsx` + `MobileNav.tsx` — Admin-Link sichtbar nur wenn `is_admin: true` im JWT (bereits in Phase 7-8 Commit enthalten)
+
 ### Sprint 5 Phase 8 — User Management Frontend (2026-05-10)
 #### Added
 - **`types/admin.ts`**: TypeScript-Interfaces: `AdminUserListItem`, `AdminUserListResponse`, `AdminUserDetail` (extends List + university/birth_date/admin_notes/gpa), `AdminUserPatch`
