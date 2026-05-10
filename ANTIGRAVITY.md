@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
-**Status:** 🔧 Sprint 5 In Progress — Phase 9 (PO-Verwaltung Frontend) complete
+**Status:** 🔧 Sprint 5 In Progress — Phase 10 (Audit-Log + System + Import Frontend) complete
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-05-10
 
@@ -349,6 +349,17 @@ Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigie
 - **`components/admin/AuditBadge.tsx`:** created/modified Varianten, locale-aware Datum + Zeit.
 - **Mobile-Regeln** in ANTIGRAVITY.md Regel 18–20 dokumentiert.
 
+### Sprint 5 Phase 10 ✅ (2026-05-10) — Audit-Log + System + Import Frontend
+- **`backend/app/schemas/admin/audit_log.py`:** AuditLogItem + AuditLogListResponse.
+- **`backend/app/routers/admin/audit_log.py`:** GET /audit-log (paginated, filter: entity_type/action/date_from/date_to), GET /audit-log/{id}. admin_name via Python Set-Lookup gegen User-Query.
+- **`types/admin.ts`:** AuditAction union, AdminAuditLog, AdminAuditLogListResponse, AdminServiceStatus, AdminSystemInfo, AdminSystemHealth.
+- **`hooks/admin/useAdminAuditLog.ts`:** useAdminAuditLogs(params) + useAdminAuditLogEntry(id), staleTime 10s, placeholderData.
+- **`hooks/admin/useAdminSystem.ts`:** useAdminSystemInfo() (staleTime 60s) + useAdminSystemHealth() (refetchInterval 60s).
+- **`app/[locale]/admin/audit-log/page.tsx`:** Timeline-View, ActionBadge (8 Farb-Varianten), DiffBlock (old→new diff), Filter-Bar (entity_type+action+date), Pagination.
+- **`app/[locale]/admin/system/page.tsx`:** OverallBadge (ok/degraded/down), ServiceBadge, Health+Info+Stack Sections, Auto-Refresh.
+- **`app/[locale]/admin/import/page.tsx`:** Exam-Reg-ID + JSON-Textarea → Validate → Preview → POST /modules/import/json → Result. PDF-Placeholder.
+- **i18n (DE+EN):** admin.auditLog, admin.system, admin.import (~70 neue Keys).
+
 ### Sprint 5 Phase 9 ✅ (2026-05-10) — PO-Verwaltung Frontend + Phase 11 Admin-Link
 - **`types/admin.ts`:** 10 neue Interfaces — AdminFaculty, AdminUniversity(Detail), AdminProgram(Detail), AdminExamReg(Detail), AdminModule(Detail), AdminPrerequisite.
 - **`hooks/admin/useAdminUniversities.ts`:** useAdminUniversities() + useAdminUniversity(id).
@@ -444,7 +455,7 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 
 ---
 
-## Next Steps: Sprint 5 Phase 10 — Import + Audit-Log Frontend
+## Next Steps: Sprint 5 Phase 12 — Tests + TypeScript-Härtung
 
 **Masterplan:** `docs/sprints/sprint-5-plan.md`
 
@@ -458,11 +469,11 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 - **Phase 7** — Mobile/i18n Rework + Reusable Components (AdminDataTable, Dialogs, Badges)
 - **Phase 8** — User Management Frontend (`/admin/users`, `/admin/users/[id]`)
 - **Phase 9** — PO-Verwaltung Frontend (universities, programs, exam-regulations, modules, prerequisites)
+- **Phase 10** — Audit-Log + System + Import Frontend (backend Router, Timeline-View, Health-Page, Import-Page)
 - **Phase 11** — Admin-Link im User-Dashboard (AppSidebar + MobileNav, is_admin guard)
 
 ### Ausstehend 🔧
-- **Phase 10** — Import + Audit-Log Frontend (JsonImportZone, Audit-Log Timeline, System-Health page)
-- **Phase 12** — Tests + Härtung (TypeScript clean, middleware, JSON-Import error cases)
+- **Phase 12** — Tests + Härtung (Backend-Tests für audit_log Router, TypeScript check, middleware test)
 
 ### Admin-Flag setzen (einmalig nach erstem Login)
 

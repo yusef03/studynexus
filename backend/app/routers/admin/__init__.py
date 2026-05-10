@@ -9,6 +9,7 @@ from app.routers.admin import modules as admin_modules
 from app.routers.admin import prerequisites as admin_prerequisites
 from app.routers.admin import analytics as admin_analytics
 from app.routers.admin import system as admin_system
+from app.routers.admin import audit_log as admin_audit_log
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 router.include_router(admin_auth.router)
@@ -21,3 +22,4 @@ router.include_router(admin_modules.router)
 router.include_router(admin_prerequisites.router)
 router.include_router(admin_analytics.router)
 router.include_router(admin_system.router)
+router.include_router(admin_audit_log.router)

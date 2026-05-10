@@ -121,3 +121,56 @@ export interface AdminUserPatch {
   is_verified?: boolean;
   admin_notes?: string;
 }
+
+export type AuditAction =
+  | "CREATE"
+  | "UPDATE"
+  | "DELETE"
+  | "ARCHIVE"
+  | "RESTORE"
+  | "RESET_PASSWORD"
+  | "LOGIN"
+  | "IMPORT";
+
+export interface AdminAuditLog {
+  id: string;
+  admin_id: string | null;
+  admin_name: string;
+  action: AuditAction;
+  entity_type: string;
+  entity_id: string | null;
+  entity_label: string | null;
+  old_value: Record<string, unknown> | null;
+  new_value: Record<string, unknown> | null;
+  reason: string | null;
+  ip_address: string | null;
+  created_at: string;
+}
+
+export interface AdminAuditLogListResponse {
+  items: AdminAuditLog[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface AdminServiceStatus {
+  status: "ok" | "error";
+  detail?: string | null;
+}
+
+export interface AdminSystemInfo {
+  db_version: string;
+  db_size_mb: number;
+  total_users: number;
+  total_modules: number;
+  total_audit_logs: number;
+  checked_at: string;
+}
+
+export interface AdminSystemHealth {
+  overall: "ok" | "degraded" | "down";
+  database: AdminServiceStatus;
+  redis: AdminServiceStatus;
+}

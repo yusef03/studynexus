@@ -20,7 +20,7 @@
 | Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3.7-review.md](sprint-3.7-review.md) |
 | Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3.7.7-review.md](sprint-3.7.7-review.md) |
 | **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | — |
-| **Sprint 5** | **Admin Panel** | **🔧 In Bearbeitung (Phase 10/12)** | **laufend** | [sprint-5-plan.md](sprint-5-plan.md) |
+| **Sprint 5** | **Admin Panel** | **🔧 In Bearbeitung (Phase 11/12)** | **laufend** | [sprint-5-plan.md](sprint-5-plan.md) |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
 | Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
@@ -512,10 +512,10 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - [x] Phase 7: Mobile (AdminMobileHeader + Slide-Drawer), vollständige i18n aller Admin-Strings, AdminDataTable, AdminFormModal, ArchiveDialog, DeleteDialog, StatusBadge, AuditBadge; Bug-Fix: Cross-Instance Admin-Session-Sync
 - [x] Phase 8: types/admin.ts, lib/adminFetch.ts, hooks/admin/useAdminUsers+useAdminUser, /admin/users Listenseite (Filter-Tabs + Tabelle), /admin/users/[id] Detailseite (Toggles + Notes + Danger Zone)
 - [x] Phase 9: hooks/admin/useAdminUniversities+Programs+Modules, types (8 neue Interfaces), /admin/universities, /admin/programs, /admin/exam-regulations/[id] (JSON-Import), /admin/modules, /admin/modules/[id] (Voraussetzungs-Editor), i18n (admin.common + 5 neue Namespaces)
+- [x] Phase 10: backend audit_log Router+Schema, hooks/admin/useAdminAuditLog+useAdminSystem, /admin/audit-log (Timeline-View, DiffBlock, ActionBadge, Filter), /admin/system (Health+Info+Stack), /admin/import (Validate→Preview→Import, PDF-Placeholder), i18n (admin.auditLog+system+import)
 - [x] Phase 11: AppSidebar + MobileNav Admin-Link (is_admin guard)
 
 **Ausstehend:**
-- [ ] Phase 10: Import + Audit-Log Frontend (JsonImportZone, Timeline, System-Health)
 - [ ] Phase 12: Tests + TypeScript-Härtung
 
 ---

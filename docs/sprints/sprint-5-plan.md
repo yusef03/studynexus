@@ -1,6 +1,6 @@
 # Sprint 5 – Admin Panel Masterplan
 
-**Status:** 🔧 In Bearbeitung — Phasen 1–9 + 11 abgeschlossen (2026-05-10)  
+**Status:** 🔧 In Bearbeitung — Phasen 1–10 + 11 abgeschlossen (2026-05-10)  
 **Zeitraum:** 2026-05-09 – laufend  
 **Basis:** ADR-009 (Admin PO-Verwaltung), ADR-019–022
 
@@ -759,11 +759,17 @@ Import-Flow:
 - [x] i18n (DE+EN): admin.common, admin.universities, admin.programs, admin.examRegs, admin.modules, admin.prerequisites
 - **Ausgelassen:** `modules/new/page.tsx` (Erstellen inline in ER-Detail), `prerequisites/page.tsx` (aus Modul-Detail heraus)
 
-### Phase 10 – Import + Audit-Log Frontend (1 Tag)
-- [ ] `components/admin/JsonImportZone.tsx` – Drag & Drop + JSON-Validierung + Vorschau
-- [ ] `app/[locale]/admin/import/page.tsx`
-- [ ] `app/[locale]/admin/audit-log/page.tsx` – Timeline-View mit Filtern
-- [ ] `app/[locale]/admin/system/page.tsx`
+### Phase 10 – Import + Audit-Log + System Frontend (1 Tag) ✅
+- [x] `backend/app/routers/admin/audit_log.py` — GET /audit-log (paginated, filter: entity_type/action/date_from/date_to), GET /audit-log/{id}; admin_name via User-Join
+- [x] `backend/app/schemas/admin/audit_log.py` — AuditLogItem, AuditLogListResponse
+- [x] `types/admin.ts` — AuditAction Union, AdminAuditLog, AdminAuditLogListResponse, AdminServiceStatus, AdminSystemInfo, AdminSystemHealth
+- [x] `hooks/admin/useAdminAuditLog.ts` — useAdminAuditLogs(params) + useAdminAuditLogEntry(id)
+- [x] `hooks/admin/useAdminSystem.ts` — useAdminSystemInfo() + useAdminSystemHealth() (refetchInterval 60s)
+- [x] `app/[locale]/admin/audit-log/page.tsx` — Timeline-View: ActionBadge (8 Varianten farbig), DiffBlock (old→new inline), Filter (entity_type/action/date_from/date_to), Pagination
+- [x] `app/[locale]/admin/system/page.tsx` — Health-Section (overall/db/redis Badges), DB-Info-Section (Version/Größe/Counts), Stack-Section; Auto-Refresh 60s
+- [x] `app/[locale]/admin/import/page.tsx` — Exam-Reg-ID + JSON-Textarea → Validate → Preview (Module-Liste) → POST /modules/import/json → Result; PDF-Placeholder Section
+- [x] i18n (DE+EN): admin.auditLog (~20 Keys), admin.system (~25 Keys), admin.import (~25 Keys)
+- **Ausgelassen:** `JsonImportZone.tsx` als separate Komponente (Import inline auf Import-Seite, kein Drag&Drop nötig)
 
 ### Phase 11 – Admin-Link im User-Dashboard (0.5 Tage) ✅
 - [x] `AppSidebar.tsx`: Admin-Link ganz unten (nur wenn `is_admin` im JWT)

@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Sprint 5 Phase 10 — Audit-Log + System + Import Frontend (2026-05-10)
+#### Added
+- **`backend/app/schemas/admin/audit_log.py`**: `AuditLogItem` (id/admin_id/admin_name/action/entity_type/entity_id/entity_label/old_value/new_value/reason/ip_address/created_at), `AuditLogListResponse` (paginated)
+- **`backend/app/routers/admin/audit_log.py`**: `GET /admin/audit-log` (paginiert, filter: entity_type/action/date_from/date_to/admin_id), `GET /admin/audit-log/{id}` — admin_name via User-Join in Python, beschleunigt durch Set-Lookup
+- **`backend/app/routers/admin/__init__.py`**: audit_log Router registriert
+- **`types/admin.ts`**: `AuditAction` Union, `AdminAuditLog`, `AdminAuditLogListResponse`, `AdminServiceStatus`, `AdminSystemInfo`, `AdminSystemHealth`
+- **`hooks/admin/useAdminAuditLog.ts`**: `useAdminAuditLogs(params)` (page/entity_type/action/date_from/date_to, staleTime 10s, placeholderData) + `useAdminAuditLogEntry(id)`
+- **`hooks/admin/useAdminSystem.ts`**: `useAdminSystemInfo()` + `useAdminSystemHealth()` (refetchInterval 60s — Auto-Refresh)
+- **`app/[locale]/admin/audit-log/page.tsx`**: Timeline-View — `ActionBadge` mit 8 Farb-Varianten (CREATE=grün/UPDATE=blau/DELETE=rot/ARCHIVE=amber/RESTORE=emerald/RESET=lila/LOGIN=grau/IMPORT=cyan), vertikale Timeline-Linie, `DiffBlock` (old→new diff inline, Strikethrough+Grün), Filter-Bar (Dropdown: entity_type+action, Datumseingabe: date_from+date_to), Pagination, vollständig i18n
+- **`app/[locale]/admin/system/page.tsx`**: `OverallBadge` (ok/degraded/down), `ServiceBadge` (ok/error), Health-Section (DB+Redis), DB-Info-Section (Version gekürzt, Größe MB, Nutzer, Module, Audit-Einträge), Stack-Section (statische Infos), Last-Checked Timestamp, Auto-Refresh 60s
+- **`app/[locale]/admin/import/page.tsx`**: Exam-Reg-ID Eingabe, JSON-Textarea → Client-Validation → Vorschau (Module-Liste, max. 10 Einträge), POST `/modules/import/json` → Ergebnis (created/skipped/errors), Admin-Session-Guard, PDF-Placeholder Section (disabled Button)
+- **i18n (DE+EN)**: `admin.auditLog` (~20 Keys inkl. alle 8 Action-Labels), `admin.system` (~25 Keys), `admin.import` (~25 Keys)
+
 ### Sprint 5 Phase 9 — PO-Verwaltung Frontend + Phase 11 Admin-Link (2026-05-10)
 #### Added
 - **`types/admin.ts`**: 8 neue Interfaces — `AdminFaculty`, `AdminUniversity`, `AdminUniversityDetail`, `AdminProgram`, `AdminProgramDetail`, `AdminExamReg`, `AdminExamRegDetail`, `AdminModule`, `AdminModuleDetail`, `AdminPrerequisite`
