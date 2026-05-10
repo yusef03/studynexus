@@ -63,6 +63,7 @@ export interface AdminModule {
   pruefungsart: string | null;
   sws: number | null;
   is_archived: boolean;
+  archive_reason: string | null;
   exam_regulation_id: string;
 }
 

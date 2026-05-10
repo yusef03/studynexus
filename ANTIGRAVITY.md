@@ -9,7 +9,7 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
-**Status:** 🔧 Sprint 5 In Progress — Phase 10 (Audit-Log + System + Import Frontend) complete
+**Status:** ✅ Sprint 5 Complete — alle 12 Phasen abgeschlossen (2026-05-10)
 **Repository:** https://github.com/yusef03/studynexus
 **Last Updated:** 2026-05-10
 
@@ -26,7 +26,7 @@
 | Database | PostgreSQL (primary), Redis (cache/sessions) |
 | Auth | JWT (python-jose), bcrypt 4.1.3 (direct, no passlib), httpOnly cookies |
 | DevOps | Docker Compose (local), GitHub Actions (CI/CD planned Sprint 6) |
-| Testing | pytest (backend, 111 tests Sprint 5 Phase 4), Jest (frontend) |
+| Testing | pytest (backend, 122/122 tests nach Sprint 5 Phase 12), Jest (frontend) |
 
 ---
 
@@ -359,6 +359,13 @@ Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigie
 - **`app/[locale]/admin/system/page.tsx`:** OverallBadge (ok/degraded/down), ServiceBadge, Health+Info+Stack Sections, Auto-Refresh.
 - **`app/[locale]/admin/import/page.tsx`:** Exam-Reg-ID + JSON-Textarea → Validate → Preview → POST /modules/import/json → Result. PDF-Placeholder.
 - **i18n (DE+EN):** admin.auditLog, admin.system, admin.import (~70 neue Keys).
+
+### Sprint 5 Phase 12 ✅ (2026-05-10) — Tests + TypeScript-Härtung
+- **`backend/tests/test_admin_audit_log.py`:** 11 neue Tests — Access Control (403 für Nicht-Admin), List (200 + Shape), Pagination (total_pages), Filter (entity_type/action), Empty List, Single Entry (200 + admin_name), 404, admin_name-Auflösung über scalar(). 122/122 grün.
+- **`backend/tests/test_admin_users.py`:** Bug-Fix `test_list_users_returns_paginated` — `get_db` Override fehlte, Test traf echte DB.
+- **TypeScript-Härtung:** `@types/jest` installiert (war in package.json, fehlte in node_modules), test files aus tsconfig.json `exclude` entfernt (Test-Typen via jest, nicht via tsc). `archive_reason: string | null` zu `AdminModule` interface hinzugefügt. `adminToken: adminToken ?? undefined` in import/page.tsx (null→undefined Mismatch). **Ergebnis: 0 TypeScript-Fehler.**
+- **Sprint 5 Review:** `docs/sprints/sprint-5-review.md` erstellt.
+- **admin-po-use-cases.md:** Von Phase 9-only auf alle Phasen (Phase 0–12) erweitert.
 
 ### Sprint 5 Phase 9 ✅ (2026-05-10) — PO-Verwaltung Frontend + Phase 11 Admin-Link
 - **`types/admin.ts`:** 10 neue Interfaces — AdminFaculty, AdminUniversity(Detail), AdminProgram(Detail), AdminExamReg(Detail), AdminModule(Detail), AdminPrerequisite.

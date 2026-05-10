@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Sprint 5 Phase 12 — Tests + TypeScript-Härtung (2026-05-10)
+#### Added
+- **`backend/tests/test_admin_audit_log.py`**: 11 neue Tests — Access Control (403), List (200/Shape/Pagination), Filters (entity_type/action), Empty List, Single Entry (200/404), admin_name-Auflösung; alle 122/122 grün
+- **`@types/jest`**: In node_modules installiert (war in package.json deklariert, fehlte im Image)
+- **`frontend/tsconfig.json`**: `exclude`-Array um Test-Verzeichnisse erweitert (`**/__tests__/**`, `*.test.tsx`, `*.spec.tsx`) — tsc prüft nur Produktionscode
+#### Fixed
+- **`frontend/src/types/admin.ts`**: `archive_reason: string | null` zu `AdminModule` hinzugefügt (TS2339 auf modules/[id]/page.tsx)
+- **`frontend/src/app/[locale]/admin/import/page.tsx`**: `adminToken ?? undefined` (TS2322: null nicht assignierbar zu string|undefined)
+- **`backend/tests/test_admin_users.py`**: `test_list_users_returns_paginated` — fehlende `get_db` Override hinzugefügt (Test traf echte DB statt Mock)
+
 ### Sprint 5 Phase 10 — Audit-Log + System + Import Frontend (2026-05-10)
 #### Added
 - **`backend/app/schemas/admin/audit_log.py`**: `AuditLogItem` (id/admin_id/admin_name/action/entity_type/entity_id/entity_label/old_value/new_value/reason/ip_address/created_at), `AuditLogListResponse` (paginated)

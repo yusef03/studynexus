@@ -79,6 +79,7 @@ def test_list_users_returns_paginated(mock_db):
     admin = _make_admin()
     user = _make_target_user()
     app.dependency_overrides[get_current_user] = lambda: admin
+    app.dependency_overrides[get_db] = lambda: mock_db
 
     mock_db.query.return_value.filter.return_value = mock_db.query.return_value
     mock_db.query.return_value.count.return_value = 1

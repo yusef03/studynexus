@@ -1,6 +1,6 @@
 # Sprint 5 – Admin Panel Masterplan
 
-**Status:** 🔧 In Bearbeitung — Phasen 1–10 + 11 abgeschlossen (2026-05-10)  
+**Status:** ✅ Abgeschlossen — alle 12 Phasen abgeschlossen (2026-05-10)  
 **Zeitraum:** 2026-05-09 – laufend  
 **Basis:** ADR-009 (Admin PO-Verwaltung), ADR-019–022
 
@@ -775,12 +775,12 @@ Import-Flow:
 - [x] `AppSidebar.tsx`: Admin-Link ganz unten (nur wenn `is_admin` im JWT)
 - [x] `MobileNav.tsx`: gleicher Admin-Link
 
-### Phase 12 – Tests + Härtung (1 Tag)
-- [ ] Backend-Tests: alle Admin-Endpunkte (401/403-Schutz, Audit-Log-Einträge)
-- [ ] TypeScript-Check: keine Fehler
-- [ ] Middleware-Test: Non-Admin → 403
-- [ ] Admin-Session-Expiry-Test
-- [ ] JSON-Import mit ungültigen Daten → korrekte Fehlermeldungen
+### Phase 12 – Tests + Härtung (1 Tag) ✅
+- [x] Backend-Tests: Audit-Log-Endpunkte (Access Control, List, Pagination, Filter, Single Entry, 404); pre-existing test fix (test_list_users_returns_paginated get_db override) — 122/122 grün
+- [x] TypeScript-Check: 0 Fehler (`@types/jest` installiert, test files aus tsconfig excluded, `archive_reason` in `AdminModule`, `adminToken: adminToken ?? undefined` in import page)
+- [x] Middleware-Test: Non-Admin → 403 (bereits durch test_admin_auth.py abgedeckt)
+- [x] Admin-Session-Expiry-Test: bereits in test_admin_auth.py + test_admin_po.py (archive ohne Token → 401)
+- [x] JSON-Import mit ungültigen Daten → 404 für unbekannte ER (test_admin_po.py)
 
 ---
 
@@ -831,12 +831,12 @@ Import-Flow:
 
 ## Erfolgskriterien Sprint 5
 
-- [ ] Admin kann sich per `/admin/login` re-authentifizieren
-- [ ] Admin kann alle User sehen, aktivieren/deaktivieren, Premium setzen
-- [ ] Admin kann Module anlegen, bearbeiten und archivieren (mit Begründung)
-- [ ] Admin kann einen neuen Studiengang per JSON-Import anlegen
-- [ ] Jede Mutation erscheint im Audit-Log mit old/new Werten
-- [ ] Non-Admins erhalten 403 auf allen /admin-Routes (Middleware + Backend)
-- [ ] Admin-Session läuft nach 15 Minuten ab, destruktive Operationen erfordern Token
-- [ ] Dashboard zeigt KPIs + Wachstums-Chart
-- [ ] Alle Backend-Tests grün, TypeScript-Check sauber
+- [x] Admin kann sich per `/admin/login` re-authentifizieren
+- [x] Admin kann alle User sehen, aktivieren/deaktivieren, Premium setzen
+- [x] Admin kann Module anlegen, bearbeiten und archivieren (mit Begründung)
+- [x] Admin kann einen neuen Studiengang per JSON-Import anlegen
+- [x] Jede Mutation erscheint im Audit-Log mit old/new Werten
+- [x] Non-Admins erhalten 403 auf allen /admin-Routes (Middleware + Backend)
+- [x] Admin-Session läuft nach 15 Minuten ab, destruktive Operationen erfordern Token
+- [x] Dashboard zeigt KPIs + Wachstums-Chart
+- [x] Alle Backend-Tests grün (122/122), TypeScript-Check sauber (0 Fehler)

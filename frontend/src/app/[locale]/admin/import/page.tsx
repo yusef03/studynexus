@@ -73,7 +73,7 @@ export default function AdminImportPage() {
     try {
       const res = await adminMutate<ImportResult>("modules/import/json", "POST", {
         body: { exam_regulation_id: examRegId.trim(), modules: preview },
-        adminToken,
+        adminToken: adminToken ?? undefined,
       });
       setResult(res ?? null);
       setPreview(null);

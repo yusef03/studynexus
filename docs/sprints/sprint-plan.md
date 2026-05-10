@@ -20,7 +20,7 @@
 | Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3.7-review.md](sprint-3.7-review.md) |
 | Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3.7.7-review.md](sprint-3.7.7-review.md) |
 | **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | — |
-| **Sprint 5** | **Admin Panel** | **🔧 In Bearbeitung (Phase 11/12)** | **laufend** | [sprint-5-plan.md](sprint-5-plan.md) |
+| **Sprint 5** | **Admin Panel** | **✅ Fertig** | **2 Tage** | [sprint-5-plan.md](sprint-5-plan.md) · [sprint-5-review.md](sprint-5-review.md) |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
 | Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
@@ -479,9 +479,9 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-### Sprint 5 – Admin Panel 🔧
+### Sprint 5 – Admin Panel ✅
 
-**Status:** In Bearbeitung — Phasen 1–8 abgeschlossen (2026-05-10)  
+**Status:** Abgeschlossen — alle 12 Phasen (2026-05-10)  
 **Detailplanung:** [sprint-5-plan.md](sprint-5-plan.md)  
 **Ziel:** Vollständiges, professionelles Admin-Panel — PO-Verwaltung, User-Management, Analytics, Audit-Log.
 
@@ -504,7 +504,7 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - [x] Phase 2: User-Management — GET List (paginated+filter), GET Detail, PATCH (is_active/is_premium/is_verified/admin_notes), POST reset-password, DELETE (cascade+reason)
 - [x] Phase 3: PO-CRUD — Universities, Faculties, Programs, ExamRegulations, Modules (inkl. Archive/Restore, JSON-Import, PDF-Placeholder), Prerequisites
 - [x] Phase 4: Analytics — GET /stats (13 KPIs), GET /stats/growth?period, GET /stats/modules, GET /stats/users; System Health-Check (DB + Redis)
-- [x] Tests: 111/111 grün (Phase 4 Abschluss)
+- [x] Tests: 111/111 grün (Phase 4 Abschluss), 122/122 nach Phase 12
 
 **Frontend (Phasen 5–8 abgeschlossen):**
 - [x] Phase 5: Middleware-Schutz (`is_admin` im JWT), Catch-all API-Proxy, Admin-Session-Hook, AdminSidebar, AdminSessionBanner, Admin-Layout, Login-Seite
@@ -514,9 +514,7 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - [x] Phase 9: hooks/admin/useAdminUniversities+Programs+Modules, types (8 neue Interfaces), /admin/universities, /admin/programs, /admin/exam-regulations/[id] (JSON-Import), /admin/modules, /admin/modules/[id] (Voraussetzungs-Editor), i18n (admin.common + 5 neue Namespaces)
 - [x] Phase 10: backend audit_log Router+Schema, hooks/admin/useAdminAuditLog+useAdminSystem, /admin/audit-log (Timeline-View, DiffBlock, ActionBadge, Filter), /admin/system (Health+Info+Stack), /admin/import (Validate→Preview→Import, PDF-Placeholder), i18n (admin.auditLog+system+import)
 - [x] Phase 11: AppSidebar + MobileNav Admin-Link (is_admin guard)
-
-**Ausstehend:**
-- [ ] Phase 12: Tests + TypeScript-Härtung
+- [x] Phase 12: Backend-Tests (122/122 grün — 11 neue Audit-Log-Tests), TypeScript-Härtung (0 Fehler), `@types/jest` installiert, test files aus tsconfig excluded, `archive_reason` in `AdminModule`
 
 ---
 

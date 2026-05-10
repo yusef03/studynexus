@@ -1,13 +1,733 @@
-# Admin PO-Verwaltung — Detaillierte Use Cases
+# Admin Panel — Vollständige Use Cases (Phase 0–12)
 
 *Erstellt: 2026-05-10 (Sprint 5 Phase 9)*  
-*Betroffene Seiten: `/admin/universities`, `/admin/programs`, `/admin/exam-regulations`, `/admin/modules`*
+*Erweitert: 2026-05-10 (Sprint 5 Phase 12) — lückenlos von Phase 0 bis Phase 12*
 
 ---
 
-## Überblick
+## Gesamt-Überblick
 
-Phase 9 liefert das vollständige Frontend für die **Prüfungsordnungs-Verwaltung** (PO-Verwaltung) im Admin-Panel. Admins können damit die komplette Hierarchie `Hochschule → Fakultät → Studiengang → Prüfungsordnung → Modul → Voraussetzung` über eine professionelle, mobile-taugliche UI pflegen — ohne direkten DB-Zugriff.
+Das Admin-Panel von StudyNexus wurde in Sprint 5 in 12 Phasen entwickelt. Dieses Dokument listet alle Use Cases lückenlos auf — von der ersten Planungsentscheidung (Phase 0) bis zu den abschließenden Tests (Phase 12).
+
+### Scope des Admin-Panels
+
+Das Admin-Panel ist ein **separates, vollständig getrenntes System** vom User-Dashboard:
+- Eigene Route `/admin` mit eigenem Layout
+- Dunkles Design (zinc-950 Sidebar, roter ADMIN-Badge)
+- Eigene Middleware-Schutzebene (is_admin JWT-Claim)
+- Eigene Authentifizierungsschicht (Admin-Re-Auth → Redis-Token)
+- Vollständiger Audit-Trail aller Mutationen
+
+### Was Admins verwalten können
+
+```
+Nutzer-Verwaltung (/admin/users)
+  → User-Liste, Detail, Aktivierung, Premium, Passwort-Reset, Löschen
+
+PO-Verwaltung (/admin/universities, /programs, /exam-regulations, /modules)
+  → Hochschule → Fakultät → Studiengang → PO → Modul → Voraussetzung
+
+Analytics (/admin Dashboard)
+  → KPI-Cards, Wachstums-Chart, Modul-Statistiken, User-Segmentierung
+
+Import (/admin/import)
+  → JSON-Bulk-Import für Module, PDF-Placeholder (Sprint 7)
+
+Audit-Log (/admin/audit-log)
+  → Alle Admin-Mutationen einsehbar, Timeline, Filter, Diff-Anzeige
+
+System (/admin/system)
+  → DB-Version/Größe, Service-Health (DB+Redis), Stack-Infos
+```
+
+---
+
+## Phase 0 — Planung & Architektur-Entscheidungen
+
+### UC-0.1 — Admin-Konzept definieren
+
+**Akteur:** Product Owner (Yusef)  
+**Ergebnis:** Alle Architektur-Entscheidungen vor dem ersten Code-Commit
+
+**Entscheidungen:**
+| Frage | Entscheidung | ADR |
+|---|---|---|
+| Admin-Stufen | Super-Admin only (`is_admin` flag im JWT) | ADR-021 |
+| Admin-Location | `/admin` separate Route + eigenes Layout | — |
+| Sicherheit | JWT is_admin + Admin-Re-Auth + Audit-Log | ADR-019 |
+| Modul-Löschen | Soft Delete (`is_archived`) + Begründungspflicht | ADR-020 |
+| PO-Import | Formulare + JSON-Bulk + PDF-Placeholder | — |
+| Analytics | Alle drei Ebenen (KPIs + Modul + Wachstum) | — |
+| Admin-Session | Redis-basiert, 15 Min TTL, UUID-Token | ADR-019 |
+| Pagination | Server-side, default 25/Seite | ADR-022 |
+
+---
+
+## Phase 1 — Backend Fundament
+
+### UC-1.1 — Datenbank für Admin vorbereiten
+
+**Akteur:** System (Alembic Migration)
+
+**Migration 0015 — Admin-Felder auf users:**
+- `is_admin BOOLEAN NOT NULL DEFAULT FALSE` — Admin-Flag (manuell setzen)
+- `is_premium BOOLEAN NOT NULL DEFAULT FALSE`
+- `last_login_at TIMESTAMP WITH TIME ZONE` — wird bei jedem Login gesetzt
+- `admin_notes TEXT` — interne Notizen, nur für Admins sichtbar
+
+**Migration 0016 — admin_audit_logs Tabelle:**
+- Vollständiger Audit-Trail mit: admin_id, action, entity_type, entity_id, entity_label, old_value (JSONB), new_value (JSONB), reason, ip_address, created_at
+- 3 Indizes: `idx_audit_admin_id`, `idx_audit_entity (entity_type, entity_id)`, `idx_audit_created (created_at DESC)`
+
+**Migration 0017 — Soft Delete:**
+- `is_archived`, `archived_at`, `archived_by`, `archive_reason` auf: modules, exam_regulations, programs
+
+---
+
+### UC-1.2 — Admin-Session erstellen (Re-Authentifizierung)
+
+**Seite:** `/admin/login`  
+**Akteur:** Admin  
+**Auslöser:** Erstmaliger Besuch von `/admin` (nach JWT-Login) oder abgelaufene Session
+
+**Ablauf:**
+1. Admin gibt Passwort im Login-Formular ein
+2. `POST /api/v1/admin/auth/session` — Backend verifiziert Passwort mit bcrypt
+3. Wenn korrekt: UUID-Token generiert, in Redis gespeichert (`admin_session:{admin_id}:{token}`, TTL 900s)
+4. Response: `{ "token": "uuid-hex-string" }`
+5. Frontend: Token in `sessionStorage` (Key: `sn_admin_session`) gespeichert
+6. Redirect zu `/admin`
+
+**Sicherheits-Eigenschaften:**
+- Token ist nicht aus dem JWT ableitbar
+- Token kann server-seitig revoked werden (Redis-Delete)
+- TTL 15 Minuten — danach muss Admin erneut authentifizieren
+
+**API:** `POST /api/v1/admin/auth/session` → `{ token, expires_at }`
+
+---
+
+### UC-1.3 — Admin-Session revoken (Logout aus Admin-Mode)
+
+**Akteur:** Admin  
+**Auslöser:** Klick auf "Logout" im Admin-Panel ODER Seitenabschluss
+
+**Ablauf:**
+1. `DELETE /api/v1/admin/auth/session` mit `X-Admin-Token`-Header
+2. Backend: `redis.delete(admin_session:{admin_id}:{token})`
+3. Frontend: `clearSession()` löscht sessionStorage-Eintrag
+4. Admin-Session-Banner zeigt "Keine aktive Session"
+
+---
+
+### UC-1.4 — Zugriffskontrolle: Admin-Endpunkte
+
+**Akteur:** Nicht-Admin-User / Unauthentifizierter User
+
+**Verhalten:**
+- Unauthentifiziert (kein JWT): Middleware redirectet zu `/login`
+- Authentifiziert, aber `is_admin=false` im JWT: Middleware gibt 403-Seite zurück
+- Authentifiziert + `is_admin=true` im JWT: Zugang zum Admin-Panel
+- Admin, aber kein Admin-Session-Token bei destruktiver Op: Backend gibt HTTP 401 zurück
+
+---
+
+### UC-1.5 — Admin-Profil anzeigen
+
+**API:** `GET /api/v1/admin/auth/me`  
+**Schutz:** `get_admin_user` (nur JWT is_admin)
+
+**Response:** Email, full_name, is_admin, last_login_at
+
+Wird vom Admin-Layout `layout.tsx` serverseitig abgerufen um Admin-Namen in der Sidebar anzuzeigen.
+
+---
+
+## Phase 2 — User-Management Backend
+
+### UC-2.1 — User-Liste abrufen (Admin-Sicht)
+
+**API:** `GET /api/v1/admin/users`  
+**Parameter:** `page` (default 1), `page_size` (default 25), `search` (email/name), `is_active`, `is_premium`, `is_verified`
+
+**Response enthält pro User:**
+- Alle Basis-Felder (id, email, full_name, matrikelnummer, is_active, is_premium, is_verified, is_admin)
+- `program_name`, `start_semester` aus UserProgram-Join
+- `total_modules`, `passed_modules`, `erreichte_ects` aus StudentModule-Aggregation
+- `created_at`, `last_login_at`
+
+---
+
+### UC-2.2 — User-Detail abrufen (Admin-Sicht)
+
+**API:** `GET /api/v1/admin/users/{id}`  
+**Zusätzlich zu UC-2.1:** `university`, `birth_date`, `admin_notes`, `gpa` (gewichtete Note-Berechnung)
+
+---
+
+### UC-2.3 — User-Felder patchen (Admin)
+
+**API:** `PATCH /api/v1/admin/users/{id}`  
+**Felder:** `is_active`, `is_premium`, `is_verified`, `admin_notes`  
+**Schutz:** Nur `get_admin_user` (kein Admin-Token nötig — nicht-destruktiv)  
+**Audit-Log:** Schreibt UPDATE-Eintrag mit old/new Snapshot
+
+---
+
+### UC-2.4 — Passwort-Reset-Mail senden (Admin)
+
+**API:** `POST /api/v1/admin/users/{id}/reset-password`  
+**Schutz:** `get_verified_admin` (Admin-Token required)  
+**Ablauf:** Generiert Reset-Token, schickt E-Mail via Resend API  
+**Audit-Log:** Schreibt RESET_PASSWORD-Eintrag
+
+---
+
+### UC-2.5 — User löschen (Admin, destruktiv)
+
+**API:** `DELETE /api/v1/admin/users/{id}`  
+**Schutz:** `get_verified_admin` (Admin-Token required)  
+**Body:** `{ "reason": "Begründungstext" }` — Pflicht  
+**Ablauf:** Cascade-Delete aller verknüpften Daten (StudentModules, UserProgram, Events, Tasks)  
+**Audit-Log:** Schreibt DELETE-Eintrag mit vollständigem User-Snapshot als old_value  
+**Sicherheit:** Admin-Account kann nicht gelöscht werden (HTTP 403)
+
+---
+
+## Phase 3 — PO-Verwaltung Backend
+
+### UC-3.1 — Hochschule anlegen (API)
+
+**API:** `POST /api/v1/admin/universities`  
+**Body:** `{ name, kuerzel, stadt, bundesland, typ }`  
+**Schutz:** `get_admin_user`  
+**Audit-Log:** CREATE University
+
+---
+
+### UC-3.2 — Hochschule löschen (API)
+
+**API:** `DELETE /api/v1/admin/universities/{id}`  
+**Schutz:** `get_verified_admin` (Admin-Token)  
+**Constraint:** HTTP 409 wenn noch Fakultäten vorhanden (Backend-Prüfung)  
+**Audit-Log:** DELETE University
+
+---
+
+### UC-3.3 — Studiengang archivieren (API)
+
+**API:** `POST /api/v1/admin/programs/{id}/archive`  
+**Schutz:** `get_verified_admin`  
+**Body:** `{ "reason": "Ausgelaufen ab WS 2025/26" }` — Pflicht  
+**Effekt:** `is_archived=true`, `archived_at=now()`, `archive_reason=reason`  
+**Sichtbarkeit für Studierende:** Studiengang erscheint nicht mehr in öffentlichen Endpunkten
+
+---
+
+### UC-3.4 — Studiengang wiederherstellen (API)
+
+**API:** `POST /api/v1/admin/programs/{id}/restore`  
+**Schutz:** `get_verified_admin`  
+**Effekt:** `is_archived=false`, `archived_at=null`, `archive_reason=null`
+
+---
+
+### UC-3.5 — Modul-JSON-Bulk-Import (API)
+
+**API:** `POST /api/v1/admin/modules/import/json`  
+**Body:** `{ "exam_regulation_id": "uuid", "modules": [...] }` (max. 500 Module)  
+**Schutz:** `get_admin_user`
+
+**Duplikat-Logik:** Module mit gleichem `kuerzel` in derselben PO werden übersprungen (Skip-Counter). Module ohne Kürzel werden nie übersprungen.
+
+**Response:** `{ "created": N, "skipped": N, "errors": [...], "audit_log_id": "uuid" }`  
+**Audit-Log:** Einziger IMPORT-Eintrag mit Summary
+
+**Technischer Kniff:** Import-Route muss VOR `/{module_id}` registriert sein — FastAPI parst "import" sonst als UUID.
+
+---
+
+### UC-3.6 — Öffentliche Endpunkte filtern archived
+
+Alle öffentlichen GET-Endpunkte (`/faculties/{id}/programs`, `/programs/{id}/exam-regulations`, `/exam-regulations/{id}/modules`) filtern automatisch `is_archived = false`. Studierende sehen nie archivierte Einträge.
+
+---
+
+### UC-3.7 — Voraussetzung anlegen (API)
+
+**API:** `POST /api/v1/admin/prerequisites`  
+**Body:** `{ module_id, prerequisite_type, description, required_module_id?, minimum_ects?, required_semesters? }`
+
+**prerequisite_type:**
+- `MODULE` → `required_module_id` (UUID) — anderes Modul muss bestanden sein
+- `ECTS_THRESHOLD` → `minimum_ects` (Zahl) — Mindest-ECTS-Summe
+- `SEMESTER_COMPLETE` → `required_semesters` (JSON-Array) — bestimmte Semester vollständig
+
+---
+
+### UC-3.8 — Voraussetzung löschen (API, Hard Delete)
+
+**API:** `DELETE /api/v1/admin/prerequisites/{id}`  
+**Schutz:** `get_verified_admin`  
+**Hard Delete** erlaubt (ADR-020) — Voraussetzungen sind Metadaten, keine Student-Daten dagegen
+
+---
+
+## Phase 4 — Analytics Backend
+
+### UC-4.1 — KPI-Dashboard abrufen
+
+**API:** `GET /api/v1/admin/stats`  
+**Response:** 13 KPI-Felder (total_users, verified_users, active_users_30d, premium_users, total_student_modules, passed_modules_today, new_registrations_today, new_registrations_week, total_universities, total_programs, total_modules, db_size_mb, last_updated)
+
+---
+
+### UC-4.2 — Registrierungs-Wachstum abrufen
+
+**API:** `GET /api/v1/admin/stats/growth?period=7d|30d|90d|1y`  
+**Response:** Array von `{ date, count }` Tages-Aggregationen  
+**Verwendung:** Recharts LineChart im Admin-Dashboard
+
+---
+
+### UC-4.3 — Modul-Statistiken abrufen
+
+**API:** `GET /api/v1/admin/stats/modules?limit=N`  
+**Response:** Top-N-Module nach Studierendenzahl, mit Ø-Note und Bestehensquote
+
+---
+
+### UC-4.4 — User-Segmentierung abrufen
+
+**API:** `GET /api/v1/admin/stats/users`  
+**Response:** Segmentierung nach Programm, nach Aktivität (active_30d), nach Premium-Status
+
+---
+
+### UC-4.5 — System-Info abrufen
+
+**API:** `GET /api/v1/admin/system`  
+**Response:** DB-Version (aus `SELECT version()`), DB-Größe MB (`pg_database_size()`), total_users, total_modules, total_audit_logs, checked_at
+
+---
+
+### UC-4.6 — System-Health prüfen
+
+**API:** `GET /api/v1/admin/system/health`  
+**Response:** `{ overall: "ok"|"degraded"|"down", database: { status, detail }, redis: { status, detail } }`
+
+**Logik:**
+- `overall="ok"`: DB + Redis erreichbar
+- `overall="degraded"`: Redis down, DB ok
+- `overall="down"`: DB nicht erreichbar
+
+---
+
+## Phase 5 — Frontend Fundament
+
+### UC-5.1 — Admin-Route-Schutz via Middleware
+
+**Seite:** Alle `/admin/*`-Routen  
+**Middleware-Logik:**
+1. Kein JWT-Cookie → Redirect zu `/{locale}/login`
+2. JWT vorhanden, `is_admin=false` → Redirect zu `/{locale}/dashboard`
+3. JWT vorhanden, `is_admin=true` → Zugang gewährt
+
+**Implementierung:** Edge-Runtime, `atob()` für JWT-Decode ohne Node.js crypto. Base64url-Padding manuell hinzugefügt.
+
+---
+
+### UC-5.2 — Admin-Seiten über Proxy aufrufen
+
+**Technologie:** Next.js Catch-all Route `app/api/admin/[...path]/route.ts`
+
+Alle Admin-Seiten rufen `/api/admin/...` auf (relativer Pfad). Der Proxy:
+1. Liest Cookie für JWT-Bearer-Token
+2. Liest `X-Admin-Token`-Header (falls mitgeschickt) und forwarded ihn
+3. Leitet an `{BACKEND_URL}/api/v1/admin/...` weiter
+4. Gibt Response zurück (204-safe)
+
+---
+
+### UC-5.3 — Admin-Session-Status im UI anzeigen
+
+**Komponente:** `AdminSessionBanner` (oben auf jeder Admin-Seite)  
+**Komponente:** Session-Timer-Chip in `AdminSidebar`
+
+**Zustände:**
+- Session aktiv + > 2 Min: Grüner Chip `🔒 Session aktiv (X min)`
+- Session aktiv + ≤ 2 Min: Amber-Banner "Session läuft ab" + Link zu `/admin/login`
+- Keine Session: Grauer Info-Banner "Keine aktive Admin-Session. Destructive Ops disabled."
+
+---
+
+## Phase 6 — Dashboard + Analytics Frontend
+
+### UC-6.1 — Admin-Dashboard aufrufen
+
+**Seite:** `/admin`  
+**Akteur:** Admin (authentifiziert + Admin-Session optional)
+
+**Ablauf:**
+1. Seite lädt parallel: `GET /api/admin/stats` + `GET /api/admin/stats/growth?period=30d`
+2. Während Laden: Skeleton-Animation auf KPI-Cards
+3. Nach Laden: 7 KPI-Cards (4 primäre + 3 sekundäre), Wachstums-Chart, Quick-Nav-Cards
+
+**KPI-Cards (primär):** Nutzer gesamt, Aktive User (30d), Premium-User, Module gesamt  
+**KPI-Cards (sekundär):** DB-Größe, Neue Registrierungen heute, Neue Registrierungen diese Woche
+
+---
+
+### UC-6.2 — Wachstums-Chart anzeigen
+
+**Komponente:** `GrowthChart`  
+**Daten:** `GET /api/admin/stats/growth?period=30d` (30 Datenpunkte, täglich)  
+**Rendering:** Recharts `ResponsiveContainer + LineChart`, CSS-Variablen für Farben (Dark-Mode-kompatibel)  
+**Leerer State:** "Noch keine Registrierungen" Platzhalter wenn keine Daten
+
+---
+
+## Phase 7 — Mobile + Reusable Komponenten
+
+### UC-7.1 — Mobile Admin-Navigation
+
+**Komponente:** `AdminMobileHeader` (sichtbar auf < md)
+
+**Ablauf:**
+1. Mobile Top-Bar zeigt Hamburger-Icon + "StudyNexus Admin"
+2. Klick auf Hamburger → Slide-Drawer öffnet sich (CSS `translate-x` Transition)
+3. Backdrop-Klick oder Route-Wechsel → Drawer schließt automatisch
+4. Body-Scroll-Lock während Drawer offen
+
+---
+
+### UC-7.2 — Tabellarische Admin-Daten anzeigen (generisch)
+
+**Komponente:** `AdminDataTable<T>`
+
+**Features:**
+- Column-Sort (klick auf Header, `SortState`)
+- Debounced Suche (350ms, lokaler State)
+- Server-side Pagination (Seiten-Buttons, total/page/pageSize aus Props)
+- `hideOnMobile: boolean` pro Spalte
+- 5-Zeilen-Skeleton während Loading
+
+**Verwendung:** Alle Listen-Seiten im Admin-Panel (Users, Module, etc.)
+
+---
+
+### UC-7.3 — Admin-Formular öffnen (generisch)
+
+**Komponente:** `AdminFormModal`
+
+**Verhalten:**
+- Desktop: Zentriertes Modal-Overlay
+- Mobile: Bottom-Sheet (von unten einfahrend)
+- Escape-Taste + Backdrop-Klick schließt
+- Body-Scroll-Lock
+- Varianten: "Erstellen" (leere Felder) / "Bearbeiten" (vorausgefüllte Felder)
+
+**Verwendung:** Alle Create/Edit-Dialoge (Hochschule, Studiengang, Modul, etc.)
+
+---
+
+### UC-7.4 — Entität archivieren (Dialog)
+
+**Komponente:** `ArchiveDialog`
+
+**Ablauf:**
+1. Entitäts-Name im Dialog angezeigt
+2. **Pflicht-Begründungsfeld** (Textarea) — Submit-Button deaktiviert wenn leer
+3. Admin-Session-Prüfung: wenn `!isActive`, roter Warntext + deaktivierter Button
+4. Bei Bestätigung: API-Call mit `{ reason }` + `X-Admin-Token`-Header
+
+---
+
+### UC-7.5 — Entität löschen (Dialog mit Bestätigungswort)
+
+**Komponente:** `DeleteDialog`
+
+**Ablauf:**
+1. Dialog zeigt Bestätigungshinweis mit Entitäts-Name
+2. Eingabefeld: Admin muss "LÖSCHEN" (DE) oder "DELETE" (EN) eintippen
+3. Submit nur wenn Wort korrekt eingegeben
+4. Admin-Session-Prüfung wie in UC-7.4
+
+---
+
+## Phase 8 — User-Management Frontend
+
+### UC-8.1 — User-Tabelle anzeigen
+
+**Seite:** `/admin/users`  
+**Ablauf:**
+1. Seite lädt User-Liste via `useAdminUsers(params)` Hook
+2. Filter-Tabs (5 Optionen: Alle / Aktiv / Inaktiv / Premium / Unverifiziert)
+3. Debounced Suche über Email + Name (350ms)
+4. 7-spaltige Tabelle: User (Name+Email), Matrikel, Status-Badges, Programm, Fortschritt (ECTS+GPA), Letzter Login, Registriert
+5. Zeilen-Klick → `/admin/users/{id}`
+
+---
+
+### UC-8.2 — User-Detail anzeigen
+
+**Seite:** `/admin/users/[id]`  
+**Sektionen:**
+1. Persönliche Daten (Email, Name, Matrikel, Hochschule, Geburtsdatum, Sprache)
+2. Studienplan-Summary (Programm, Start-Semester, Module-Count, GPA, ECTS)
+3. Status-Toggles (is_active / is_premium / is_verified) — PATCH-Call ohne Admin-Token
+4. Admin-Notes-Textarea + "Speichern"-Button — PATCH mit admin_notes-Feld
+5. Danger Zone: Passwort-Reset-Button + Löschen-Button (mit DeleteDialog)
+
+---
+
+### UC-8.3 — User aktivieren / deaktivieren
+
+**Akteur:** Admin  
+**Auslöser:** Toggle-Switch in User-Detail oder Quick-Action in User-Liste
+
+**Ablauf:**
+1. Toggle-Click → `PATCH /api/admin/users/{id}` mit `{ is_active: !currentValue }`
+2. TanStack Query invalidiert `["admin-user", id]` und `["admin-users"]`
+3. Toggle zeigt neuen Zustand
+
+**Kein Admin-Token nötig** — nicht-destruktiv
+
+---
+
+## Phase 9 — PO-Verwaltung Frontend
+
+> Dieser Abschnitt enthält die vollständigen Use Cases der PO-Verwaltungs-UI.
+> Die detaillierte Beschreibung (UC-A01 bis UC-A29) folgt weiter unten.
+
+**Überblick der Phase-9-Seiten:**
+
+| Seite | Use Cases |
+|---|---|
+| `/admin/universities` | UC-A01 (Liste), UC-A02 (Anlegen) |
+| `/admin/universities/[id]` | UC-A03 (Detail), UC-A04 (Fakultät hinzufügen), UC-A05 (Fakultät löschen), UC-A06 (Bearbeiten), UC-A07 (Löschen) |
+| `/admin/programs` | UC-A08 (Liste), UC-A09 (Anlegen) |
+| `/admin/programs/[id]` | UC-A10 (Detail), UC-A11 (Bearbeiten), UC-A12 (Archivieren), UC-A13 (Wiederherstellen) |
+| `/admin/exam-regulations/[id]` | UC-A14 (PO anlegen), UC-A15 (Detail/Hub), UC-A16 (Bearbeiten), UC-A17 (Archivieren), UC-A18 (Wiederherstellen) |
+| `/admin/modules/[id]` | UC-A19 (Modul anlegen), UC-A20 (JSON-Import), UC-A21 (Filtern), UC-A22 (Detail), UC-A23 (Bearbeiten), UC-A24 (Archivieren), UC-A25 (Wiederherstellen) |
+| `/admin/modules/[id]` | UC-A26 (Voraussetzung hinzufügen), UC-A27 (Voraussetzung löschen), UC-A28 (Voraussetzungen einsehen) |
+| `/admin/modules` | UC-A29 (Globale Übersicht) |
+
+---
+
+## Phase 10 — Audit-Log + System + Import Frontend
+
+### UC-10.1 — Audit-Log anzeigen (Timeline)
+
+**Seite:** `/admin/audit-log`  
+**Akteur:** Admin
+
+**Ablauf:**
+1. Seite lädt `GET /api/admin/audit-log` (paginiert, 25/Seite) via `useAdminAuditLogs(params)`
+2. Timeline-Layout: vertikale Linie links, Dot mit Entity-Kürzel, Card pro Eintrag
+3. Pro Eintrag: `ActionBadge` + Entity-Name + Admin-Name + Zeitstempel + Begründung (wenn vorhanden) + DiffBlock
+
+**ActionBadge Farb-Schema:**
+| Action | Farbe | Bedeutung |
+|---|---|---|
+| CREATE | Grün | Neue Entität angelegt |
+| UPDATE | Blau | Felder geändert |
+| DELETE | Rot | Entität gelöscht |
+| ARCHIVE | Amber | Entität archiviert |
+| RESTORE | Emerald | Entität wiederhergestellt |
+| RESET_PASSWORD | Lila | Passwort zurückgesetzt |
+| LOGIN | Grau/Zinc | Admin hat sich eingeloggt |
+| IMPORT | Cyan | Bulk-Import durchgeführt |
+
+---
+
+### UC-10.2 — Audit-Log filtern
+
+**Seite:** `/admin/audit-log`
+
+**Filter-Bar:**
+- Entity-Typ-Dropdown: Module, Program, University, User, ExamRegulation, …
+- Action-Dropdown: alle 8 AuditAction-Werte
+- Datum von / Datum bis: Datumseingabefelder (ISO-Format)
+- "Filter zurücksetzen"-Button
+
+**Verhalten:** Jede Filter-Änderung setzt `page=1` zurück, neuer API-Call mit Query-Parametern.
+
+---
+
+### UC-10.3 — Audit-Log-Diff anzeigen
+
+**Komponente:** `DiffBlock`  
+**Voraussetzung:** Eintrag hat `old_value` UND `new_value` (bei UPDATE/ARCHIVE)
+
+**Anzeige:**
+- Iteriert über alle Keys des `new_value`-Objekts
+- Wenn `old_value[key] !== new_value[key]`: Zeile mit Label + Strikethrough (rot) für alten Wert + Grün-Text für neuen Wert
+- Zeigt nur tatsächlich geänderte Felder
+
+---
+
+### UC-10.4 — Einzelnen Audit-Log-Eintrag einsehen
+
+**API:** `GET /api/v1/admin/audit-log/{id}` via `useAdminAuditLogEntry(id)`  
+**Anzeige:** Alle Felder (admin_name, action, entity_type, entity_label, old/new JSON-vollständig, reason, ip_address, created_at)
+
+---
+
+### UC-10.5 — System-Status anzeigen
+
+**Seite:** `/admin/system`  
+**Akteur:** Admin
+
+**Sektionen:**
+1. **Health-Section**: OverallBadge (ok=grün/degraded=amber/down=rot) + ServiceBadge pro Service (DB + Redis)
+2. **DB-Info-Section**: Version (erste 2 Wörter der Postgres-Version), Größe MB, User-Count, Modul-Count, Audit-Log-Count
+3. **Stack-Section**: Statische Infos (Frontend: Next.js 14, Backend: FastAPI/Python, DB: PostgreSQL, Cache: Redis)
+4. **Last-Checked-Timestamp** aus `dataUpdatedAt` der Query
+
+**Auto-Refresh:** `useAdminSystemHealth()` hat `refetchInterval: 60_000` — alle 60 Sekunden automatisch
+
+---
+
+### UC-10.6 — JSON-Modul-Import (Import-Seite)
+
+**Seite:** `/admin/import`  
+**Akteur:** Admin (mit aktiver Admin-Session empfohlen)
+
+**Ablauf:**
+1. Admin gibt Exam-Regulation-UUID ein (Monospace-Textfeld + Tooltip "UUID der Ziel-PO")
+2. Admin fügt JSON-Array in Textarea ein
+3. Klick "Validieren":
+   - Client: `JSON.parse()` — Fehler → roter Fehlertext
+   - Client: `Array.isArray()` — Fehler → "Muss ein JSON-Array sein"
+   - Erfolg → Preview: Erste 10 Module (Kürzel + Name + ECTS)
+4. Klick "Import ausführen":
+   - `POST /api/admin/modules/import/json` mit `{ exam_regulation_id, modules: preview }`
+   - Ergebnis: grüne Zeilen "N erstellt, N übersprungen" + rote Fehler-Liste wenn vorhanden
+5. Formular nach erfolgreichem Import zurückgesetzt
+
+**Admin-Session-Guard:**
+- Ohne aktive Session: Amber-Warnung "Import erfordert aktive Admin-Session"
+- `canImport`: nur wenn preview vorhanden + UUID eingegeben + Session aktiv
+
+---
+
+## Phase 11 — Admin-Link im User-Dashboard
+
+### UC-11.1 — Admin-Link in User-Sidebar
+
+**Komponenten:** `AppSidebar`, `MobileNav`
+
+**Verhalten:**
+- Link "Admin Panel" erscheint **nur** wenn JWT-Claim `is_admin === true`
+- Positioniert ganz unten in der Navigation, optisch abgesetzt
+- Klick → navigiert zu `/admin` (kein neuer Tab — Admin-Panel im selben Window)
+
+**Implementierung:** `session?.is_admin` aus Next-Auth-Session-Daten, konditionales Rendern
+
+---
+
+## Phase 12 — Tests + TypeScript-Härtung
+
+### UC-12.1 — Backend-Test: Audit-Log Access Control
+
+**Testdatei:** `backend/tests/test_admin_audit_log.py`
+
+**Abgedeckte Szenarien:**
+- Nicht-Admin (`is_admin=False`) → `GET /audit-log` → HTTP 403
+- Nicht-Admin → `GET /audit-log/{id}` → HTTP 403
+- Admin → `GET /audit-log` → HTTP 200 mit korrekter Response-Shape
+
+---
+
+### UC-12.2 — Backend-Test: Audit-Log Liste
+
+**Abgedeckte Szenarien:**
+- Leere Liste: `total=0`, `items=[]`, `total_pages=1` (Fallback)
+- 1 Eintrag: korrekte Shape (`action`, `entity_type`, `entity_label`, `admin_name="System"` bei `admin_id=None`)
+- 2 Einträge: `total=2`, `len(items)=2`
+- Pagination: 26 Einträge → `total_pages=2`
+
+---
+
+### UC-12.3 — Backend-Test: Audit-Log Filter
+
+**Abgedeckte Szenarien:**
+- Filter `entity_type=University`: DB-Query `filter()` wird aufgerufen
+- Filter `action=DELETE`: Response enthält Eintrag mit `action="DELETE"`
+
+---
+
+### UC-12.4 — Backend-Test: Audit-Log Einzeleintrag
+
+**Abgedeckte Szenarien:**
+- `GET /audit-log/{id}` → HTTP 200, korrektes `action`, korrektes `entity_type`
+- Unbekannte UUID → HTTP 404 mit "not found" in detail
+- `admin_id=None` → `admin_name="System"`
+- `admin_id` vorhanden → `admin_name` aus DB aufgelöst (User.full_name)
+
+---
+
+### UC-12.5 — TypeScript-Härtung
+
+**Behobene Fehler:**
+- `TS2339 archive_reason`: `AdminModule` interface fehlte `archive_reason: string | null` — war im Backend und auf der Modul-Detail-Seite genutzt, aber nicht typisiert
+- `TS2322 adminToken null→undefined`: `adminMutate` erwartet `adminToken?: string` (`string|undefined`), aber `useAdminSession().token` ist `string|null` — Fix: `adminToken ?? undefined`
+
+**Infrastruktur-Verbesserungen:**
+- `@types/jest` installiert (war in package.json deklariert, aber in Container nicht vorhanden)
+- Test-Dateien aus `tsconfig.json` `exclude`-Array entfernt — tsc prüft nur Produktionscode; jest hat eigenen TS-Transform
+
+---
+
+## Vorbedingungen (für alle Phase-9-Use-Cases)
+
+1. Benutzer ist eingeloggt mit einem Account, der `is_admin = true` im JWT-Payload hat
+2. Middleware `/admin/*` prüft `is_admin` aus dem Cookie-JWT und gibt sonst `403` zurück
+3. Für **destruktive Operationen** (Archivieren, Löschen, Wiederherstellen) ist zusätzlich eine aktive **Admin-Session** nötig:
+   - Admin-Session wird über `/admin/auth/session` (Re-Authentifizierung) erzeugt
+   - Der Session-Token liegt im localStorage als `admin_token`
+   - TTL: 15 Minuten (Redis-basiert)
+   - Die UI zeigt einen roten Warntext "Keine aktive Admin-Session" wenn kein Token vorhanden oder abgelaufen
+
+---
+
+## Datenhierarchie
+
+```
+Hochschule (University)
+└── Fakultät (Faculty)         [1..N pro Hochschule]
+    └── Studiengang (Program)  [1..N pro Fakultät]
+        └── Prüfungsordnung    [1..N pro Studiengang]
+            └── Modul          [1..N pro PO]
+                └── Voraussetzung [0..N pro Modul]
+```
+
+**Archivierung** (Soft Delete) ist möglich auf: Studiengang, Prüfungsordnung, Modul.  
+**Hartes Löschen** ist möglich bei: Hochschule (nur wenn keine Fakultäten), Fakultät, Voraussetzung.
+
+---
+
+## Navigation (Routing)
+
+```
+/admin
+  /universities                → UC-A01, UC-A02
+    /[id]                      → UC-A03, UC-A04, UC-A05, UC-A06, UC-A07
+  /programs                    → UC-A08, UC-A09
+    /[id]                      → UC-A10, UC-A11, UC-A12, UC-A13
+  /exam-regulations
+    /[id]                      → UC-A14, UC-A15, UC-A16, UC-A17, UC-A18
+  /modules                     → UC-A25 (globale Übersicht → UC-A29)
+    /[id]                      → UC-A19..UC-A28
+  /audit-log                   → UC-10.1..UC-10.4
+  /system                      → UC-10.5
+  /import                      → UC-10.6
+```
+
+**Breadcrumb-Navigation:** Jede Detailseite hat einen "Zurück"-Link zur übergeordneten Seite.
+
+---
 
 ---
 
