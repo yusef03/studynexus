@@ -484,6 +484,7 @@
   },
   "admin": {
     "nav": {
+      "title": "Admin Panel",
       "dashboard": "Dashboard",
       "users": "Users",
       "universities": "Universities",
@@ -653,6 +654,7 @@
         "notesError": "Error saving notes.",
         "toggleActive": "Account active",
         "togglePremium": "Premium",
+        "togglePremiumDesc": "Premium status (currently no features, preparation for Sprint 6+)",
         "toggleVerified": "Email verified",
         "adminFlag": "Admin",
         "resetPassword": "Reset password",
@@ -689,6 +691,14 @@
       "form": {
         "createTitle": "New university",
         "editTitle": "Edit university",
+        "name": "Name",
+        "namePlaceholder": "e.g. Hannover University of Applied Sciences",
+        "kuerzel": "Code",
+        "kuerzelPlaceholder": "e.g. HsH",
+        "stadt": "City",
+        "stadtPlaceholder": "e.g. Hannover",
+        "bundesland": "State",
+        "bundeslandPlaceholder": "e.g. Lower Saxony",
         "typ": "Type",
         "fh": "University of applied sciences",
         "uni": "University"

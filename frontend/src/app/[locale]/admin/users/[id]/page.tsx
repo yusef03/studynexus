@@ -219,12 +219,15 @@ export default function AdminUserDetailPage({ params }: Props) {
             onChange={(v) => handleToggle("is_active", v)}
             disabled={patchLoading}
           />
-          <Toggle
-            label={t("togglePremium")}
-            checked={user.is_premium}
-            onChange={(v) => handleToggle("is_premium", v)}
-            disabled={patchLoading}
-          />
+          <div className="space-y-1">
+            <Toggle
+              label={t("togglePremium")}
+              checked={user.is_premium}
+              onChange={(v) => handleToggle("is_premium", v)}
+              disabled={patchLoading}
+            />
+            <p className="text-xs text-muted-foreground pl-3">{t("togglePremiumDesc")}</p>
+          </div>
           <Toggle
             label={t("toggleVerified")}
             checked={user.is_verified}

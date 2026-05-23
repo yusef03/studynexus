@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Request
 import random
 from datetime import datetime, timezone, timedelta
 from app.services.email_service import send_verification_email
@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.user import LoginRequest, TokenResponse, UserCreate, UserResponse, VerifyEmailRequest
 from app.core.security import create_access_token, hash_password, verify_password
+from app.core.audit import AuditLogger
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -44,7 +45,7 @@ def register(payload: UserCreate, background_tasks: BackgroundTasks, db: Session
 
 
 @router.post("/login", response_model=TokenResponse)
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+def login(payload: LoginRequest, request: Request, db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == payload.email).first()
     if not user or not verify_password(payload.password, user.hashed_password):
         raise HTTPException(
@@ -57,6 +58,17 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account deactivated")
 
     user.last_login_at = datetime.now(timezone.utc)
+    
+    if user.is_admin:
+        ip = request.client.host if request.client else None
+        audit = AuditLogger(db=db, admin=user, ip=ip)
+        audit.log(
+            action="LOGIN",
+            entity_type="SYSTEM",
+            entity_label=user.email,
+            reason="Admin Panel Login"
+        )
+        
     db.commit()
 
     return TokenResponse(access_token=create_access_token(str(user.id), is_admin=user.is_admin))

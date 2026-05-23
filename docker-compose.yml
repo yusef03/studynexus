@@ -38,6 +38,7 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       OPENAI_API_KEY: ${OPENAI_API_KEY}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
+      RESEND_API_KEY: ${RESEND_API_KEY}
       ENVIRONMENT: development
       ALLOWED_ORIGINS: '["http://localhost:3000"]'
     depends_on:

@@ -3,15 +3,16 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, ListTodo, BookOpen, Settings, UserCircle, Map, ScrollText } from "lucide-react";
+import { LayoutDashboard, Calendar, ListTodo, BookOpen, Settings, UserCircle, Map, ScrollText, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 import { useUserProgram } from "@/hooks/queries/useUserProgram";
 import { computeCurrentSemesterNumber, formatSemesterLabel } from "@/lib/semesterUtils";
 
-export function AppSidebar({ locale }: { locale: string }) {
+export function AppSidebar({ locale, isAdmin = false }: { locale: string; isAdmin?: boolean }) {
   const t = useTranslations("dashboard.nav");
   const tDash = useTranslations("dashboard");
+  const tAdmin = useTranslations("admin.nav");
   const pathname = usePathname();
   const { data: program } = useUserProgram();
 
@@ -62,6 +63,22 @@ export function AppSidebar({ locale }: { locale: string }) {
             </Link>
           );
         })}
+
+        {/* Admin Link (only for admins) */}
+        {isAdmin && (
+          <Link
+            href={`/${locale}/admin`}
+            className={cn(
+              "flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors mt-4 border-t pt-4",
+              pathname.startsWith(`/${locale}/admin`)
+                ? "bg-red-500/10 text-red-600 dark:text-red-400"
+                : "text-muted-foreground hover:bg-red-500/5 hover:text-red-600 dark:hover:text-red-400"
+            )}
+          >
+            <ShieldCheck className="h-4 w-4" />
+            {tAdmin("title")}
+          </Link>
+        )}
       </nav>
 
       {semesterNum !== null && (

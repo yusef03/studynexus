@@ -9,6 +9,19 @@ import Link from "next/link";
 import { MobileQuickAdd } from "@/components/dashboard/MobileQuickAdd";
 import { MobileNav } from "@/components/dashboard/MobileNav";
 
+// Edge-runtime safe JWT payload decode
+function parseJwtPayload(token: string): Record<string, unknown> | null {
+  try {
+    const b64 = token.split(".")[1];
+    if (!b64) return null;
+    const padded = b64.replace(/-/g, "+").replace(/_/g, "/");
+    const pad = (4 - (padded.length % 4)) % 4;
+    return JSON.parse(atob(padded + "=".repeat(pad)));
+  } catch {
+    return null;
+  }
+}
+
 export default async function DashboardMainLayout({
   children,
   params: { locale },
@@ -19,6 +32,9 @@ export default async function DashboardMainLayout({
   const cookieStore = cookies();
   const tokenCookie = cookieStore.get("access_token");
   if (!tokenCookie) redirect(`/${locale}/login`);
+
+  const payload = parseJwtPayload(tokenCookie.value);
+  const isAdmin = !!payload?.is_admin;
 
   // Check program — redirect to setup if not selected yet
   try {
@@ -34,10 +50,10 @@ export default async function DashboardMainLayout({
 
   return (
     <div className="flex min-h-screen bg-background">
-      <AppSidebar locale={locale} />
+      <AppSidebar locale={locale} isAdmin={isAdmin} />
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 border-b flex items-center justify-between px-6">
-          <MobileNav locale={locale} />
+          <MobileNav locale={locale} isAdmin={isAdmin} />
           <div className="flex-1"></div>
           <div className="flex items-center gap-5">
             <Link href={`/${locale}/dashboard/settings`} className="text-muted-foreground hover:text-primary transition-colors">

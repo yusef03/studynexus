@@ -40,7 +40,7 @@ My primary focus during this project was on:
 - ✅ **Bilingual (DE/EN)** — Full i18n with next-intl, zero hardcoded strings
 
 ### Planned
-- ✅ **Admin Panel** — University/PO management, user administration, analytics dashboard, audit log, system health *(Sprint 5 — complete, all 12 phases: full backend + full frontend incl. Audit-Log, System-Health, Bulk-Import, 122 backend tests, 0 TS errors)*
+- ✅ **Admin Panel** — University/PO management, user administration, analytics dashboard, audit log, system health *(Sprint 5 — complete, 100% Frontend Test Coverage (Line & Branch), 122 backend tests, CI/CD Pipeline)*
 - 🤝 **Study Spaces** — Digital study groups with shared Kanban boards *(Sprint 8)*
 - 📚 **Module Wiki** — Community knowledge base with anonymous module reviews *(planned)*
 - 🤖 **AI Planning** — Smart recommendations and auto-scheduling *(planned)*
@@ -67,7 +67,7 @@ My primary focus during this project was on:
 | 3 | Study plan, DnD, Quick Add FAB | ✅ Complete |
 | 3.7 | BIN PO full integration | ✅ Complete |
 | 4 | PO-Übersicht, note validation, Vorprüfungs-Milestone | ✅ Complete |
-| 5 | Admin Panel (university/PO/user management, analytics) | ✅ Complete (all 12 phases) |
+| 5 | Admin Panel (university/PO/user management, analytics) | ✅ Complete (100% Test Coverage + CI/CD) |
 | 6–7 | AI features, extended analytics | Backlog |
 | 8 | Community (Study Spaces, Module Wiki) | Backlog |
 

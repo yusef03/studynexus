@@ -9,9 +9,9 @@
 
 **Name:** StudyNexus
 **Type:** B2C SaaS — Gamified Study and Collaboration Platform for HsH students
-**Status:** ✅ Sprint 5 Complete — alle 12 Phasen abgeschlossen (2026-05-10)
+**Status:** ✅ Sprint 5 Complete — alle 20 Phasen abgeschlossen (inkl. 100% Frontend Coverage & CI/CD Pipeline) (2026-05-23)
 **Repository:** https://github.com/yusef03/studynexus
-**Last Updated:** 2026-05-10
+**Last Updated:** 2026-05-23
 
 ---
 
@@ -25,8 +25,8 @@
 | Backend | FastAPI (Python), SQLAlchemy, Alembic, Pydantic v2 |
 | Database | PostgreSQL (primary), Redis (cache/sessions) |
 | Auth | JWT (python-jose), bcrypt 4.1.3 (direct, no passlib), httpOnly cookies |
-| DevOps | Docker Compose (local), GitHub Actions (CI/CD planned Sprint 6) |
-| Testing | pytest (backend, 122/122 tests nach Sprint 5 Phase 12), Jest (frontend) |
+| DevOps | Docker Compose (local), GitHub Actions (Frontend CI/CD active) |
+| Testing | pytest (backend, 122/122 tests), Jest (frontend, 100% Line/Branch Coverage im Admin Panel) |
 
 ---
 
@@ -178,7 +178,7 @@ docker compose exec db psql -U studynexus -d studynexus -c "TRUNCATE users CASCA
 
 ### Admin (`/api/v1/admin/`) — Sprint 5
 All endpoints require `is_admin=true` in JWT. Destructive ops require `X-Admin-Token` (Redis-based session).
-Full endpoint list: `docs/sprints/sprint-5-plan.md`
+Full endpoint list: `docs/sprints/sprint-5/01-plan.md`
 
 ---
 
@@ -267,13 +267,13 @@ FAB (Mobile Quick Add), Agenda View, Submissions, iOS Safari Fix.
 Visual Study Plan Board (DnD Semester-Spalten), Digital ID Card, Settings Page.
 
 ### Sprint 3.7 – Rework & i18n ✅
-`@dnd-kit` für Kanban + StudyPlanBoard, vollständige i18n (DE/EN), Settings mit echten Daten, Passwort-Änderung, 401-Auto-Redirect.
+`@dnd-kit` für Kanban + StudyPlanBoard, vollständige i18n (DE/EN), Settings mit echten Daten, Passwort-Ändung, 401-Auto-Redirect.
 
 ### Sprint 3.7.7 – BIN PO Datenkorrektur ✅
-Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigiert, custom_ist_benotet, WAHLPFLICHT-Limit (2).
+Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Module korrigiert, custom_ist_benotet, WAHLPFLICHT-Limit (2).
 
 ### Sprint 4 – BIN Studiengang Vollintegration ✅
-**Review:** `docs/sprints/sprint-4-review.md` | **Zeitraum:** 08.–09. Mai 2026 | **Tests:** 66/66 grün
+**Review:** `docs/sprints/sprint-4/01-review.md` | **Zeitraum:** 08.–09. Mai 2026 | **Tests:** 66/66 grün
 
 - **Phase 1:** Migration 0012 — pruefungsart + sws auf modules, BIN-Seed für alle 37 Module. ModuleModal: farbige PA-Badges (PX=blau, EA=amber, R=lila, BAA+Ko=emerald). ModuleList: PA-Chip.
 - **Phase 2:** GET /me/stats — 8 neue Felder (sem1/2_complete, vorpruefung_bestanden, sem4/5/6_zugaenglich, ba_zulassung_eligible, ects_fuer_ba). MilestoneWidget im Dashboard.
@@ -364,7 +364,7 @@ Migration 0011: alle Kürzel korrigiert, BIN-209 eingefügt, 9 WP-Namen korrigie
 - **`backend/tests/test_admin_audit_log.py`:** 11 neue Tests — Access Control (403 für Nicht-Admin), List (200 + Shape), Pagination (total_pages), Filter (entity_type/action), Empty List, Single Entry (200 + admin_name), 404, admin_name-Auflösung über scalar(). 122/122 grün.
 - **`backend/tests/test_admin_users.py`:** Bug-Fix `test_list_users_returns_paginated` — `get_db` Override fehlte, Test traf echte DB.
 - **TypeScript-Härtung:** `@types/jest` installiert (war in package.json, fehlte in node_modules), test files aus tsconfig.json `exclude` entfernt (Test-Typen via jest, nicht via tsc). `archive_reason: string | null` zu `AdminModule` interface hinzugefügt. `adminToken: adminToken ?? undefined` in import/page.tsx (null→undefined Mismatch). **Ergebnis: 0 TypeScript-Fehler.**
-- **Sprint 5 Review:** `docs/sprints/sprint-5-review.md` erstellt.
+- **Sprint 5 Review:** `docs/sprints/sprint-5/02-review.md` erstellt.
 - **admin-po-use-cases.md:** Von Phase 9-only auf alle Phasen (Phase 0–12) erweitert.
 
 ### Sprint 5 Phase 9 ✅ (2026-05-10) — PO-Verwaltung Frontend + Phase 11 Admin-Link
@@ -462,25 +462,45 @@ Das DB-Schema `University → Faculty → Program → ExamRegulation → Module`
 
 ---
 
-## Next Steps: Sprint 5 Phase 12 — Tests + TypeScript-Härtung
+## Sprint 5 Bug-Fixes (2026-05-18) ✅
 
-**Masterplan:** `docs/sprints/sprint-5-plan.md`
+**Dokumentation:** `docs/sprints/sprint-5/04-bugfix-umsetzung.md`
 
-### Abgeschlossen ✅
-- **Phase 1** — Backend Fundament (Migrations 0015–0017, admin_auth, audit, JWT is_admin)
-- **Phase 2** — User-Management Backend (CRUD + Audit, 25 Tests)
-- **Phase 3** — PO-Verwaltung Backend (30+ Endpunkte, JSON-Import, 99 Tests)
-- **Phase 4** — Analytics Backend (stats/growth/modules/system/health, 111 Tests)
-- **Phase 5** — Frontend Fundament (Middleware, Layout, Session, Login, Sidebar)
-- **Phase 6** — Dashboard + Analytics Frontend (KPICard, GrowthChart, Dashboard-Page)
-- **Phase 7** — Mobile/i18n Rework + Reusable Components (AdminDataTable, Dialogs, Badges)
-- **Phase 8** — User Management Frontend (`/admin/users`, `/admin/users/[id]`)
-- **Phase 9** — PO-Verwaltung Frontend (universities, programs, exam-regulations, modules, prerequisites)
-- **Phase 10** — Audit-Log + System + Import Frontend (backend Router, Timeline-View, Health-Page, Import-Page)
-- **Phase 11** — Admin-Link im User-Dashboard (AppSidebar + MobileNav, is_admin guard)
+Nach manueller QA wurden 17 Bugs identifiziert und systematisch behoben:
 
-### Ausstehend 🔧
-- **Phase 12** — Tests + Härtung (Backend-Tests für audit_log Router, TypeScript check, middleware test)
+### Root Cause A: CSRF-Header fehlte (12 Bugs gelöst)
+- `adminFetch.ts` setzte `x-studynexus-client: true` nicht
+- **Fix:** Header hinzugefügt → alle Admin-Mutationen (POST/PATCH/DELETE) funktionieren jetzt
+
+### Root Cause B: i18n-Keys fehlten (2 Bugs gelöst)
+- Universities-Form-Keys existierten nur in `detail`, nicht in `form`
+- **Fix:** Keys `name`, `kuerzel`, `stadt`, `bundesland` + Placeholders hinzugefügt (DE + EN)
+
+### Root Cause C: Admin-Link fehlte (1 Bug gelöst)
+- Phase 11 wurde initial unvollständig bzw. fehlerhaft implementiert (client-side `fetch` mit Next.js 14 URL-Cache-Bug).
+- **Fix:** JWT-Payload wird jetzt auf dem Server (`layout.tsx`) geparst, und `isAdmin` wird als Prop übergeben. Der fehlende `cache: "no-store"` in der `/api/auth/me` Route wurde korrigiert. Zudem wurde der fehlende i18n-Key `admin.nav.title` ergänzt.
+
+### Weitere Fixes:
+- **Prerequisites-Link entfernt:** `/admin/prerequisites` 404 → Link aus Sidebar entfernt (wird in Modul-Detail verwaltet)
+- **Premium-Erklärungstext:** Toggle zeigt jetzt "aktuell keine Features, Vorbereitung für Sprint 6+"
+
+### Ausstehend:
+- **Alle Bugs via manueller QA und Docker-Tests behoben!**
+
+---
+
+## Sprint 5 Phase 14-20: Admin UI QA & CI/CD Pipeline (2026-05-23) ✅
+
+**Dokumentation:** `docs/qa/sprint-5-qa-report.md` und Einzel-Reports in `docs/qa/`
+
+- **100% Jest Coverage:** Dashboard, Users, Universities, Programs, Modules, Exam Regulations, Audit-Log, System, Import vollständig getestet (Line & Branch Coverage = 100%).
+- **DOM Testing Excellence:** Umstellung von `userEvent` auf `fireEvent` für Radix UI Portal Modals. Eliminierung von `MultipleElementsFoundError`.
+- **i18n Testing:** Strikte `NextIntlClientProvider` Wrappers mit vollständigen `admin`-Namespaces verhindern fatal `MissingMessage` Errors im Test-DOM.
+- **CI/CD Pipeline (DevOps):** `frontend-ci.yml` für GitHub Actions erstellt. Führt `npm ci`, `npm run lint` und `npm run test:coverage` (100% Coverage Enforcer) auf jeden PR in den `main` Branch aus.
+
+---
+
+## Next Steps: Sprint 6 Planung (PWA, Branding & Launch)
 
 ### Admin-Flag setzen (einmalig nach erstem Login)
 

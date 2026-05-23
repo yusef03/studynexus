@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, X, Settings, UserCircle, Map, ScrollText } from "lucide-react";
+import { LayoutDashboard, Calendar, ListTodo, BookOpen, Menu, X, Settings, UserCircle, Map, ScrollText, ShieldCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Logo } from "@/components/ui/Logo";
 
-export function MobileNav({ locale }: { locale: string }) {
+export function MobileNav({ locale, isAdmin = false }: { locale: string; isAdmin?: boolean }) {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations("dashboard.nav");
+  const tAdmin = useTranslations("admin.nav");
   const pathname = usePathname();
 
   const routes = [
@@ -76,6 +77,23 @@ export function MobileNav({ locale }: { locale: string }) {
                   </Link>
                 );
               })}
+
+              {/* Admin Link (only for admins) */}
+              {isAdmin && (
+                <Link
+                  href={`/${locale}/admin`}
+                  onClick={() => setIsOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-3 py-3 rounded-lg text-base font-medium transition-colors mt-4 border-t pt-4",
+                    pathname.startsWith(`/${locale}/admin`)
+                      ? "bg-red-500/10 text-red-600 dark:text-red-400"
+                      : "text-muted-foreground hover:bg-red-500/5 hover:text-red-600 dark:hover:text-red-400"
+                  )}
+                >
+                  <ShieldCheck className="h-5 w-5" />
+                  {tAdmin("title")}
+                </Link>
+              )}
             </nav>
           </div>
         </div>

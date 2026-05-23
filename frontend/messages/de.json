@@ -484,6 +484,7 @@
   },
   "admin": {
     "nav": {
+      "title": "Admin Panel",
       "dashboard": "Dashboard",
       "users": "Nutzer",
       "universities": "Hochschulen",
@@ -653,6 +654,7 @@
         "notesError": "Fehler beim Speichern.",
         "toggleActive": "Konto aktiv",
         "togglePremium": "Premium",
+        "togglePremiumDesc": "Premium-Status (aktuell keine Features, Vorbereitung für Sprint 6+)",
         "toggleVerified": "E-Mail verifiziert",
         "adminFlag": "Admin",
         "resetPassword": "Passwort zurücksetzen",
@@ -689,6 +691,14 @@
       "form": {
         "createTitle": "Neue Hochschule",
         "editTitle": "Hochschule bearbeiten",
+        "name": "Name",
+        "namePlaceholder": "z.B. Hochschule Hannover",
+        "kuerzel": "Kürzel",
+        "kuerzelPlaceholder": "z.B. HsH",
+        "stadt": "Stadt",
+        "stadtPlaceholder": "z.B. Hannover",
+        "bundesland": "Bundesland",
+        "bundeslandPlaceholder": "z.B. Niedersachsen",
         "typ": "Typ",
         "fh": "Fachhochschule",
         "uni": "Universität"

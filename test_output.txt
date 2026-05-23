@@ -1,0 +1,1272 @@
+time="2026-05-22T22:58:37+02:00" level=warning msg="/Users/yusefbach/Projekte/studynexus/docker-compose.yml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion"
+
+> studynexus-frontend@0.1.0 test
+> jest universities --coverage
+
+FAIL src/app/[locale]/admin/universities/__tests__/page.test.tsx
+  ● AdminUniversitiesPage › handles creating a new university (Happy & Sad Path)
+
+    TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Speichern"
+
+    Here are the accessible roles:
+
+      heading:
+
+      Name "Hochschulen":
+      [36m<h1[39m
+        [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+      [36m/>[39m
+
+      Name "Neue Uni":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-base font-semibold"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      paragraph:
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m=[32m"text-sm text-muted-foreground mt-0.5"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m=[32m"text-sm text-muted-foreground py-8 text-center"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      button:
+
+      Name "Erstellen":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 self-start sm:self-auto"[39m
+      [36m/>[39m
+
+      Name "Abbrechen":
+      [36m<button[39m
+        [33maria-label[39m=[32m"Abbrechen"[39m
+        [33mclass[39m=[32m"p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"[39m
+      [36m/>[39m
+
+      Name "Abbrechen":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full sm:w-auto"[39m
+      [36m/>[39m
+
+      Name "Erstellen":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full sm:max-w-sm rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"Suche Unis"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"z.B. Hochschule Hannover"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"z.B. HsH"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"z.B. Hannover"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"z.B. Niedersachsen"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      combobox:
+
+      Name "":
+      [36m<select[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      option:
+
+      Name "Fachhochschule":
+      [36m<option[39m
+        [33mvalue[39m=[32m"FH"[39m
+      [36m/>[39m
+
+      Name "Universität":
+      [36m<option[39m
+        [33mvalue[39m=[32m"Uni"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+
+    Ignored nodes: comments, script, style
+    [36m<body[39m
+      [33mstyle[39m=[32m"overflow: hidden;"[39m
+    [36m>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-6 space-y-4 sm:space-y-6"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 sm:justify-between"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+              [36m>[39m
+                [0mHochschulen[0m
+              [36m</h1>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-sm text-muted-foreground mt-0.5"[39m
+              [36m>[39m
+                [0mVerwalte Hochschulen[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 self-start sm:self-auto"[39m
+            [36m>[39m
+              [0mErstellen[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"w-full sm:max-w-sm rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+            [33mplaceholder[39m=[32m"Suche Unis"[39m
+            [33mtype[39m=[32m"text"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm text-muted-foreground py-8 text-center"[39m
+          [36m>[39m
+            [0mSuche Unis[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"absolute inset-0 bg-black/60"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative z-10 w-full bg-background border-t sm:border rounded-t-xl sm:rounded-xl shadow-xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] sm:max-w-lg"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center justify-between px-4 sm:px-6 py-4 border-b shrink-0"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  [33mclass[39m=[32m"text-base font-semibold"[39m
+                [36m>[39m
+                  [0mNeue Uni[0m
+                [36m</h2>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"Abbrechen"[39m
+                  [33mclass[39m=[32m"p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"lucide lucide-x h-4 w-4"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"24"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M18 6 6 18"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"m6 6 12 12"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex-1 overflow-y-auto px-4 sm:px-6 py-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"space-y-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mName[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. Hochschule Hannover"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mKürzel[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. HsH"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mStadt[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. Hannover"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mBundesland[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. Niedersachsen"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mTyp[0m
+                    [36m</label>[39m
+                    [36m<select[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                    [36m>[39m
+                      [36m<option[39m
+                        [33mvalue[39m=[32m"FH"[39m
+                      [36m>[39m
+                        [0mFachhochschule[0m
+                      [36m</option>[39m
+                      [36m<option[39m
+                        [33mvalue[39m=[32m"Uni"[39m
+                      [36m>[39m
+                        [0mUniversität[0m
+                      [36m</option>[39m
+                    [36m</select>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-4 sm:px-6 py-4 border-t shrink-0"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full sm:w-auto"[39m
+                [36m>[39m
+                  [0mAbbrechen[0m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto"[39m
+                [36m>[39m
+                  [0mErstellen[0m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+      148 |
+      149 |     // Sad Path: Try to submit empty form
+    > 150 |     fireEvent.click(screen.getByRole("button", { name: "Speichern" }));
+          |                            ^
+      151 |     // adminMutate should not have been called because of the early return
+      152 |     expect(adminMutate).not.toHaveBeenCalled();
+      153 |
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByRole (src/app/[locale]/admin/universities/__tests__/page.test.tsx:150:28)
+
+  ● AdminUniversitiesPage › handles cancel in create modal
+
+    TestingLibraryElementError: Found multiple elements with the role "button" and name "Abbrechen"
+
+    Here are the matching elements:
+
+    Ignored nodes: comments, script, style
+    [36m<button[39m
+      [33maria-label[39m=[32m"Abbrechen"[39m
+      [33mclass[39m=[32m"p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"[39m
+    [36m>[39m
+      [36m<svg[39m
+        [33mclass[39m=[32m"lucide lucide-x h-4 w-4"[39m
+        [33mfill[39m=[32m"none"[39m
+        [33mheight[39m=[32m"24"[39m
+        [33mstroke[39m=[32m"currentColor"[39m
+        [33mstroke-linecap[39m=[32m"round"[39m
+        [33mstroke-linejoin[39m=[32m"round"[39m
+        [33mstroke-width[39m=[32m"2"[39m
+        [33mviewBox[39m=[32m"0 0 24 24"[39m
+        [33mwidth[39m=[32m"24"[39m
+        [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+      [36m>[39m
+        [36m<path[39m
+          [33md[39m=[32m"M18 6 6 18"[39m
+        [36m/>[39m
+        [36m<path[39m
+          [33md[39m=[32m"m6 6 12 12"[39m
+        [36m/>[39m
+      [36m</svg>[39m
+    [36m</button>[39m
+
+    Ignored nodes: comments, script, style
+    [36m<button[39m
+      [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full sm:w-auto"[39m
+    [36m>[39m
+      [0mAbbrechen[0m
+    [36m</button>[39m
+
+    (If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+    Ignored nodes: comments, script, style
+    [36m<body[39m
+      [33mstyle[39m=[32m"overflow: hidden;"[39m
+    [36m>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-6 space-y-4 sm:space-y-6"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-0 sm:justify-between"[39m
+          [36m>[39m
+            [36m<div>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+              [36m>[39m
+                [0mHochschulen[0m
+              [36m</h1>[39m
+              [36m<p[39m
+                [33mclass[39m=[32m"text-sm text-muted-foreground mt-0.5"[39m
+              [36m>[39m
+                [0mVerwalte Hochschulen[0m
+              [36m</p>[39m
+            [36m</div>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-9 rounded-md px-3 self-start sm:self-auto"[39m
+            [36m>[39m
+              [0mErstellen[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<input[39m
+            [33mclass[39m=[32m"w-full sm:max-w-sm rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+            [33mplaceholder[39m=[32m"Suche Unis"[39m
+            [33mtype[39m=[32m"text"[39m
+            [33mvalue[39m=[32m""[39m
+          [36m/>[39m
+          [36m<p[39m
+            [33mclass[39m=[32m"text-sm text-muted-foreground py-8 text-center"[39m
+          [36m>[39m
+            [0mSuche Unis[0m
+          [36m</p>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"absolute inset-0 bg-black/60"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative z-10 w-full bg-background border-t sm:border rounded-t-xl sm:rounded-xl shadow-xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] sm:max-w-lg"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center justify-between px-4 sm:px-6 py-4 border-b shrink-0"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  [33mclass[39m=[32m"text-base font-semibold"[39m
+                [36m>[39m
+                  [0mNeue Uni[0m
+                [36m</h2>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"Abbrechen"[39m
+                  [33mclass[39m=[32m"p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"lucide lucide-x h-4 w-4"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"24"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M18 6 6 18"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"m6 6 12 12"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex-1 overflow-y-auto px-4 sm:px-6 py-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"space-y-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mName[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. Hochschule Hannover"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mKürzel[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. HsH"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mStadt[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. Hannover"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mBundesland[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"z.B. Niedersachsen"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mTyp[0m
+                    [36m</label>[39m
+                    [36m<select[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                    [36m>[39m
+                      [36m<option[39m
+                        [33mvalue[39m=[32m"FH"[39m
+                      [36m>[39m
+                        [0mFachhochschule[0m
+                      [36m</option>[39m
+                      [36m<option[39m
+                        [33mvalue[39m=[32m"Uni"[39m
+                      [36m>[39m
+                        [0mUniversität[0m
+                      [36m</option>[39m
+                    [36m</select>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-4 sm:px-6 py-4 border-t shrink-0"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full sm:w-auto"[39m
+                [36m>[39m
+                  [0mAbbrechen[0m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto"[39m
+                [36m>[39m
+                  [0mErstellen[0m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+      193 |
+      194 |     // Close modal
+    > 195 |     fireEvent.click(screen.getByRole("button", { name: "Abbrechen" }));
+          |                            ^
+      196 |     
+      197 |     await waitFor(() => {
+      198 |       expect(screen.queryByText("Neue Uni")).not.toBeInTheDocument();
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at getElementError (node_modules/@testing-library/dom/dist/query-helpers.js:20:35)
+      at getMultipleElementsFoundError (node_modules/@testing-library/dom/dist/query-helpers.js:23:10)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByRole (src/app/[locale]/admin/universities/__tests__/page.test.tsx:195:28)
+
+FAIL src/app/[locale]/admin/universities/[id]/__tests__/page.test.tsx
+  ● AdminUniversityDetailPage › renders university data correctly
+
+    TestingLibraryElementError: Found multiple elements with the text: Hochschule Hannover
+
+    Here are the matching elements:
+
+    Ignored nodes: comments, script, style
+    [36m<h1[39m
+      [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+    [36m>[39m
+      [0mHochschule Hannover[0m
+    [36m</h1>[39m
+
+    Ignored nodes: comments, script, style
+    [36m<dd[39m
+      [33mclass[39m=[32m"text-sm"[39m
+    [36m>[39m
+      [0mHochschule Hannover[0m
+    [36m</dd>[39m
+
+    (If this is intentional, then use the `*AllBy*` variant of the query (like `queryAllByText`, `getAllByText`, or `findAllByText`)).
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-6 space-y-5 max-w-3xl"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"text-sm text-muted-foreground hover:text-foreground transition-colors"[39m
+              [33mhref[39m=[32m"/de/admin/universities"[39m
+            [36m>[39m
+              [0mBack[0m
+            [36m</a>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between mt-2"[39m
+            [36m>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+              [36m>[39m
+                [0mHochschule Hannover[0m
+              [36m</h1>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"[39m
+              [36m>[39m
+                [0mEdit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"rounded-lg border bg-card p-4 sm:p-5 space-y-1"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+            [36m>[39m
+              [0mInfo[0m
+            [36m</h2>[39m
+            [36m<dl>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mName[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mHochschule Hannover[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mKürzel[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mHsH[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mStadt[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mHannover[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mBundesland[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mNiedersachsen[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mTyp[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0mFH[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+            [36m</dl>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"rounded-lg border bg-card p-4 sm:p-5 space-y-1"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+            [36m>[39m
+              [0mFaculties[0m
+            [36m</h2>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"space-y-1"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center gap-3 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"flex-1 min-w-0"[39m
+                [36m>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"text-sm font-medium truncate"[39m
+                  [36m>[39m
+                    [0mFakultät IV[0m
+                  [36m</p>[39m
+                  [36m<p[39m
+                    [33mclass[39m=[32m"text-xs text-muted-foreground"[39m
+                  [36m>[39m
+                    [0mF4[0m
+                  [36m</p>[39m
+                [36m</div>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"p-1.5 rounded text-muted-foreground hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"[39m
+                  [33mtitle[39m=[32m"Delete Faculty"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"lucide lucide-trash2 h-3.5 w-3.5"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"24"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M3 6h18"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"[39m
+                    [36m/>[39m
+                    [36m<line[39m
+                      [33mx1[39m=[32m"10"[39m
+                      [33mx2[39m=[32m"10"[39m
+                      [33my1[39m=[32m"11"[39m
+                      [33my2[39m=[32m"17"[39m
+                    [36m/>[39m
+                    [36m<line[39m
+                      [33mx1[39m=[32m"14"[39m
+                      [33mx2[39m=[32m"14"[39m
+                      [33my1[39m=[32m"11"[39m
+                      [33my2[39m=[32m"17"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-3"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"[39m
+              [36m>[39m
+                [0mAdd Faculty[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+      153 |     renderPage();
+      154 |
+    > 155 |     expect(screen.getByText("Hochschule Hannover")).toBeInTheDocument();
+          |                   ^
+      156 |     expect(screen.getByText("Fakultät IV")).toBeInTheDocument();
+      157 |   });
+      158 |
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at getElementError (node_modules/@testing-library/dom/dist/query-helpers.js:20:35)
+      at getMultipleElementsFoundError (node_modules/@testing-library/dom/dist/query-helpers.js:23:10)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:55:13
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByText (src/app/[locale]/admin/universities/[id]/__tests__/page.test.tsx:155:19)
+
+  ● AdminUniversityDetailPage › handles adding a faculty
+
+    TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "Save"
+
+    Here are the accessible roles:
+
+      link:
+
+      Name "Back":
+      [36m<a[39m
+        [33mclass[39m=[32m"text-sm text-muted-foreground hover:text-foreground transition-colors"[39m
+        [33mhref[39m=[32m"/de/admin/universities"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      heading:
+
+      Name "":
+      [36m<h1[39m
+        [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+      [36m/>[39m
+
+      Name "Info":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+      [36m/>[39m
+
+      Name "Faculties":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+      [36m/>[39m
+
+      Name "Delete Uni":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+      [36m/>[39m
+
+      Name "Create Faculty":
+      [36m<h2[39m
+        [33mclass[39m=[32m"text-base font-semibold"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      button:
+
+      Name "Edit":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"[39m
+      [36m/>[39m
+
+      Name "Add Faculty":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"[39m
+      [36m/>[39m
+
+      Name "Delete":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3"[39m
+      [36m/>[39m
+
+      Name "Cancel":
+      [36m<button[39m
+        [33maria-label[39m=[32m"Cancel"[39m
+        [33mclass[39m=[32m"p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"[39m
+      [36m/>[39m
+
+      Name "Cancel":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full sm:w-auto"[39m
+      [36m/>[39m
+
+      Name "Create":
+      [36m<button[39m
+        [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      term:
+
+      Name "":
+      [36m<dt[39m
+        [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dt[39m
+        [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dt[39m
+        [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dt[39m
+        [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dt[39m
+        [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      definition:
+
+      Name "":
+      [36m<dd[39m
+        [33mclass[39m=[32m"text-sm"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dd[39m
+        [33mclass[39m=[32m"text-sm"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dd[39m
+        [33mclass[39m=[32m"text-sm"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dd[39m
+        [33mclass[39m=[32m"text-sm"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<dd[39m
+        [33mclass[39m=[32m"text-sm"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      paragraph:
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m=[32m"text-sm text-muted-foreground py-2"[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<p[39m
+        [33mclass[39m=[32m"text-xs text-muted-foreground mb-3"[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+      textbox:
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"Name PH"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      Name "":
+      [36m<input[39m
+        [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+        [33mplaceholder[39m=[32m"Kürzel PH"[39m
+        [33mtype[39m=[32m"text"[39m
+        [33mvalue[39m=[32m""[39m
+      [36m/>[39m
+
+      --------------------------------------------------
+
+    Ignored nodes: comments, script, style
+    [36m<body[39m
+      [33mstyle[39m=[32m"overflow: hidden;"[39m
+    [36m>[39m
+      [36m<div>[39m
+        [36m<div[39m
+          [33mclass[39m=[32m"p-4 sm:p-6 space-y-5 max-w-3xl"[39m
+        [36m>[39m
+          [36m<div>[39m
+            [36m<a[39m
+              [33mclass[39m=[32m"text-sm text-muted-foreground hover:text-foreground transition-colors"[39m
+              [33mhref[39m=[32m"/de/admin/universities"[39m
+            [36m>[39m
+              [0mBack[0m
+            [36m</a>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"flex items-center justify-between mt-2"[39m
+            [36m>[39m
+              [36m<h1[39m
+                [33mclass[39m=[32m"text-xl sm:text-2xl font-bold tracking-tight"[39m
+              [36m/>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"[39m
+              [36m>[39m
+                [0mEdit[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"rounded-lg border bg-card p-4 sm:p-5 space-y-1"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+            [36m>[39m
+              [0mInfo[0m
+            [36m</h2>[39m
+            [36m<dl>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mName[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mKürzel[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mStadt[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mBundesland[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col sm:flex-row sm:items-center gap-0.5 sm:gap-4 py-2.5 border-b last:border-0"[39m
+              [36m>[39m
+                [36m<dt[39m
+                  [33mclass[39m=[32m"text-xs font-medium text-muted-foreground sm:w-36 shrink-0"[39m
+                [36m>[39m
+                  [0mTyp[0m
+                [36m</dt>[39m
+                [36m<dd[39m
+                  [33mclass[39m=[32m"text-sm"[39m
+                [36m>[39m
+                  [0m—[0m
+                [36m</dd>[39m
+              [36m</div>[39m
+            [36m</dl>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"rounded-lg border bg-card p-4 sm:p-5 space-y-1"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+            [36m>[39m
+              [0mFaculties[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-sm text-muted-foreground py-2"[39m
+            [36m>[39m
+              [0mNo faculties[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-3"[39m
+            [36m>[39m
+              [36m<button[39m
+                [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 rounded-md px-3"[39m
+              [36m>[39m
+                [0mAdd Faculty[0m
+              [36m</button>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"rounded-lg border bg-card p-4 sm:p-5 space-y-1"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-sm font-semibold mb-3"[39m
+            [36m>[39m
+              [0mDelete Uni[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"text-xs text-muted-foreground mb-3"[39m
+            [36m>[39m
+              [0mDanger delete uni[0m
+            [36m</p>[39m
+            [36m<button[39m
+              [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-destructive text-destructive-foreground hover:bg-destructive/90 h-9 rounded-md px-3"[39m
+            [36m>[39m
+              [0mDelete[0m
+            [36m</button>[39m
+          [36m</div>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"[39m
+          [36m>[39m
+            [36m<div[39m
+              [33maria-hidden[39m=[32m"true"[39m
+              [33mclass[39m=[32m"absolute inset-0 bg-black/60"[39m
+            [36m/>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"relative z-10 w-full bg-background border-t sm:border rounded-t-xl sm:rounded-xl shadow-xl flex flex-col max-h-[90dvh] sm:max-h-[85vh] sm:max-w-lg"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex items-center justify-between px-4 sm:px-6 py-4 border-b shrink-0"[39m
+              [36m>[39m
+                [36m<h2[39m
+                  [33mclass[39m=[32m"text-base font-semibold"[39m
+                [36m>[39m
+                  [0mCreate Faculty[0m
+                [36m</h2>[39m
+                [36m<button[39m
+                  [33maria-label[39m=[32m"Cancel"[39m
+                  [33mclass[39m=[32m"p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"[39m
+                [36m>[39m
+                  [36m<svg[39m
+                    [33mclass[39m=[32m"lucide lucide-x h-4 w-4"[39m
+                    [33mfill[39m=[32m"none"[39m
+                    [33mheight[39m=[32m"24"[39m
+                    [33mstroke[39m=[32m"currentColor"[39m
+                    [33mstroke-linecap[39m=[32m"round"[39m
+                    [33mstroke-linejoin[39m=[32m"round"[39m
+                    [33mstroke-width[39m=[32m"2"[39m
+                    [33mviewBox[39m=[32m"0 0 24 24"[39m
+                    [33mwidth[39m=[32m"24"[39m
+                    [33mxmlns[39m=[32m"http://www.w3.org/2000/svg"[39m
+                  [36m>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"M18 6 6 18"[39m
+                    [36m/>[39m
+                    [36m<path[39m
+                      [33md[39m=[32m"m6 6 12 12"[39m
+                    [36m/>[39m
+                  [36m</svg>[39m
+                [36m</button>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex-1 overflow-y-auto px-4 sm:px-6 py-4"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"space-y-3"[39m
+                [36m>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mName[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"Name PH"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                  [36m<div[39m
+                    [33mclass[39m=[32m"space-y-1"[39m
+                  [36m>[39m
+                    [36m<label[39m
+                      [33mclass[39m=[32m"text-sm font-medium"[39m
+                    [36m>[39m
+                      [0mKürzel[0m
+                    [36m</label>[39m
+                    [36m<input[39m
+                      [33mclass[39m=[32m"w-full rounded-md border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"[39m
+                      [33mplaceholder[39m=[32m"Kürzel PH"[39m
+                      [33mtype[39m=[32m"text"[39m
+                      [33mvalue[39m=[32m""[39m
+                    [36m/>[39m
+                  [36m</div>[39m
+                [36m</div>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"flex flex-col-reverse sm:flex-row sm:justify-end gap-2 px-4 sm:px-6 py-4 border-t shrink-0"[39m
+              [36m>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 w-full sm:w-auto"[39m
+                [36m>[39m
+                  [0mCancel[0m
+                [36m</button>[39m
+                [36m<button[39m
+                  [33mclass[39m=[32m"inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 w-full sm:w-auto"[39m
+                [36m>[39m
+                  [0mCreate[0m
+                [36m</button>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</div>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+      220 |     
+      221 |     // Sad Path: Try to submit empty form
+    > 222 |     fireEvent.click(screen.getByRole("button", { name: "Save" }));
+          |                            ^
+      223 |     expect(adminMutate).not.toHaveBeenCalled(); // due to early return
+      224 |
+      225 |     // Happy Path: Fill form and submit
+
+      at Object.getElementError (node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByRole (src/app/[locale]/admin/universities/[id]/__tests__/page.test.tsx:222:28)
+
+--------------------------------------|---------|----------|---------|---------|-----------------------
+File                                  | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s     
+--------------------------------------|---------|----------|---------|---------|-----------------------
+All files                             |   56.84 |    55.38 |   48.38 |   61.68 |                       
+ app/[locale]/admin/universities      |   65.11 |    66.66 |   57.14 |      70 |                       
+  page.tsx                            |   65.11 |    66.66 |   57.14 |      70 | 43-55,112,125-135     
+ app/[locale]/admin/universities/[id] |   75.29 |    80.95 |    62.5 |   82.89 |                       
+  page.tsx                            |   75.29 |    80.95 |    62.5 |   82.89 | 84-92,213,225,248-270 
+ components/admin                     |    90.9 |    81.25 |   83.33 |   94.11 |                       
+  AdminFormModal.tsx                  |    90.9 |    81.25 |   83.33 |   94.11 | 40                    
+ components/ui                        |      90 |    66.66 |     100 |     100 |                       
+  button.tsx                          |      90 |    66.66 |     100 |     100 | 40                    
+ hooks                                |   11.53 |        0 |       0 |   12.76 |                       
+  useAdminSession.ts                  |   11.53 |        0 |       0 |   12.76 | 16-24,29-78           
+ hooks/admin                          |      50 |      100 |       0 |      50 |                       
+  useAdminUniversities.ts             |      50 |      100 |       0 |      50 | 8-10,16-18            
+ lib                                  |   28.57 |        0 |   33.33 |   35.29 |                       
+  adminFetch.ts                       |   11.76 |        0 |       0 |   15.38 | 7-10,18-33            
+  utils.ts                            |     100 |      100 |     100 |     100 |                       
+--------------------------------------|---------|----------|---------|---------|-----------------------
+Test Suites: 2 failed, 2 total
+Tests:       4 failed, 10 passed, 14 total
+Snapshots:   0 total
+Time:        1.093 s, estimated 2 s
+Ran all test suites matching /universities/i.

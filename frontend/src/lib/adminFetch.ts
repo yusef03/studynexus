@@ -16,7 +16,10 @@ export async function adminMutate<T>(
   options: { body?: unknown; adminToken?: string } = {}
 ): Promise<T | undefined> {
   const cleanPath = path.replace(/^\/?(admin\/)?/, "");
-  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    "x-studynexus-client": "true", // CSRF protection required by middleware
+  };
   if (options.adminToken) headers["x-admin-token"] = options.adminToken;
 
   const res = await fetch(`/api/admin/${cleanPath}`, {

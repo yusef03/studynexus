@@ -51,7 +51,7 @@ export function AdminMobileHeader({ locale, adminName }: Props) {
     { href: `${base}/universities`, label: t("nav.universities"), icon: Building2 },
     { href: `${base}/programs`, label: t("nav.programs"), icon: GraduationCap },
     { href: `${base}/modules`, label: t("nav.modules"), icon: BookOpen },
-    { href: `${base}/prerequisites`, label: t("nav.prerequisites"), icon: Link2 },
+    // Prerequisites managed directly in module detail pages
     { href: `${base}/import`, label: t("nav.bulkImport"), icon: FileUp },
     { href: `${base}/audit-log`, label: t("nav.auditLog"), icon: ClipboardList },
     { href: `${base}/system`, label: t("nav.system"), icon: Server },

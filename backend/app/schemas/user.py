@@ -42,6 +42,7 @@ class UserResponse(UserBase):
     id: UUID
     is_active: bool
     is_premium: bool
+    is_admin: bool
     matrikelnummer: Optional[str] = None
     birth_date: Optional[datetime] = None
     university: Optional[str] = None

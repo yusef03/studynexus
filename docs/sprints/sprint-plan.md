@@ -11,16 +11,16 @@
 | Sprint | Thema | Status | Dauer | Review |
 |---|---|---|---|---|
 | Sprint 0 | Setup & Anforderungen | ✅ Fertig | 1 Woche | — |
-| Sprint 1 | Infrastruktur & Authentifizierung | ✅ Fertig | 2 Wochen | [sprint-1-review.md](sprint-1-review.md) |
-| Sprint 2 | Studienplan & Notenmanagement | ✅ Fertig | 2 Wochen | [sprint-2-review.md](sprint-2-review.md) |
-| Sprint 3A | Auth Hardening & Dashboard Fixes | ✅ Fertig | 2 Wochen | [sprint-3a-review.md](sprint-3a-review.md) |
-| Sprint 3B | Mission Control | ✅ Fertig | 2 Wochen | [sprint-3b-review.md](sprint-3b-review.md) |
-| Sprint 3.5 | Mobile Ergonomics | ✅ Fertig | 1 Woche | [sprint-3.5-review.md](sprint-3.5-review.md) |
-| Sprint 3.6 | UX Polish & Visual Features | ✅ Fertig | 1 Woche | [sprint-3.6-review.md](sprint-3.6-review.md) |
-| Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3.7-review.md](sprint-3.7-review.md) |
-| Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3.7.7-review.md](sprint-3.7.7-review.md) |
-| **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | — |
-| **Sprint 5** | **Admin Panel** | **✅ Fertig** | **2 Tage** | [sprint-5-plan.md](sprint-5-plan.md) · [sprint-5-review.md](sprint-5-review.md) |
+| Sprint 1 | Infrastruktur & Authentifizierung | ✅ Fertig | 2 Wochen | [sprint-1/01-review.md](sprint-1/01-review.md) |
+| Sprint 2 | Studienplan & Notenmanagement | ✅ Fertig | 2 Wochen | [sprint-2/01-review.md](sprint-2/01-review.md) |
+| Sprint 3A | Auth Hardening & Dashboard Fixes | ✅ Fertig | 2 Wochen | [sprint-3/01-phase-a-review.md](sprint-3/01-phase-a-review.md) |
+| Sprint 3B | Mission Control | ✅ Fertig | 2 Wochen | [sprint-3/02-phase-b-review.md](sprint-3/02-phase-b-review.md) |
+| Sprint 3.5 | Mobile Ergonomics | ✅ Fertig | 1 Woche | [sprint-3/03-phase-3.5-review.md](sprint-3/03-phase-3.5-review.md) |
+| Sprint 3.6 | UX Polish & Visual Features | ✅ Fertig | 1 Woche | [sprint-3/04-phase-3.6-review.md](sprint-3/04-phase-3.6-review.md) |
+| Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3/05-phase-3.7-review.md](sprint-3/05-phase-3.7-review.md) |
+| Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3/06-phase-3.7.7-review.md](sprint-3/06-phase-3.7.7-review.md) |
+| **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | [sprint-4/01-review.md](sprint-4/01-review.md) |
+| **Sprint 5** | **Admin Panel** | **✅ Fertig** | **2 Tage** | [sprint-5/01-plan.md](sprint-5/01-plan.md) · [sprint-5/02-review.md](sprint-5/02-review.md) |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
 | Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
@@ -219,7 +219,7 @@
 
 **Grundlage:** Vollständige Analyse von Modulhandbuch BIN 19WS (76 S.), PO BIN 2019, ATPO-FIV 2025.
 Quell-PDFs: `docs/pos_test/` (ATPO-FIV 2025, PO BIN 2019, Modulhandbuch BIN 19WS).
-Detailliertes Review: [sprint-3.7.7-review.md](sprint-3.7.7-review.md)
+Detailliertes Review: [sprint-3/06-phase-3.7.7-review.md](sprint-3/06-phase-3.7.7-review.md)
 
 **Erledigte Tasks:**
 - [x] Alembic Migration 0011: Alle 27 PFLICHT-Kürzel auf BIN-100..BIN-210 korrigiert
@@ -481,8 +481,8 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ### Sprint 5 – Admin Panel ✅
 
-**Status:** Abgeschlossen — alle 12 Phasen (2026-05-10)  
-**Detailplanung:** [sprint-5-plan.md](sprint-5-plan.md)  
+**Status:** Abgeschlossen — alle 20 Phasen inkl. QA (2026-05-23)  
+**Detailplanung:** [sprint-5/01-plan.md](sprint-5/01-plan.md)  
 **Ziel:** Vollständiges, professionelles Admin-Panel — PO-Verwaltung, User-Management, Analytics, Audit-Log.
 
 **Basis:** ADR-009, ADR-019 (Admin-Session Redis), ADR-020 (Soft Delete), ADR-021 (JWT is_admin), ADR-022 (Server-side Pagination)
@@ -515,6 +515,7 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - [x] Phase 10: backend audit_log Router+Schema, hooks/admin/useAdminAuditLog+useAdminSystem, /admin/audit-log (Timeline-View, DiffBlock, ActionBadge, Filter), /admin/system (Health+Info+Stack), /admin/import (Validate→Preview→Import, PDF-Placeholder), i18n (admin.auditLog+system+import)
 - [x] Phase 11: AppSidebar + MobileNav Admin-Link (is_admin guard)
 - [x] Phase 12: Backend-Tests (122/122 grün — 11 neue Audit-Log-Tests), TypeScript-Härtung (0 Fehler), `@types/jest` installiert, test files aus tsconfig excluded, `archive_reason` in `AdminModule`
+- [x] Phase 13-20 (QA & DevOps): Vollständiges Jest UI-Testing für alle Admin-Routen (100% Line & Branch Coverage), Behebung von Radix UI Portal-Test-Issues (DOM Overlaps), Strikte i18n-Testumgebungen. GitHub Actions Workflow `frontend-ci.yml` für automatisiertes Linting & Coverage Barrier implementiert.
 
 ---
 
@@ -534,10 +535,10 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - [ ] Service Worker: Offline-Cache für Dashboard + StaticAssets
 - [ ] PWA Manifest: Icons, Farben, `display: standalone`
 - [ ] Lighthouse PWA Score ≥ 90 erreichen
-- [ ] GitHub Actions CI/CD Pipeline:
-  - Backend: pytest auf PRs
-  - Frontend: `next build` + TypeScript-Check auf PRs
-  - Deployment: automatisch auf main-Push
+- [x] GitHub Actions CI/CD Pipeline: (Vorgezogen in Sprint 5)
+  - Frontend-Linting & 100% Jest Coverage Enforcer (`frontend-ci.yml`) auf PRs und Main-Push aktiv.
+  - [ ] Backend: pytest auf PRs (ausstehend)
+  - [ ] Deployment: automatisch auf main-Push (ausstehend)
 - [ ] Cloud Deployment (Railway oder Render):
   - PostgreSQL Managed DB
   - Redis Managed

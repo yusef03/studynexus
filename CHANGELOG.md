@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### DevOps — CI/CD Pipeline & Code Quality (2026-05-23)
+#### Added
+- **GitHub Actions Workflow (`.github/workflows/frontend-ci.yml`)**: Automated pipeline triggering on `push` and `pull_request` to `main`/`master`.
+- **Strict Linting & Coverage Barrier**: Pipeline ensures codebase remains pristine by enforcing `npm run lint` and `npm run test:coverage`. Fails if line or branch coverage drops below 100% or tests fail.
+
+### Sprint 5 Phase 14-20 — Admin UI QA & 100% Coverage (2026-05-23)
+#### Added
+- **100% Jest Coverage**: All `/admin` routes (Dashboard, Users, Universities, Programs, Modules, Exam Regulations, Audit-Log, System, Import) successfully covered.
+- **Robust DOM Testing**: Switched from `userEvent` to `fireEvent` and refined `getAllByRole` selectors to prevent `MultipleElementsFoundError` caused by Radix UI Portal animations and overlapping modals.
+- **i18n Test Safety**: Added strict `NextIntlClientProvider` wrappers with complete `admin` namespaces to all test setups to prevent `MissingMessage` fatal errors.
+#### Fixed
+- **Form Modal Overlaps**: Resolved testing ambiguities when handling "Cancel" and "Save" operations across multiple simultaneous forms.
+### Sprint 5 Phase 13 — Admin UI Bugfixes & SSR Optimization (2026-05-22)
+#### Fixed
+- **`AppSidebar.tsx` / `MobileNav.tsx`**: Admin link not showing due to Next.js 14 global fetch caching of `/api/auth/me`. Fixed by completely eliminating the client-side `fetch` and parsing the JWT server-side in `layout.tsx`, passing `isAdmin` as a prop. Button now renders instantly with zero layout shift.
+- **`route.ts` (api/auth/me)**: Added missing `cache: "no-store"` to prevent global caching of user profile payloads.
+- **i18n (`de.json` / `en.json`)**: Added missing `admin.nav.title` key which caused literal string rendering in the navigation.
+
 ### Sprint 5 Phase 12 — Tests + TypeScript-Härtung (2026-05-10)
 #### Added
 - **`backend/tests/test_admin_audit_log.py`**: 11 neue Tests — Access Control (403), List (200/Shape/Pagination), Filters (entity_type/action), Empty List, Single Entry (200/404), admin_name-Auflösung; alle 122/122 grün
