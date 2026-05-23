@@ -18,9 +18,9 @@
 | Sprint 3.5 | Mobile Ergonomics | ✅ Fertig | 1 Woche | [sprint-3/03-phase-3.5-review.md](sprint-3/03-phase-3.5-review.md) |
 | Sprint 3.6 | UX Polish & Visual Features | ✅ Fertig | 1 Woche | [sprint-3/04-phase-3.6-review.md](sprint-3/04-phase-3.6-review.md) |
 | Sprint 3.7 | Dashboard Rework, i18n & DnD | ✅ Fertig | 3 Wochen | [sprint-3/05-phase-3.7-review.md](sprint-3/05-phase-3.7-review.md) |
-| Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 1 Tag | [sprint-3/06-phase-3.7.7-review.md](sprint-3/06-phase-3.7.7-review.md) |
-| **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **2 Tage** | [sprint-4/01-review.md](sprint-4/01-review.md) |
-| **Sprint 5** | **Admin Panel** | **✅ Fertig** | **2 Tage** | [sprint-5/01-plan.md](sprint-5/01-plan.md) · [sprint-5/02-review.md](sprint-5/02-review.md) |
+| Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 4 Tage | [sprint-3/06-phase-3.7.7-review.md](sprint-3/06-phase-3.7.7-review.md) |
+| **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **1 Woche** | [sprint-4/01-review.md](sprint-4/01-review.md) |
+| **Sprint 5** | **Admin Panel** | **✅ Fertig** | **2 Wochen** | [sprint-5/01-plan.md](sprint-5/01-plan.md) · [sprint-5/02-review.md](sprint-5/02-review.md) |
 | Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
 | Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
 | Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
