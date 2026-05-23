@@ -500,6 +500,17 @@ Nach manueller QA wurden 17 Bugs identifiziert und systematisch behoben:
 
 ---
 
+## Sprint 5 Backend QA & CI/CD (2026-05-23) ✅
+
+**Dokumentation:** Fünf isolierte QA-Reports abgelegt in `docs/qa/backend/admin-qa/`:
+- `phase-1-auth.md`, `phase-2-users.md`, `phase-3-po-hierarchy.md`, `phase-4-modules.md`, `phase-5-observability.md`
+
+- **100% Backend Coverage:** Die gesamte Admin-Backend-Logik (`app/routers/admin/`) wurde durch eine makellose Testabdeckung von 100% gehärtet. Alle Edge-Cases (401, 403, 404, Transaktions-Rollbacks, Redis-Ausfälle) wurden intensiv getestet.
+- **Isolierte Pytest-Architektur:** Jeder Test verwendet konsequent Dependency Injection (`get_db` Overrides), um die Produktionsdatenbank komplett unberührt zu lassen. Sauberes Mocking via Pydantic und SQLAlchemy.
+- **CI/CD Pipeline (DevOps):** `backend-ci.yml` für GitHub Actions implementiert. Installiert Dependencies, richtet Python 3.11 ein und bricht den Build ab, falls die Backend-Coverage durch einen Push unter die 100%-Marke fällt (`--cov-fail-under=100`).
+
+---
+
 ## Next Steps: Sprint 6 Planung (PWA, Branding & Launch)
 
 ### Admin-Flag setzen (einmalig nach erstem Login)

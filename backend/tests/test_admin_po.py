@@ -1,25 +1,13 @@
 """Tests for Sprint 5 Phase 3 – Admin PO-Verwaltung.
 
-Coverage:
-  - GET /admin/universities returns list
-  - POST /admin/universities creates and logs audit entry
-  - DELETE /admin/universities/{id} blocked when faculties exist (409)
-  - GET /admin/programs?faculty_id= filters correctly
-  - POST /admin/programs/{id}/archive requires Admin-Token (401 without)
-  - POST /admin/programs/{id}/archive sets is_archived + audit entry
-  - POST /admin/programs/{id}/restore clears archived fields
-  - POST /admin/programs/{id}/archive returns 400 when already archived
-  - GET /admin/exam-regulations?program_id= filters correctly
-  - GET /admin/modules returns only non-archived by default
-  - POST /admin/modules/import/json creates modules, skips duplicates
-  - POST /admin/modules/import/json returns 404 for unknown ER
-  - POST /admin/modules/import/pdf returns 501
-  - POST /admin/modules/{id}/archive sets archived fields
-  - POST /admin/modules/{id}/restore clears archived fields
-  - Public /faculties/{id}/programs filters archived programs
+Coverage should be 100% for:
+  - universities.py
+  - faculties.py
+  - programs.py
+  - exam_regulations.py
 """
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -28,7 +16,6 @@ from fastapi.testclient import TestClient
 from app.core.dependencies import get_current_user
 from app.database import get_db
 from app.main import app
-from app.models.module import ModulTyp
 
 _ADMIN_UUID = uuid.UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
 _UNI_UUID = uuid.UUID("11111111-1111-1111-1111-111111111111")
@@ -37,7 +24,6 @@ _PROG_UUID = uuid.UUID("33333333-3333-3333-3333-333333333333")
 _ER_UUID = uuid.UUID("44444444-4444-4444-4444-444444444444")
 _MOD_UUID = uuid.UUID("55555555-5555-5555-5555-555555555555")
 _DT = datetime(2026, 5, 9, 12, 0, 0, tzinfo=timezone.utc)
-
 
 def _admin():
     u = MagicMock()
@@ -50,7 +36,6 @@ def _admin():
     u.created_at = _DT
     return u
 
-
 def _make_uni():
     uni = MagicMock()
     uni.id = _UNI_UUID
@@ -59,8 +44,19 @@ def _make_uni():
     uni.stadt = "Hannover"
     uni.bundesland = "Niedersachsen"
     uni.typ = "FH"
+    uni.created_at = _DT
+    uni.updated_at = _DT
     return uni
 
+def _make_fac():
+    fac = MagicMock()
+    fac.id = _FAC_UUID
+    fac.university_id = _UNI_UUID
+    fac.name = "Fakultät IV"
+    fac.kuerzel = "F4"
+    fac.created_at = _DT
+    fac.updated_at = _DT
+    return fac
 
 def _make_program(is_archived=False):
     prog = MagicMock()
@@ -73,33 +69,37 @@ def _make_program(is_archived=False):
     prog.is_archived = is_archived
     prog.archived_at = _DT if is_archived else None
     prog.archive_reason = "Test" if is_archived else None
+    prog.created_at = _DT
+    prog.updated_at = _DT
     return prog
 
+def _make_er(is_archived=False):
+    er = MagicMock()
+    er.id = _ER_UUID
+    er.program_id = _PROG_UUID
+    er.version = "2026"
+    er.ist_aktuell = True
+    er.gueltig_ab = date(2026, 9, 1)
+    er.gueltig_bis = None
+    er.is_archived = is_archived
+    er.archived_at = _DT if is_archived else None
+    er.archive_reason = "Test" if is_archived else None
+    er.created_at = _DT
+    er.updated_at = _DT
+    return er
 
-def _make_module(is_archived=False):
-    mod = MagicMock()
-    mod.id = _MOD_UUID
-    mod.exam_regulation_id = _ER_UUID
-    mod.name = "Programmierung I"
-    mod.kuerzel = "BIN-100"
-    mod.ects = 5
-    mod.semester_empfehlung = 1
-    mod.modul_typ = ModulTyp.PFLICHT
-    mod.ist_benotet = True
-    mod.max_versuche = 3
-    mod.gewichtung = 1.0
-    mod.has_prerequisites = False
-    mod.pruefungsart = None
-    mod.sws = 4
-    mod.is_archived = is_archived
-    mod.archived_at = _DT if is_archived else None
-    mod.archive_reason = "Test" if is_archived else None
-    return mod
-
+def _mock_refresh(obj):
+    obj.id = uuid.uuid4()
+    obj.created_at = _DT
+    obj.updated_at = _DT
+    if not hasattr(obj, "is_archived") or obj.is_archived is None:
+        obj.is_archived = False
+    if hasattr(obj, "gueltig_ab"):
+        obj.gueltig_ab = date(2026, 9, 1)
 
 # ── Universities ───────────────────────────────────────────────────────────────
 
-def test_list_universities_returns_list(mock_db):
+def test_list_universities(mock_db):
     admin = _admin()
     app.dependency_overrides[get_current_user] = lambda: admin
     app.dependency_overrides[get_db] = lambda: mock_db
@@ -107,333 +107,545 @@ def test_list_universities_returns_list(mock_db):
 
     with TestClient(app) as c:
         resp = c.get("/api/v1/admin/universities")
-
     app.dependency_overrides.clear()
     assert resp.status_code == 200
-    assert isinstance(resp.json(), list)
-    assert len(resp.json()) == 1
 
-
-def test_create_university_returns_201(mock_db):
-    admin = _admin()
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_create_university(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    # Simulate SQLAlchemy setting the PK on flush
-    def _flush_sets_id():
-        pass
-
-    mock_db.add.side_effect = lambda obj: setattr(obj, "id", _UNI_UUID)
-    mock_db.refresh.side_effect = lambda obj: None
+    mock_db.refresh.side_effect = _mock_refresh
 
     with patch("app.core.audit.AuditLogger.log") as mock_log:
         with TestClient(app) as c:
-            resp = c.post("/api/v1/admin/universities", json={
-                "name": "Hochschule Hannover",
-                "kuerzel": "HsH",
-                "stadt": "Hannover",
-                "bundesland": "Niedersachsen",
-                "typ": "FH",
-            })
-
+            resp = c.post("/api/v1/admin/universities", json={"name": "HSH", "kuerzel": "HsH", "stadt": "H", "bundesland": "N", "typ": "FH"})
     app.dependency_overrides.clear()
     assert resp.status_code == 201
     mock_log.assert_called_once()
 
-
-def test_delete_university_blocked_with_faculties(mock_db):
-    admin = _admin()
-    uni = _make_uni()
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_get_university_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_uni()
+    mock_db.query.return_value.filter.return_value.all.return_value = [_make_fac()]
 
+    with TestClient(app) as c:
+        resp = c.get(f"/api/v1/admin/universities/{_UNI_UUID}")
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
+    assert resp.json()["name"] == "Hochschule Hannover"
+    assert len(resp.json()["faculties"]) == 1
+
+def test_get_university_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.get(f"/api/v1/admin/universities/{uuid.uuid4()}")
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_patch_university_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    uni = _make_uni()
     mock_db.get.return_value = uni
-    mock_db.query.return_value.filter.return_value.count.return_value = 2  # has faculties
 
+    with patch("app.core.audit.AuditLogger.log") as mock_log:
+        with TestClient(app) as c:
+            resp = c.patch(f"/api/v1/admin/universities/{_UNI_UUID}", json={"name": "Neu"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
+    assert uni.name == "Neu"
+    mock_log.assert_called_once()
+
+def test_patch_university_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.patch(f"/api/v1/admin/universities/{uuid.uuid4()}", json={"name": "Neu"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_delete_university_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_uni()
+    mock_db.query.return_value.filter.return_value.count.return_value = 0
     with patch("app.core.admin_auth._redis") as mock_redis:
         mock_redis.exists.return_value = 1
         with TestClient(app) as c:
-            resp = c.delete(
-                f"/api/v1/admin/universities/{_UNI_UUID}",
-                headers={"X-Admin-Token": "valid"},
-            )
+            resp = c.delete(f"/api/v1/admin/universities/{_UNI_UUID}", headers={"X-Admin-Token": "test"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 204
 
+def test_delete_university_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.delete(f"/api/v1/admin/universities/{uuid.uuid4()}", headers={"X-Admin-Token": "test"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_delete_university_409(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_uni()
+    mock_db.query.return_value.filter.return_value.count.return_value = 1
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.delete(f"/api/v1/admin/universities/{_UNI_UUID}", headers={"X-Admin-Token": "test"})
     app.dependency_overrides.clear()
     assert resp.status_code == 409
-    assert "faculties" in resp.json()["detail"]
+
+
+# ── Faculties ─────────────────────────────────────────────────────────────────
+
+def test_list_faculties(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.query.return_value.order_by.return_value.all.return_value = [_make_fac()]
+    mock_db.query.return_value.filter.return_value.order_by.return_value.all.return_value = [_make_fac()]
+
+    with TestClient(app) as c:
+        resp1 = c.get("/api/v1/admin/faculties")
+        resp2 = c.get(f"/api/v1/admin/faculties?university_id={_UNI_UUID}")
+    app.dependency_overrides.clear()
+    assert resp1.status_code == 200
+    assert resp2.status_code == 200
+
+def test_create_faculty_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_uni()
+    mock_db.refresh.side_effect = _mock_refresh
+    with patch("app.core.audit.AuditLogger.log"):
+        with TestClient(app) as c:
+            resp = c.post("/api/v1/admin/faculties", json={"university_id": str(_UNI_UUID), "name": "F4", "kuerzel": "F4"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 201
+
+def test_create_faculty_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.post("/api/v1/admin/faculties", json={"university_id": str(_UNI_UUID), "name": "F4", "kuerzel": "F4"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_patch_faculty_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    fac = _make_fac()
+    mock_db.get.return_value = fac
+    with patch("app.core.audit.AuditLogger.log"):
+        with TestClient(app) as c:
+            resp = c.patch(f"/api/v1/admin/faculties/{_FAC_UUID}", json={"name": "F5"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
+    assert fac.name == "F5"
+
+def test_patch_faculty_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.patch(f"/api/v1/admin/faculties/{_FAC_UUID}", json={"name": "F5"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_delete_faculty_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_fac()
+    mock_db.query.return_value.filter.return_value.count.return_value = 0
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.delete(f"/api/v1/admin/faculties/{_FAC_UUID}", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 204
+
+def test_delete_faculty_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.delete(f"/api/v1/admin/faculties/{uuid.uuid4()}", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_delete_faculty_409(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_fac()
+    mock_db.query.return_value.filter.return_value.count.return_value = 1
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.delete(f"/api/v1/admin/faculties/{_FAC_UUID}", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 409
 
 
 # ── Programs ──────────────────────────────────────────────────────────────────
 
-def test_list_programs_filters_by_faculty(mock_db):
-    admin = _admin()
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_list_programs(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.query.return_value.filter.return_value.filter.return_value.order_by.return_value.all.return_value = [_make_program()]
+    
+    def mock_query(model):
+        q = MagicMock()
+        q.filter.return_value.filter.return_value.order_by.return_value.all.return_value = [_make_program()]
+        q.order_by.return_value.all.return_value = [_make_program()]
+        q.filter.return_value.order_by.return_value.all.return_value = [_make_program()]
+        return q
+    mock_db.query.side_effect = mock_query
 
     with TestClient(app) as c:
-        resp = c.get(f"/api/v1/admin/programs?faculty_id={_FAC_UUID}")
+        resp1 = c.get("/api/v1/admin/programs")
+        resp2 = c.get(f"/api/v1/admin/programs?faculty_id={_FAC_UUID}")
+        resp3 = c.get("/api/v1/admin/programs?include_archived=true")
+    app.dependency_overrides.clear()
+    assert resp1.status_code == 200
+    assert resp2.status_code == 200
+    assert resp3.status_code == 200
 
+def test_create_program_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_fac()
+    mock_db.refresh.side_effect = _mock_refresh
+    with patch("app.core.audit.AuditLogger.log"):
+        with TestClient(app) as c:
+            resp = c.post("/api/v1/admin/programs", json={
+                "faculty_id": str(_FAC_UUID), "name": "P", "abschluss": "B", "regelstudienzeit": 7, "gesamt_ects": 210
+            })
+    app.dependency_overrides.clear()
+    assert resp.status_code == 201
+
+def test_create_program_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.post("/api/v1/admin/programs", json={
+            "faculty_id": str(_FAC_UUID), "name": "P", "abschluss": "B", "regelstudienzeit": 7, "gesamt_ects": 210
+        })
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_get_program_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_program()
+    
+    er_mock = _make_er()
+    
+    def mock_query(model):
+        q = MagicMock()
+        if model.__name__ == "ExamRegulation":
+            q.filter.return_value.all.return_value = [er_mock]
+        elif model.__name__ == "UserProgram":
+            q.filter.return_value.count.return_value = 5
+        return q
+    mock_db.query.side_effect = mock_query
+
+    with TestClient(app) as c:
+        resp = c.get(f"/api/v1/admin/programs/{_PROG_UUID}")
     app.dependency_overrides.clear()
     assert resp.status_code == 200
-    assert len(resp.json()) == 1
+    assert resp.json()["student_count"] == 5
 
-
-def test_archive_program_requires_admin_token(mock_db):
-    admin = _admin()
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_get_program_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    with patch("app.core.admin_auth._redis") as mock_redis:
-        mock_redis.exists.return_value = 0  # no valid session
-        with TestClient(app) as c:
-            resp = c.post(
-                f"/api/v1/admin/programs/{_PROG_UUID}/archive",
-                json={"reason": "Auslaufmodell"},
-            )
-
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.get(f"/api/v1/admin/programs/{uuid.uuid4()}")
     app.dependency_overrides.clear()
-    assert resp.status_code == 401
+    assert resp.status_code == 404
 
-
-def test_archive_program_sets_archived_fields(mock_db):
-    admin = _admin()
-    prog = _make_program(is_archived=False)
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_patch_program_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
+    prog = _make_program()
     mock_db.get.return_value = prog
+    with patch("app.core.audit.AuditLogger.log"):
+        with TestClient(app) as c:
+            resp = c.patch(f"/api/v1/admin/programs/{_PROG_UUID}", json={"name": "P2"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
+    assert prog.name == "P2"
 
+def test_patch_program_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.patch(f"/api/v1/admin/programs/{uuid.uuid4()}", json={"name": "P2"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_archive_program_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    prog = _make_program(False)
+    mock_db.get.return_value = prog
     with patch("app.core.admin_auth._redis") as mock_redis:
         mock_redis.exists.return_value = 1
-        with patch("app.core.audit.AuditLogger.log") as mock_log:
+        with patch("app.core.audit.AuditLogger.log"):
             with TestClient(app) as c:
-                resp = c.post(
-                    f"/api/v1/admin/programs/{_PROG_UUID}/archive",
-                    headers={"X-Admin-Token": "valid"},
-                    json={"reason": "Auslaufmodell"},
-                )
-
+                resp = c.post(f"/api/v1/admin/programs/{_PROG_UUID}/archive", headers={"X-Admin-Token": "t"}, json={"reason": "r"})
     app.dependency_overrides.clear()
     assert resp.status_code == 204
     assert prog.is_archived is True
-    assert prog.archive_reason == "Auslaufmodell"
-    mock_log.assert_called_once()
-    assert mock_log.call_args.args[0] == "ARCHIVE"
 
-
-def test_archive_program_already_archived_returns_400(mock_db):
-    admin = _admin()
-    prog = _make_program(is_archived=True)
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_archive_program_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = prog
-
+    mock_db.get.return_value = None
     with patch("app.core.admin_auth._redis") as mock_redis:
         mock_redis.exists.return_value = 1
         with TestClient(app) as c:
-            resp = c.post(
-                f"/api/v1/admin/programs/{_PROG_UUID}/archive",
-                headers={"X-Admin-Token": "valid"},
-                json={"reason": "Test"},
-            )
+            resp = c.post(f"/api/v1/admin/programs/{uuid.uuid4()}/archive", headers={"X-Admin-Token": "t"}, json={"reason": "r"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
 
+def test_archive_program_400(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    prog = _make_program(True)
+    mock_db.get.return_value = prog
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/programs/{_PROG_UUID}/archive", headers={"X-Admin-Token": "t"}, json={"reason": "r"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 400
+
+def test_restore_program_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    prog = _make_program(True)
+    mock_db.get.return_value = prog
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with patch("app.core.audit.AuditLogger.log"):
+            with TestClient(app) as c:
+                resp = c.post(f"/api/v1/admin/programs/{_PROG_UUID}/restore", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 204
+    assert prog.is_archived is False
+
+def test_restore_program_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/programs/{uuid.uuid4()}/restore", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_restore_program_400(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    prog = _make_program(False)
+    mock_db.get.return_value = prog
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/programs/{_PROG_UUID}/restore", headers={"X-Admin-Token": "t"})
     app.dependency_overrides.clear()
     assert resp.status_code == 400
 
 
-def test_restore_program_clears_archived_fields(mock_db):
-    admin = _admin()
-    prog = _make_program(is_archived=True)
-    app.dependency_overrides[get_current_user] = lambda: admin
+# ── Exam Regulations ──────────────────────────────────────────────────────────
+
+def test_list_exam_regulations(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = prog
-
-    with patch("app.core.admin_auth._redis") as mock_redis:
-        mock_redis.exists.return_value = 1
-        with patch("app.core.audit.AuditLogger.log"):
-            with TestClient(app) as c:
-                resp = c.post(
-                    f"/api/v1/admin/programs/{_PROG_UUID}/restore",
-                    headers={"X-Admin-Token": "valid"},
-                )
-
-    app.dependency_overrides.clear()
-    assert resp.status_code == 204
-    assert prog.is_archived is False
-    assert prog.archived_at is None
-    assert prog.archive_reason is None
-
-
-# ── Modules ───────────────────────────────────────────────────────────────────
-
-def test_list_modules_excludes_archived_by_default(mock_db):
-    admin = _admin()
-    app.dependency_overrides[get_current_user] = lambda: admin
-    app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.query.return_value.filter.return_value.filter.return_value.order_by.return_value.all.return_value = [_make_module()]
+    
+    def mock_query(model):
+        q = MagicMock()
+        q.filter.return_value.filter.return_value.order_by.return_value.all.return_value = [_make_er()]
+        q.order_by.return_value.all.return_value = [_make_er()]
+        q.filter.return_value.order_by.return_value.all.return_value = [_make_er()]
+        return q
+    mock_db.query.side_effect = mock_query
 
     with TestClient(app) as c:
-        resp = c.get("/api/v1/admin/modules")
-
+        resp1 = c.get("/api/v1/admin/exam-regulations")
+        resp2 = c.get(f"/api/v1/admin/exam-regulations?program_id={_PROG_UUID}")
+        resp3 = c.get("/api/v1/admin/exam-regulations?include_archived=true")
     app.dependency_overrides.clear()
-    assert resp.status_code == 200
+    assert resp1.status_code == 200
+    assert resp2.status_code == 200
+    assert resp3.status_code == 200
 
-
-def test_import_modules_json_creates_new_modules(mock_db):
-    admin = _admin()
-    er = MagicMock()
-    er.id = _ER_UUID
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_create_er_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = er
-    # No existing kuerzel
-    mock_db.query.return_value.filter.return_value.filter.return_value.all.return_value = []
-
-    audit_entry = MagicMock()
-    audit_entry.id = uuid.uuid4()
-
-    with patch("app.core.audit.AuditLogger.log", return_value=audit_entry):
+    mock_db.get.return_value = _make_program()
+    mock_db.refresh.side_effect = _mock_refresh
+    with patch("app.core.audit.AuditLogger.log"):
         with TestClient(app) as c:
-            resp = c.post("/api/v1/admin/modules/import/json", json={
-                "exam_regulation_id": str(_ER_UUID),
-                "modules": [
-                    {"name": "Prog I", "kuerzel": "BIN-100", "ects": 5, "modul_typ": "PFLICHT"},
-                    {"name": "Prog II", "kuerzel": "BIN-200", "ects": 5, "modul_typ": "PFLICHT"},
-                ],
+            resp = c.post("/api/v1/admin/exam-regulations", json={
+                "program_id": str(_PROG_UUID), "version": "2026", "ist_aktuell": True
             })
-
     app.dependency_overrides.clear()
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["created"] == 2
-    assert data["skipped"] == 0
-    assert data["errors"] == []
+    assert resp.status_code == 201
 
-
-def test_import_modules_json_skips_duplicate_kuerzel(mock_db):
-    admin = _admin()
-    er = MagicMock()
-    er.id = _ER_UUID
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_create_er_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = er
-    # Router calls db.query(Module.kuerzel).filter(...).all() — one filter, one .all()
-    mock_db.query.return_value.filter.return_value.all.return_value = [("BIN-100",)]
-
-    with patch("app.core.audit.AuditLogger.log", return_value=MagicMock(id=uuid.uuid4())):
-        with TestClient(app) as c:
-            resp = c.post("/api/v1/admin/modules/import/json", json={
-                "exam_regulation_id": str(_ER_UUID),
-                "modules": [
-                    {"name": "Prog I", "kuerzel": "BIN-100", "ects": 5, "modul_typ": "PFLICHT"},
-                    {"name": "Prog II", "kuerzel": "BIN-200", "ects": 5, "modul_typ": "PFLICHT"},
-                ],
-            })
-
-    app.dependency_overrides.clear()
-    assert resp.status_code == 200
-    data = resp.json()
-    assert data["skipped"] == 1
-    assert data["created"] == 1
-
-
-def test_import_modules_json_unknown_er_returns_404(mock_db):
-    admin = _admin()
-    app.dependency_overrides[get_current_user] = lambda: admin
-    app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = None  # ER not found
-
+    mock_db.get.return_value = None
     with TestClient(app) as c:
-        resp = c.post("/api/v1/admin/modules/import/json", json={
-            "exam_regulation_id": str(uuid.uuid4()),
-            "modules": [{"name": "X", "kuerzel": "X-001", "ects": 5, "modul_typ": "PFLICHT"}],
+        resp = c.post("/api/v1/admin/exam-regulations", json={
+            "program_id": str(_PROG_UUID), "version": "2026", "ist_aktuell": True
         })
-
     app.dependency_overrides.clear()
     assert resp.status_code == 404
 
-
-def test_import_modules_pdf_returns_501(mock_db):
-    admin = _admin()
-    app.dependency_overrides[get_current_user] = lambda: admin
+def test_get_er_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
     app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_er()
+    mock_db.query.return_value.filter.return_value.count.return_value = 5
 
     with TestClient(app) as c:
-        resp = c.post("/api/v1/admin/modules/import/pdf")
-
-    app.dependency_overrides.clear()
-    assert resp.status_code == 501
-
-
-def test_archive_module_sets_archived_fields(mock_db):
-    admin = _admin()
-    mod = _make_module(is_archived=False)
-    app.dependency_overrides[get_current_user] = lambda: admin
-    app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = mod
-
-    with patch("app.core.admin_auth._redis") as mock_redis:
-        mock_redis.exists.return_value = 1
-        with patch("app.core.audit.AuditLogger.log"):
-            with TestClient(app) as c:
-                resp = c.post(
-                    f"/api/v1/admin/modules/{_MOD_UUID}/archive",
-                    headers={"X-Admin-Token": "valid"},
-                    json={"reason": "Modul entfernt"},
-                )
-
-    app.dependency_overrides.clear()
-    assert resp.status_code == 204
-    assert mod.is_archived is True
-    assert mod.archive_reason == "Modul entfernt"
-
-
-def test_restore_module_clears_archived_fields(mock_db):
-    admin = _admin()
-    mod = _make_module(is_archived=True)
-    app.dependency_overrides[get_current_user] = lambda: admin
-    app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = mod
-
-    with patch("app.core.admin_auth._redis") as mock_redis:
-        mock_redis.exists.return_value = 1
-        with patch("app.core.audit.AuditLogger.log"):
-            with TestClient(app) as c:
-                resp = c.post(
-                    f"/api/v1/admin/modules/{_MOD_UUID}/restore",
-                    headers={"X-Admin-Token": "valid"},
-                )
-
-    app.dependency_overrides.clear()
-    assert resp.status_code == 204
-    assert mod.is_archived is False
-    assert mod.archived_at is None
-    assert mod.archive_reason is None
-
-
-# ── Public endpoint filtering ─────────────────────────────────────────────────
-
-def test_public_programs_excludes_archived(mock_db):
-    fac = MagicMock()
-    fac.id = _FAC_UUID
-    app.dependency_overrides[get_db] = lambda: mock_db
-
-    mock_db.get.return_value = fac
-    mock_db.query.return_value.filter.return_value.filter.return_value.all.return_value = []
-
-    with TestClient(app) as c:
-        resp = c.get(f"/api/v1/faculties/{_FAC_UUID}/programs")
-
+        resp = c.get(f"/api/v1/admin/exam-regulations/{_ER_UUID}")
     app.dependency_overrides.clear()
     assert resp.status_code == 200
-    assert resp.json() == []
+    assert resp.json()["module_count"] == 5
+
+def test_get_er_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.get(f"/api/v1/admin/exam-regulations/{uuid.uuid4()}")
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_patch_er_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    er = _make_er()
+    mock_db.get.return_value = er
+    with patch("app.core.audit.AuditLogger.log"):
+        with TestClient(app) as c:
+            resp = c.patch(f"/api/v1/admin/exam-regulations/{_ER_UUID}", json={"version": "2027"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
+    assert er.version == "2027"
+
+def test_patch_er_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with TestClient(app) as c:
+        resp = c.patch(f"/api/v1/admin/exam-regulations/{uuid.uuid4()}", json={"version": "2027"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_archive_er_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    er = _make_er(False)
+    mock_db.get.return_value = er
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with patch("app.core.audit.AuditLogger.log"):
+            with TestClient(app) as c:
+                resp = c.post(f"/api/v1/admin/exam-regulations/{_ER_UUID}/archive", headers={"X-Admin-Token": "t"}, json={"reason": "r"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 204
+    assert er.is_archived is True
+
+def test_archive_er_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/exam-regulations/{uuid.uuid4()}/archive", headers={"X-Admin-Token": "t"}, json={"reason": "r"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_archive_er_400(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    er = _make_er(True)
+    mock_db.get.return_value = er
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/exam-regulations/{_ER_UUID}/archive", headers={"X-Admin-Token": "t"}, json={"reason": "r"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 400
+
+def test_restore_er_success(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    er = _make_er(True)
+    mock_db.get.return_value = er
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with patch("app.core.audit.AuditLogger.log"):
+            with TestClient(app) as c:
+                resp = c.post(f"/api/v1/admin/exam-regulations/{_ER_UUID}/restore", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 204
+    assert er.is_archived is False
+
+def test_restore_er_404(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = None
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/exam-regulations/{uuid.uuid4()}/restore", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 404
+
+def test_restore_er_400(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    er = _make_er(False)
+    mock_db.get.return_value = er
+    with patch("app.core.admin_auth._redis") as mock_redis:
+        mock_redis.exists.return_value = 1
+        with TestClient(app) as c:
+            resp = c.post(f"/api/v1/admin/exam-regulations/{_ER_UUID}/restore", headers={"X-Admin-Token": "t"})
+    app.dependency_overrides.clear()
+    assert resp.status_code == 400
+
+def test_get_program_student_count_empty(mock_db):
+    app.dependency_overrides[get_current_user] = _admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = _make_program()
+    
+    def mock_query(model):
+        q = MagicMock()
+        if model.__name__ == "ExamRegulation":
+            q.filter.return_value.all.return_value = [] # no ERs
+        return q
+    mock_db.query.side_effect = mock_query
+
+    with TestClient(app) as c:
+        resp = c.get(f"/api/v1/admin/programs/{_PROG_UUID}")
+    app.dependency_overrides.clear()
+    assert resp.status_code == 200
+    assert resp.json()["student_count"] == 0

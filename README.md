@@ -67,7 +67,7 @@ My primary focus during this project was on:
 | 3 | Study plan, DnD, Quick Add FAB | ✅ Complete |
 | 3.7 | BIN PO full integration | ✅ Complete |
 | 4 | PO-Übersicht, note validation, Vorprüfungs-Milestone | ✅ Complete |
-| 5 | Admin Panel (university/PO/user management, analytics) | ✅ Complete (100% Test Coverage + CI/CD) |
+| 5 | Admin Panel (university/PO/user management, analytics) | ✅ Complete (100% Frontend & Backend Coverage + CI/CD) |
 | 6–7 | AI features, extended analytics | Backlog |
 | 8 | Community (Study Spaces, Module Wiki) | Backlog |
 
@@ -144,6 +144,10 @@ docker compose exec backend pytest tests/ -v
 
 # Access database
 docker compose exec db psql -U studynexus -d studynexus
+
+# Note: Automated CI/CD Pipelines (GitHub Actions) are configured!
+# Any push to `main` will trigger `frontend-ci.yml` and `backend-ci.yml`.
+# Both pipelines enforce a strict 100% test coverage rule.
 ```
 
 ## License
