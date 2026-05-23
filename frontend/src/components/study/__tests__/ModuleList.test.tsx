@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ModuleList } from "../ModuleList";
 import type { StudentModulesBySemester } from "@/types/study";
 
@@ -76,18 +77,24 @@ function mockFetch(data: unknown, ok = true) {
   });
 }
 
+const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
+
+function renderWithClient(ui: React.ReactElement) {
+  return render(<QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>);
+}
+
 describe("ModuleList", () => {
   afterEach(() => jest.clearAllMocks());
 
   it("shows loading text initially", () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     expect(screen.getByText("dashboard.modules.loading")).toBeInTheDocument();
   });
 
   it("renders semester heading and modules", async () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("Semester 1")).toBeInTheDocument();
       expect(screen.getByText("Programmieren 1")).toBeInTheDocument();
@@ -97,7 +104,7 @@ describe("ModuleList", () => {
 
   it("renders kuerzel for modules that have it", async () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("BIN-101")).toBeInTheDocument();
     });
@@ -105,7 +112,7 @@ describe("ModuleList", () => {
 
   it("renders PASSED status badge", async () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("dashboard.modules.status.PASSED")).toBeInTheDocument();
     });
@@ -113,7 +120,7 @@ describe("ModuleList", () => {
 
   it("renders note for passed modules", async () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("2.3")).toBeInTheDocument();
     });
@@ -121,7 +128,7 @@ describe("ModuleList", () => {
 
   it("shows empty state when no modules", async () => {
     mockFetch([]);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("dashboard.modules.noModules")).toBeInTheDocument();
     });
@@ -129,7 +136,7 @@ describe("ModuleList", () => {
 
   it("shows error on fetch failure", async () => {
     mockFetch({}, false);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("dashboard.modules.loadError")).toBeInTheDocument();
     });
@@ -137,7 +144,7 @@ describe("ModuleList", () => {
 
   it("opens modal when module row is clicked", async () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => screen.getByText("Programmieren 1"));
 
     fireEvent.click(screen.getByText("Programmieren 1").closest("button")!);
@@ -146,25 +153,29 @@ describe("ModuleList", () => {
 
   it("shows add module button after loading", async () => {
     mockFetch(mockGroups);
-    render(<ModuleList />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => {
       expect(screen.getByText("dashboard.modules.addButton")).toBeInTheDocument();
     });
   });
 
-  it("calls onModuleSaved after a successful module save", async () => {
+  it("opens modal, saves module, and closes modal", async () => {
     const saved = { ...mockGroups[0].modules[0], status: "PASSED" as const, note: 2.0 };
     global.fetch = jest.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => mockGroups })
-      .mockResolvedValueOnce({ ok: true, json: async () => saved });
+      .mockResolvedValueOnce({ ok: true, json: async () => saved })
+      .mockResolvedValue({ ok: true, json: async () => mockGroups });
 
-    const onModuleSaved = jest.fn();
-    render(<ModuleList onModuleSaved={onModuleSaved} />);
+    renderWithClient(<ModuleList />);
     await waitFor(() => screen.getByText("Programmieren 1"));
 
     fireEvent.click(screen.getByText("Programmieren 1").closest("button")!);
+    expect(screen.getByText("dashboard.modal.title")).toBeInTheDocument();
+
     fireEvent.click(screen.getByText("dashboard.modal.save"));
 
-    await waitFor(() => expect(onModuleSaved).toHaveBeenCalledTimes(1));
+    await waitFor(() => {
+      expect(screen.queryByText("dashboard.modal.title")).not.toBeInTheDocument();
+    });
   });
 });

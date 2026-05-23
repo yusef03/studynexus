@@ -96,8 +96,8 @@ describe("SetupForm", () => {
   });
 
   it("calls POST and redirects on successful confirm", async () => {
-    const replace = jest.fn();
-    jest.spyOn(require("next/navigation"), "useRouter").mockReturnValue({ replace });
+    delete (window as any).location;
+    window.location = { href: "" } as any;
 
     global.fetch = jest.fn()
       .mockResolvedValueOnce({ ok: true, json: async () => mockUniversity })
@@ -129,7 +129,7 @@ describe("SetupForm", () => {
     fireEvent.click(screen.getByText("dashboard.setup.confirm"));
 
     await waitFor(() => {
-      expect(replace).toHaveBeenCalledWith("/de/dashboard");
+      expect(window.location.href).toBe("/de/dashboard");
     });
     expect(global.fetch).toHaveBeenCalledWith(
       "/api/study/program",

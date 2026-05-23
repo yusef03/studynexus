@@ -27,7 +27,7 @@ describe("LogoutButton", () => {
     render(<LogoutButton locale="de" />);
     await userEvent.click(screen.getByRole("button"));
 
-    expect(global.fetch).toHaveBeenCalledWith("/api/auth/logout", { method: "POST" });
+    expect(global.fetch).toHaveBeenCalledWith("/api/auth/logout", expect.objectContaining({ method: "POST" }));
     expect(mockPush).toHaveBeenCalledWith("/de/login");
   });
 });

@@ -10,6 +10,17 @@ jest.mock("next-intl", () => ({
 }));
 
 describe("RegisterForm", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => [{ id: "1", name: "Hochschule Hannover" }],
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   it("renders all form fields", () => {
     render(<RegisterForm locale="de" />);
     expect(screen.getByLabelText("fields.fullName")).toBeInTheDocument();
@@ -60,10 +71,15 @@ describe("RegisterForm", () => {
   });
 
   it("shows backend error on failed registration", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: false,
-      json: async () => ({ detail: "Email already registered" }),
-    });
+    global.fetch = jest.fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => [{ id: "1", name: "Hochschule Hannover" }],
+      })
+      .mockResolvedValueOnce({
+        ok: false,
+        json: async () => ({ detail: "Email already registered" }),
+      });
 
     render(<RegisterForm locale="de" />);
 

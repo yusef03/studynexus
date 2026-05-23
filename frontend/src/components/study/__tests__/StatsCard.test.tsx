@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StatsCard } from "../StatsCard";
 
 jest.mock("next-intl", () => ({
@@ -22,18 +23,23 @@ function mockFetch(data: unknown, ok = true) {
   });
 }
 
+const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
+function renderWithClient(ui: React.ReactElement) {
+  return render(<QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>);
+}
+
 describe("StatsCard", () => {
   afterEach(() => jest.clearAllMocks());
 
   it("shows loading text initially", () => {
     mockFetch(mockStats);
-    render(<StatsCard />);
+    renderWithClient(<StatsCard />);
     expect(screen.getByText("dashboard.stats.loading")).toBeInTheDocument();
   });
 
   it("renders GPA after load", async () => {
     mockFetch(mockStats);
-    render(<StatsCard />);
+    renderWithClient(<StatsCard />);
     await waitFor(() => {
       expect(screen.getByText("2,3")).toBeInTheDocument();
     });
@@ -41,7 +47,7 @@ describe("StatsCard", () => {
 
   it("renders — when GPA is null", async () => {
     mockFetch({ ...mockStats, gpa: null });
-    render(<StatsCard />);
+    renderWithClient(<StatsCard />);
     await waitFor(() => {
       expect(screen.getByText("dashboard.stats.noGpa")).toBeInTheDocument();
     });
@@ -49,7 +55,7 @@ describe("StatsCard", () => {
 
   it("renders ECTS progress", async () => {
     mockFetch(mockStats);
-    render(<StatsCard />);
+    renderWithClient(<StatsCard />);
     await waitFor(() => {
       expect(screen.getByText("42")).toBeInTheDocument();
       expect(screen.getByText(/180/)).toBeInTheDocument();
@@ -58,7 +64,7 @@ describe("StatsCard", () => {
 
   it("renders progress bar with correct aria values", async () => {
     mockFetch(mockStats);
-    render(<StatsCard />);
+    renderWithClient(<StatsCard />);
     await waitFor(() => {
       const bar = screen.getByRole("progressbar");
       expect(bar).toHaveAttribute("aria-valuenow", String(mockStats.fortschritt_prozent));
@@ -67,23 +73,10 @@ describe("StatsCard", () => {
 
   it("shows error message on fetch failure", async () => {
     mockFetch({}, false);
-    render(<StatsCard />);
+    renderWithClient(<StatsCard />);
     await waitFor(() => {
       expect(screen.getByText("dashboard.stats.loadError")).toBeInTheDocument();
     });
   });
 
-  it("re-fetches when refreshKey changes", async () => {
-    global.fetch = jest.fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => mockStats })
-      .mockResolvedValueOnce({ ok: true, json: async () => ({ ...mockStats, gpa: 1.7 }) });
-
-    const { rerender } = render(<StatsCard refreshKey={0} />);
-    await waitFor(() => expect(screen.getByText("2,3")).toBeInTheDocument());
-
-    rerender(<StatsCard refreshKey={1} />);
-    await waitFor(() => expect(screen.getByText("1,7")).toBeInTheDocument());
-
-    expect(global.fetch).toHaveBeenCalledTimes(2);
-  });
 });

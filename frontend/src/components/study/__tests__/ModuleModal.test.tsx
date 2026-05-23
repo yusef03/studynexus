@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ModuleModal } from "../ModuleModal";
 import type { StudentModuleResponse } from "@/types/study";
 
@@ -36,37 +37,44 @@ function makeModule(overrides: Partial<StudentModuleResponse> = {}): StudentModu
   };
 }
 
+const emptyFn = jest.fn();
+
+const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
+function renderWithClient(ui: React.ReactElement) {
+  return render(<QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>);
+}
+
 const noop = () => {};
 
 describe("ModuleModal", () => {
   afterEach(() => jest.clearAllMocks());
 
   it("does not render when closed", () => {
-    render(<ModuleModal studentModule={makeModule()} open={false} onClose={noop} onSave={noop} />);
+    renderWithClient(<ModuleModal studentModule={makeModule()} open={false} onClose={noop} onSave={noop} />);
     expect(screen.queryByText("dashboard.modal.title")).not.toBeInTheDocument();
   });
 
   it("renders when open", () => {
-    render(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={noop} />);
+    renderWithClient(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={noop} />);
     expect(screen.getByText("dashboard.modal.title")).toBeInTheDocument();
     expect(screen.getByText("Programmieren 1")).toBeInTheDocument();
   });
 
   it("shows note input for graded module", () => {
-    render(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={noop} />);
+    renderWithClient(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={noop} />);
     expect(screen.getByLabelText("dashboard.modal.note")).toBeInTheDocument();
   });
 
   it("hides note input and shows badge for ungraded module", () => {
     const sm = makeModule({ module: { ...makeModule().module!, ist_benotet: false } });
-    render(<ModuleModal studentModule={sm} open={true} onClose={noop} onSave={noop} />);
+    renderWithClient(<ModuleModal studentModule={sm} open={true} onClose={noop} onSave={noop} />);
     expect(screen.queryByLabelText("dashboard.modal.note")).not.toBeInTheDocument();
     expect(screen.getByText("dashboard.modal.noteUngraded")).toBeInTheDocument();
   });
 
   it("calls onClose when backdrop is clicked", () => {
     const onClose = jest.fn();
-    render(<ModuleModal studentModule={makeModule()} open={true} onClose={onClose} onSave={noop} />);
+    renderWithClient(<ModuleModal studentModule={makeModule()} open={true} onClose={onClose} onSave={noop} />);
     fireEvent.click(screen.getByLabelText("dashboard.modal.close"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -79,7 +87,7 @@ describe("ModuleModal", () => {
     });
 
     const onSave = jest.fn();
-    render(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={onSave} />);
+    renderWithClient(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={onSave} />);
 
     fireEvent.click(screen.getByText("dashboard.modal.save"));
 
@@ -94,7 +102,7 @@ describe("ModuleModal", () => {
       json: async () => ({ detail: "Validation error" }),
     });
 
-    render(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={noop} />);
+    renderWithClient(<ModuleModal studentModule={makeModule()} open={true} onClose={noop} onSave={noop} />);
     fireEvent.click(screen.getByText("dashboard.modal.save"));
 
     await waitFor(() => {

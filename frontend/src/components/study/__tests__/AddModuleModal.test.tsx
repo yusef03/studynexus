@@ -1,4 +1,5 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AddModuleModal } from "../AddModuleModal";
 import type { ModuleResponse, StudentModuleResponse, UserProgramResponse } from "@/types/study";
 
@@ -52,29 +53,46 @@ const mockCatalogModules: ModuleResponse[] = [
   },
 ];
 
-function mockFetchChain() {
-  global.fetch = jest.fn()
-    .mockResolvedValueOnce({ ok: true, json: async () => mockProgram })
-    .mockResolvedValueOnce({ ok: true, json: async () => mockCatalogModules });
+function mockFetchChain(postOverride?: any) {
+  global.fetch = jest.fn().mockImplementation((url: string, options?: RequestInit) => {
+    if (url === "/api/study/program") {
+      return Promise.resolve({ ok: true, json: async () => mockProgram });
+    }
+    if (url.includes("/modules") && options?.method !== "POST") {
+      return Promise.resolve({ ok: true, json: async () => [{ semester: 1, modules: mockCatalogModules }] });
+    }
+    if (url === "/api/study/modules" && options?.method === "POST") {
+      if (postOverride) {
+        return Promise.resolve(postOverride);
+      }
+      return Promise.resolve({ ok: true, json: async () => ({ id: "sm-new" }) });
+    }
+    return Promise.resolve({ ok: false, json: async () => ({}) });
+  });
 }
 
 const noopClose = jest.fn();
-const noopAdded = jest.fn();
+
 const emptyIds = new Set<string>();
+
+const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } });
+function renderWithClient(ui: React.ReactElement) {
+  return render(<QueryClientProvider client={createTestQueryClient()}>{ui}</QueryClientProvider>);
+}
 
 describe("AddModuleModal", () => {
   afterEach(() => jest.clearAllMocks());
 
   it("shows loading indicator initially", () => {
     mockFetchChain();
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} />);
     // While loading, save button should be disabled
     expect(screen.getByText("dashboard.addModule.save")).toBeDisabled();
   });
 
   it("renders wahlpflicht dropdown after load (filters out PFLICHT modules)", async () => {
     mockFetchChain();
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} />);
     await waitFor(() => {
       expect(screen.getByText(/Machine Learning/)).toBeInTheDocument();
       expect(screen.getByText(/IT-Sicherheit/)).toBeInTheDocument();
@@ -86,7 +104,7 @@ describe("AddModuleModal", () => {
   it("filters out already-added modules", async () => {
     mockFetchChain();
     const alreadyAdded = new Set(["wpm-1"]);
-    render(<AddModuleModal alreadyAddedModuleIds={alreadyAdded} onClose={noopClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={alreadyAdded} onClose={noopClose} />);
     await waitFor(() => {
       expect(screen.getByText(/IT-Sicherheit/)).toBeInTheDocument();
     });
@@ -95,29 +113,26 @@ describe("AddModuleModal", () => {
 
   it("shows custom form when mode is switched to Eigenes", async () => {
     mockFetchChain();
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} />);
     await waitFor(() => screen.getByText(/Machine Learning/));
 
-    fireEvent.click(screen.getByDisplayValue("custom"));
+    fireEvent.click(screen.getByText("dashboard.addModule.modeCustom"));
     expect(screen.getByLabelText("dashboard.addModule.customName")).toBeInTheDocument();
     expect(screen.getByLabelText("dashboard.addModule.customEcts")).toBeInTheDocument();
   });
 
   it("calls POST with module_id when saving wahlpflicht", async () => {
     const newSm: Partial<StudentModuleResponse> = { id: "sm-new", module_id: "wpm-1" };
-    global.fetch = jest.fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => mockProgram })
-      .mockResolvedValueOnce({ ok: true, json: async () => mockCatalogModules })
-      .mockResolvedValueOnce({ ok: true, json: async () => newSm });
+    mockFetchChain({ ok: true, json: async () => newSm });
 
-    const onAdded = jest.fn();
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={onAdded} />);
+    const onClose = jest.fn();
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={onClose} />);
     await waitFor(() => screen.getByText(/Machine Learning/));
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "wpm-1" } });
     fireEvent.click(screen.getByText("dashboard.addModule.save"));
 
-    await waitFor(() => expect(onAdded).toHaveBeenCalledWith(newSm));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     expect(global.fetch).toHaveBeenCalledWith(
       "/api/study/modules",
       expect.objectContaining({ method: "POST" }),
@@ -126,16 +141,13 @@ describe("AddModuleModal", () => {
 
   it("calls POST with custom_name and custom_ects when saving custom module", async () => {
     const newSm: Partial<StudentModuleResponse> = { id: "sm-new", custom_name: "Planspiel" };
-    global.fetch = jest.fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => mockProgram })
-      .mockResolvedValueOnce({ ok: true, json: async () => mockCatalogModules })
-      .mockResolvedValueOnce({ ok: true, json: async () => newSm });
+    mockFetchChain({ ok: true, json: async () => newSm });
 
-    const onAdded = jest.fn();
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={onAdded} />);
+    const onClose = jest.fn();
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={onClose} />);
     await waitFor(() => screen.getByText(/Machine Learning/));
 
-    fireEvent.click(screen.getByDisplayValue("custom"));
+    fireEvent.click(screen.getByText("dashboard.addModule.modeCustom"));
     fireEvent.change(screen.getByLabelText("dashboard.addModule.customName"), {
       target: { value: "Planspiel" },
     });
@@ -144,18 +156,15 @@ describe("AddModuleModal", () => {
     });
     fireEvent.click(screen.getByText("dashboard.addModule.save"));
 
-    await waitFor(() => expect(onAdded).toHaveBeenCalledWith(newSm));
+    await waitFor(() => expect(onClose).toHaveBeenCalledTimes(1));
     const [, postOpts] = (global.fetch as jest.Mock).mock.calls[2];
-    expect(JSON.parse(postOpts.body)).toEqual({ custom_name: "Planspiel", custom_ects: 2 });
+    expect(JSON.parse(postOpts.body)).toEqual({ custom_name: "Planspiel", custom_ects: 2, custom_ist_benotet: true });
   });
 
   it("shows error message when POST fails", async () => {
-    global.fetch = jest.fn()
-      .mockResolvedValueOnce({ ok: true, json: async () => mockProgram })
-      .mockResolvedValueOnce({ ok: true, json: async () => mockCatalogModules })
-      .mockResolvedValueOnce({ ok: false, json: async () => ({ detail: "Modul bereits vorhanden" }) });
+    mockFetchChain({ ok: false, json: async () => ({ detail: "Modul bereits vorhanden" }) });
 
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} />);
     await waitFor(() => screen.getByText(/Machine Learning/));
 
     fireEvent.change(screen.getByRole("combobox"), { target: { value: "wpm-1" } });
@@ -169,14 +178,14 @@ describe("AddModuleModal", () => {
   it("calls onClose when cancel button is clicked", async () => {
     mockFetchChain();
     const onClose = jest.fn();
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={onClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={onClose} />);
     fireEvent.click(screen.getByText("dashboard.addModule.close"));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   it("shows load error when fetch fails", async () => {
     global.fetch = jest.fn().mockResolvedValueOnce({ ok: false, json: async () => ({}) });
-    render(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} onAdded={noopAdded} />);
+    renderWithClient(<AddModuleModal alreadyAddedModuleIds={emptyIds} onClose={noopClose} />);
     await waitFor(() => {
       expect(screen.getAllByText("dashboard.addModule.loadError").length).toBeGreaterThan(0);
     });
