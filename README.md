@@ -40,11 +40,10 @@ My primary focus during this project was on:
 - ✅ **Bilingual (DE/EN)** — Full i18n with next-intl, zero hardcoded strings
 
 ### Planned
-- ✅ **Admin Panel** — University/PO management, user administration, analytics dashboard, audit log, system health *(Sprint 5 — complete, 100% Frontend Test Coverage (Line & Branch), 122 backend tests, CI/CD Pipeline)*
-- 🤝 **Study Spaces** — Digital study groups with shared Kanban boards *(Sprint 8)*
-- 📚 **Module Wiki** — Community knowledge base with anonymous module reviews *(planned)*
-- 🤖 **AI Planning** — Smart recommendations and auto-scheduling *(planned)*
-- 🏆 **Gamification** — XP, Badges, Streaks *(planned)*
+- 🛠 **Admin UX & Data Operations** — PDF import, batch ops, dry-runs *(Sprint 6)*
+- 🚀 **PWA, Branding & Launch** — Offline capability, deployments *(Sprint 7)*
+- 🎓 **Multi-Program-Architektur** — Expanding beyond BIN *(Sprint 8)*
+- 🤝 **Community & AI Features** — Study Groups, AI recommendations *(Sprint 9)*
 
 ## Tech Stack
 
@@ -67,9 +66,11 @@ My primary focus during this project was on:
 | 3 | Study plan, DnD, Quick Add FAB | ✅ Complete |
 | 3.7 | BIN PO full integration | ✅ Complete |
 | 4 | PO-Übersicht, note validation, Vorprüfungs-Milestone | ✅ Complete |
-| 5 | Admin Panel (university/PO/user management, analytics) | ✅ Complete (100% Frontend & Backend Coverage + CI/CD) |
-| 6–7 | AI features, extended analytics | Backlog |
-| 8 | Community (Study Spaces, Module Wiki) | Backlog |
+| 5 | Admin Panel (university/PO/user management, analytics, hotfixes) | ✅ Complete (100% Coverage + CI/CD) |
+| 6 | Admin UX & Data Operations (Imports, Batch Ops) | Backlog |
+| 7 | PWA, Branding & Launch | Backlog |
+| 8 | Multi-Program-Architektur | Backlog |
+| 9 | Community & AI Features | Backlog |
 
 ## Authentication & Security
 

@@ -484,6 +484,12 @@ Nach manueller QA wurden 17 Bugs identifiziert und systematisch behoben:
 - **Prerequisites-Link entfernt:** `/admin/prerequisites` 404 → Link aus Sidebar entfernt (wird in Modul-Detail verwaltet)
 - **Premium-Erklärungstext:** Toggle zeigt jetzt "aktuell keine Features, Vorbereitung für Sprint 6+"
 
+### Die 4 kritischen Admin Hotfixes (2026-05-24)
+- **Bug 1 (Admin Self-Deaktivierung):** Verhindert (sowohl Frontend-Guards via `useAdminMe` als auch Backend HTTP 403), dass Admins sich selbst deaktivieren, Rechte entziehen oder löschen können.
+- **Bug 2 (User Löschen Proxy-Fehler):** HTTP `DELETE`-Aufruf nutzt nun Query-Parameter statt JSON-Body für den `reason`, da der Next.js Proxy den Body strippte. Error-State im UI fängt etwaige Rest-Fehler ab.
+- **Bug 3 (Studiengang Creation 422 Error):** Das fehleranfällige Freitext-Feld für Fakultäts-IDs wurde durch ein `<select>` Dropdown ersetzt (via `useAdminFaculties` Hook). UI sperrt Submit bis Daten geladen sind.
+- **Bug 4 (Passwort-Reset):** Komplett überarbeitet. Nutzt nun das kryptographisch sichere `secrets`-Modul zur Generierung. Das erzeugte Passwort wird dem Admin im UI (als Response) einmalig angezeigt, plus ein verbessertes Klartext E-Mail-Template.
+
 ### Ausstehend:
 - **Alle Bugs via manueller QA und Docker-Tests behoben!**
 
@@ -511,7 +517,11 @@ Nach manueller QA wurden 17 Bugs identifiziert und systematisch behoben:
 
 ---
 
-## Next Steps: Sprint 6 Planung (PWA, Branding & Launch)
+## Next Steps: Sprint 6 Planung (Admin UX & Data Operations)
+
+**Sprint 6 (Admin UX):** Fokus auf Restarbeiten aus dem Audit (PDF-Import, Batch-Ops, Dry-Run-JSON-Import).
+**Sprint 7 (Launch):** PWA, Deployment, Offline-Fähigkeit.
+**Sprint 8 (Multi-Program):** MDI und Master-Studiengänge hinzufügen.
 
 ### Admin-Flag setzen (einmalig nach erstem Login)
 

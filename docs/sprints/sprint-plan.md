@@ -21,9 +21,10 @@
 | Sprint 3.7.7 | BIN PO Datenkorrektur | ✅ Fertig | 4 Tage | [sprint-3/06-phase-3.7.7-review.md](sprint-3/06-phase-3.7.7-review.md) |
 | **Sprint 4** | **BIN Studiengang Vollintegration** | **✅ Fertig** | **1 Woche** | [sprint-4/01-review.md](sprint-4/01-review.md) |
 | **Sprint 5** | **Admin Panel** | **✅ Fertig** | **2 Wochen** | [sprint-5/01-plan.md](sprint-5/01-plan.md) · [sprint-5/02-review.md](sprint-5/02-review.md) |
-| Sprint 6 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
-| Sprint 7 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
-| Sprint 8 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
+| Sprint 6 | Admin UX & Data Operations | Geplant | 2 Wochen | — |
+| Sprint 7 | PWA, Branding & Launch | Geplant | 2 Wochen | — |
+| Sprint 8 | Multi-Program-Architektur | Geplant | 3 Wochen | — |
+| Sprint 9 | Community & Kollaboration | Fern geplant | 3 Wochen | — |
 
 ---
 
@@ -228,7 +229,10 @@ Detailliertes Review: [sprint-3/06-phase-3.7.7-review.md](sprint-3/06-phase-3.7.
 - [x] Migration 0011: Alle 9 WAHLPFLICHT-Namen auf PO-korrekte Namen korrigiert
 - [x] Migration 0011: `has_prerequisites` korrigiert (false für Sem 1-3, true für Sem 4+)
 - [x] Migration 0011: Fake-Platzhaltermodule gelöscht
-- [x] Migration 0011: `custom_ist_benotet BOOLEAN NULLABLE` auf student_modules
+- [x] CI/CD:
+  - [x] Frontend-Linting & 100% Jest Coverage Enforcer (`frontend-ci.yml`) auf PRs und Main-Push aktiv.
+  - [x] Backend: pytest auf PRs (ausstehend)
+  - [ ] Deployment: automatisch auf main-Push (ausstehend)
 - [x] Migration 0011: BIN-209 automatisch für alle bestehenden User provisioniert
 - [x] Backend: `custom_ist_benotet` in Model, Schema (Add/Update/Response), Router
 - [x] Backend: WAHLPFLICHT-Limit = 2 mit HTTP 409 durchgesetzt
@@ -519,9 +523,24 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-### Sprint 6 – PWA, Branding & Launch
+### Sprint 6 – Admin UX & Data Operations
 
 **Status:** Geplant (nach Sprint 5)
+**Ziel:** Die noch offenen High/Medium UX-Probleme aus dem Admin-Bereich beheben, bevor PWA/Launch starten (Import Dry-Run, Batch-Ops etc).
+
+**User Stories:**
+- Als Admin möchte ich den Bulk-Import erst testen (Dry-Run), bevor Daten geschrieben werden
+- Als Admin möchte ich PDF-Modulhandbücher hochladen können, statt JSON zu tippen
+- Als Admin möchte ich Fehler beim Löschen von Daten sofort im UI sehen
+
+**Technische Tasks:**
+Siehe `docs/sprints/sprint-6-backlog.md` für die genaue Auflistung.
+
+---
+
+### Sprint 7 – PWA, Branding & Launch
+
+**Status:** Geplant (nach Sprint 6)
 **Ziel:** Produktionsreife App — offline-fähig, deployed, launch-ready.
 
 **Hinweis:** i18n (DE/EN) wurde bereits in Sprint 3.7 vorgezogen ✅. Branding in Sprint 3A ✅.
@@ -537,7 +556,7 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 - [ ] Lighthouse PWA Score ≥ 90 erreichen
 - [x] GitHub Actions CI/CD Pipeline: (Vorgezogen in Sprint 5)
   - Frontend-Linting & 100% Jest Coverage Enforcer (`frontend-ci.yml`) auf PRs und Main-Push aktiv.
-  - [ ] Backend: pytest auf PRs (ausstehend)
+  - [x] Backend: pytest auf PRs (ausstehend)
   - [ ] Deployment: automatisch auf main-Push (ausstehend)
 - [ ] Cloud Deployment (Railway oder Render):
   - PostgreSQL Managed DB
@@ -555,9 +574,9 @@ Lücken gegenüber PO BIN 2019 + ATPO-FIV 2025 + Modulhandbuch:
 
 ---
 
-### Sprint 7 – Multi-Program-Architektur
+### Sprint 8 – Multi-Program-Architektur
 
-**Status:** Geplant (nach Sprint 6)
+**Status:** Geplant (nach Sprint 7)
 **Ziel:** Weitere HsH-Studiengänge aus Fakultät IV hinzufügen — MDI zuerst, dann Master-Programme.
 
 **Hintergrund:**
@@ -582,9 +601,9 @@ Das DB-Schema ist bereits vollständig multi-program-fähig (`University → Fac
 
 ---
 
-### Sprint 8 – Community & Kollaboration
+### Sprint 9 – Community & Kollaboration
 
-**Status:** Fern geplant (nach Sprint 7)
+**Status:** Fern geplant (nach Sprint 8)
 **Ziel:** Soziale Features für kollaboratives Lernen an der HsH.
 
 **User Stories:**

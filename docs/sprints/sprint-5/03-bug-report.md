@@ -1,7 +1,7 @@
 # Sprint 5 — Bug-Fix-Plan (Admin Panel)
 
 **Erstellt:** 2026-05-10  
-**Status:** 📋 Geplant — wird diese Woche abgearbeitet  
+**Status:** ✅ Abgeschlossen (Historischer Snapshot)  
 **Basis:** Manuelle QA-Session nach Phase 12 (alle Bugs vom PO gemeldet)
 
 > **Wichtig:** Dieser Plan beschreibt ausschließlich was kaputt ist und warum es vermutlich kaputt ist.

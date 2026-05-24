@@ -1,7 +1,7 @@
 # Sprint 5 — Bug-Fix-Umsetzung
 
 **Datum:** 2026-05-18  
-**Status:** ✅ Hauptfixes abgeschlossen, QA ausstehend  
+**Status:** ✅ QA und Hotfixes abgeschlossen (Historischer Snapshot)  
 **Basis:** `docs/sprints/sprint-5-bugfix-plan.md`
 
 ---

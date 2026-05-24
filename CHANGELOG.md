@@ -14,8 +14,14 @@ All notable changes to this project will be documented in this file.
 - **100% Jest Coverage**: All `/admin` routes (Dashboard, Users, Universities, Programs, Modules, Exam Regulations, Audit-Log, System, Import) successfully covered.
 - **Robust DOM Testing**: Switched from `userEvent` to `fireEvent` and refined `getAllByRole` selectors to prevent `MultipleElementsFoundError` caused by Radix UI Portal animations and overlapping modals.
 - **i18n Test Safety**: Added strict `NextIntlClientProvider` wrappers with complete `admin` namespaces to all test setups to prevent `MissingMessage` fatal errors.
-#### Fixed
 - **Form Modal Overlaps**: Resolved testing ambiguities when handling "Cancel" and "Save" operations across multiple simultaneous forms.
+
+### Sprint 5 — Admin Hotfixes & Deep Audit (2026-05-24)
+#### Fixed
+- **Bug 1 (Admin Self-Deaktivierung)**: Verhindert, dass Admins sich über Toggles selbst deaktivieren können (`useAdminMe` Hook + Backend-Guard).
+- **Bug 2 (User Löschen Proxy-Fehler)**: `DELETE`-Request nutzt nun Query-Parameter statt Body, um Proxy-Stripping zu umgehen. Fehler werden im UI angezeigt.
+- **Bug 3 (Studiengang Creation 422 Error)**: Faculty-ID Eingabefeld durch ein `<select>` Dropdown ersetzt (`useAdminFaculties` Hook).
+- **Bug 4 (Passwort-Reset)**: Generierung nutzt nun kryptographisch sicheres `secrets`-Modul statt `random`. Neues Passwort wird dem Admin einmalig angezeigt und per Custom-Template via E-Mail gesendet.
 ### Sprint 5 Phase 13 — Admin UI Bugfixes & SSR Optimization (2026-05-22)
 #### Fixed
 - **`AppSidebar.tsx` / `MobileNav.tsx`**: Admin link not showing due to Next.js 14 global fetch caching of `/api/auth/me`. Fixed by completely eliminating the client-side `fetch` and parsing the JWT server-side in `layout.tsx`, passing `isAdmin` as a prop. Button now renders instantly with zero layout shift.
