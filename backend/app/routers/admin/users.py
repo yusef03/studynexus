@@ -11,7 +11,7 @@ All mutations are audit-logged (AuditLogger dependency, ADR-019).
 DELETE and reset-password require a valid Admin-Session token (ADR-019).
 """
 import math
-import random
+import secrets
 import string
 from uuid import UUID
 from typing import Optional
@@ -31,7 +31,7 @@ from app.models.program import Program
 from app.core.admin_auth import get_admin_user, get_verified_admin
 from app.core.audit import AuditLogger, get_audit_logger
 from app.core.security import hash_password
-from app.services.email_service import send_verification_email
+from app.services.email_service import send_verification_email, send_password_reset_email
 from app.schemas.admin.user import (
     AdminUserListItem,
     AdminUserListResponse,
@@ -226,6 +226,8 @@ def patch_user(
     old_snap = _user_snap(user)
 
     if payload.is_active is not None:
+        if payload.is_active is False and user.id == admin.id:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Cannot deactivate your own account.")
         user.is_active = payload.is_active
     if payload.is_premium is not None:
         user.is_premium = payload.is_premium
@@ -261,7 +263,7 @@ def reset_password(
     if not user:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    new_password = "".join(random.choices(string.ascii_letters + string.digits, k=12))
+    new_password = "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(12))
     user.hashed_password = hash_password(new_password)
 
     audit.log(
@@ -272,14 +274,14 @@ def reset_password(
     )
     db.commit()
 
-    background_tasks.add_task(send_verification_email, user.email, new_password)
-    return {"detail": "Password reset. New password sent to user's email."}
+    background_tasks.add_task(send_password_reset_email, user.email, new_password)
+    return {"detail": "Password reset. New password sent to user's email.", "new_password": new_password}
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(
     user_id: UUID,
-    payload: DeleteUserRequest,
+    reason: str = Query(..., min_length=1, description="Begründung für die Löschung"),
     verified_admin: User = Depends(get_verified_admin),
     db: Session = Depends(get_db),
     audit: AuditLogger = Depends(get_audit_logger),
@@ -307,7 +309,7 @@ def delete_user(
         entity_id=user.id,
         entity_label=f"{user.full_name} <{user.email}>",
         old_value=old_snap,
-        reason=payload.reason,
+        reason=reason,
     )
 
     # Delete cascaded data that has no DB-level ON DELETE CASCADE

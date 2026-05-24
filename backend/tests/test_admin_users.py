@@ -219,7 +219,7 @@ def test_reset_password_success(mock_db):
     with patch("app.core.admin_auth._redis") as mock_redis:
         mock_redis.exists.return_value = 1
         with patch("app.core.audit.AuditLogger.log") as mock_log:
-            with patch("app.routers.admin.users.send_verification_email") as mock_send_email:
+            with patch("app.routers.admin.users.send_password_reset_email") as mock_send_email:
                 with TestClient(app) as c:
                     resp = c.post(
                         f"/api/v1/admin/users/{_TARGET_UUID}/reset-password",
@@ -228,6 +228,8 @@ def test_reset_password_success(mock_db):
 
     app.dependency_overrides.clear()
     assert resp.status_code == 200
+    assert "new_password" in resp.json()
+    assert len(resp.json()["new_password"]) == 12
     mock_log.assert_called_once()
     assert mock_log.call_args.kwargs["action"] == "RESET_PASSWORD"
 
@@ -259,7 +261,7 @@ def test_delete_user_without_admin_token_returns_401(mock_db):
             resp = c.request(
                 "DELETE",
                 f"/api/v1/admin/users/{_TARGET_UUID}",
-                json={"reason": "Test"},
+                params={"reason": "Test"},
             )
 
     app.dependency_overrides.clear()
@@ -279,7 +281,7 @@ def test_delete_admin_account_is_forbidden(mock_db):
                 "DELETE",
                 f"/api/v1/admin/users/{_TARGET_UUID}",
                 headers={"X-Admin-Token": "validtoken"},
-                json={"reason": "Test"},
+                params={"reason": "Test"},
             )
 
     app.dependency_overrides.clear()
@@ -298,7 +300,7 @@ def test_delete_user_returns_404(mock_db):
                 "DELETE",
                 f"/api/v1/admin/users/{uuid.uuid4()}",
                 headers={"X-Admin-Token": "validtoken"},
-                json={"reason": "Test"},
+                params={"reason": "Test"},
             )
 
     app.dependency_overrides.clear()
@@ -319,7 +321,7 @@ def test_delete_user_success(mock_db):
                     "DELETE",
                     f"/api/v1/admin/users/{_TARGET_UUID}",
                     headers={"X-Admin-Token": "validtoken"},
-                    json={"reason": "Account auf Wunsch des Users gelöscht"},
+                    params={"reason": "Account auf Wunsch des Users gelöscht"},
                 )
 
     app.dependency_overrides.clear()
@@ -374,3 +376,16 @@ def test_get_user_detail_failed_module(mock_db):
     app.dependency_overrides.clear()
     assert resp.status_code == 200
     assert resp.json()["passed_modules"] == 0
+
+def test_patch_user_cannot_deactivate_self(mock_db):
+    admin = _make_admin()
+    app.dependency_overrides[get_current_user] = lambda: admin
+    app.dependency_overrides[get_db] = lambda: mock_db
+    mock_db.get.return_value = admin
+
+    with TestClient(app) as c:
+        resp = c.patch(f"/api/v1/admin/users/{_ADMIN_UUID}", json={"is_active": False})
+
+    app.dependency_overrides.clear()
+    assert resp.status_code == 400
+    assert "deactivate your own account" in resp.json()["detail"]

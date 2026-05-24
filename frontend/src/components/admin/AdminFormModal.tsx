@@ -12,6 +12,7 @@ interface Props {
   title: string;
   onSubmit: () => void;
   loading?: boolean;
+  submitDisabled?: boolean;
   submitLabel?: string;
   /** Use "create" to show "Erstellen" as default, otherwise "Speichern" */
   submitVariant?: "save" | "create";
@@ -26,6 +27,7 @@ export function AdminFormModal({
   title,
   onSubmit,
   loading = false,
+  submitDisabled = false,
   submitLabel,
   submitVariant = "save",
   children,
@@ -92,7 +94,7 @@ export function AdminFormModal({
           <Button variant="outline" onClick={onClose} disabled={loading} className="w-full sm:w-auto">
             {t("cancel")}
           </Button>
-          <Button onClick={onSubmit} disabled={loading} className="w-full sm:w-auto">
+          <Button onClick={onSubmit} disabled={loading || submitDisabled} className="w-full sm:w-auto">
             {loading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />

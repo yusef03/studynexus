@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useQueryClient } from "@tanstack/react-query";
 import { GraduationCap } from "lucide-react";
 import { useAdminPrograms } from "@/hooks/admin/useAdminPrograms";
+import { useAdminFaculties } from "@/hooks/admin/useAdminFaculties";
 import { adminMutate } from "@/lib/adminFetch";
 import { AdminFormModal } from "@/components/admin/AdminFormModal";
 import { StatusBadge } from "@/components/admin/StatusBadge";
@@ -31,6 +32,7 @@ export default function AdminProgramsPage() {
   const { data: programs = [], isLoading } = useAdminPrograms({
     include_archived: filter === "archived" || filter === "all",
   });
+  const { data: faculties = [], isLoading: loadingFaculties } = useAdminFaculties();
 
   const filtered = programs.filter((p) => {
     if (filter === "active" && p.is_archived) return false;
@@ -142,6 +144,7 @@ export default function AdminProgramsPage() {
         title={t("form.createTitle")}
         onSubmit={handleCreate}
         loading={saving}
+        submitDisabled={loadingFaculties}
         submitVariant="create"
       >
         <div className="space-y-3">
@@ -189,13 +192,19 @@ export default function AdminProgramsPage() {
           </div>
           <div className="space-y-1">
             <label className="text-sm font-medium">{t("form.facultyId")}</label>
-            <input
-              type="text"
+            <select
               value={form.faculty_id}
               onChange={(e) => setForm((f) => ({ ...f, faculty_id: e.target.value }))}
-              placeholder={t("form.facultyIdPlaceholder")}
-              className="w-full rounded-md border bg-background px-3 py-2 text-sm font-mono placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
+              disabled={loadingFaculties}
+              className="w-full rounded-md border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <option value="" disabled>-- Bitte Fakultät wählen --</option>
+              {faculties.map((fac) => (
+                <option key={fac.id} value={fac.id}>
+                  {fac.name}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       </AdminFormModal>

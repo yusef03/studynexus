@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Loader2, ShieldCheck } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAdminUser } from "@/hooks/admin/useAdminUser";
+import { useAdminMe } from "@/hooks/admin/useAdminMe";
 import { useAdminSession } from "@/hooks/useAdminSession";
 import { adminMutate } from "@/lib/adminFetch";
 import { DeleteDialog } from "@/components/admin/DeleteDialog";
@@ -75,8 +76,11 @@ export default function AdminUserDetailPage({ params }: Props) {
   const currentLocale = useLocale();
   const qc = useQueryClient();
   const { token: adminToken, isActive } = useAdminSession();
+  const { data: adminMe } = useAdminMe();
 
   const { data: user, isLoading, error } = useAdminUser(id);
+
+  const isSelf = user?.id === adminMe?.id;
 
   const [patchLoading, setPatchLoading] = useState(false);
   const [notesValue, setNotesValue] = useState<string | null>(null);
@@ -84,8 +88,10 @@ export default function AdminUserDetailPage({ params }: Props) {
   const [notesMsg, setNotesMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetMsg, setResetMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [generatedPassword, setGeneratedPassword] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const notes = notesValue !== null ? notesValue : (user?.admin_notes ?? "");
 
@@ -120,9 +126,13 @@ export default function AdminUserDetailPage({ params }: Props) {
     if (!adminToken) return;
     setResetLoading(true);
     setResetMsg(null);
+    setGeneratedPassword(null);
     try {
-      await adminMutate(`users/${id}/reset-password`, "POST", { adminToken });
+      const data = await adminMutate<{ detail: string; new_password?: string }>(`users/${id}/reset-password`, "POST", { adminToken });
       setResetMsg({ ok: true, text: t("resetPasswordSuccess") });
+      if (data.new_password) {
+        setGeneratedPassword(data.new_password);
+      }
     } catch {
       setResetMsg({ ok: false, text: t("resetPasswordError") });
     } finally {
@@ -133,12 +143,16 @@ export default function AdminUserDetailPage({ params }: Props) {
   async function handleDelete(reason: string) {
     if (!adminToken) return;
     setDeleteLoading(true);
+    setDeleteError(null);
     try {
-      await adminMutate(`users/${id}`, "DELETE", { body: { reason }, adminToken });
+      await adminMutate(`users/${id}?reason=${encodeURIComponent(reason)}`, "DELETE", { adminToken });
       qc.invalidateQueries({ queryKey: ["admin-users"] });
+      setDeleteOpen(false);
       router.push(`/${currentLocale}/admin/users`);
     } catch {
+      setDeleteError(t("deleteError"));
       setDeleteLoading(false);
+      setDeleteOpen(false);
     }
   }
 
@@ -217,7 +231,7 @@ export default function AdminUserDetailPage({ params }: Props) {
             label={t("toggleActive")}
             checked={user.is_active}
             onChange={(v) => handleToggle("is_active", v)}
-            disabled={patchLoading}
+            disabled={patchLoading || isSelf}
           />
           <div className="space-y-1">
             <Toggle
@@ -287,6 +301,17 @@ export default function AdminUserDetailPage({ params }: Props) {
               ) : t("resetPassword")}
             </Button>
           </div>
+          
+          {generatedPassword && (
+            <div className="p-3 rounded-md border border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-900/10">
+              <p className="text-sm font-medium text-green-800 dark:text-green-300">
+                Neues Passwort generiert (wird nur einmalig angezeigt):
+              </p>
+              <code className="mt-2 block w-fit font-mono bg-green-100 dark:bg-green-900/30 text-green-900 dark:text-green-100 px-3 py-1.5 rounded text-lg select-all">
+                {generatedPassword}
+              </code>
+            </div>
+          )}
 
           {/* Delete user */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6 p-3 rounded-md border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/10">
@@ -294,11 +319,12 @@ export default function AdminUserDetailPage({ params }: Props) {
               <p className="text-sm font-medium text-red-700 dark:text-red-400">{t("deleteUser")}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{t("deleteUserDesc")}</p>
               {!isActive && <p className="text-xs text-red-500 mt-1">{t("noSession")}</p>}
+              {deleteError && <p className="text-xs text-red-500 mt-1">{deleteError}</p>}
             </div>
             <Button
               size="sm"
               onClick={() => setDeleteOpen(true)}
-              disabled={!isActive}
+              disabled={!isActive || isSelf}
               className="shrink-0 bg-red-600 hover:bg-red-700 text-white disabled:bg-red-300"
             >
               {t("deleteUser")}
